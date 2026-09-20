@@ -5,7 +5,9 @@ from pydantic import BaseModel, Field
 
 
 class LLMGenerationConfig(BaseModel):
-    messages: list[Messages] 
+    messages: list[Messages] = Field(
+        min_length=1
+    )
     reasoning_effort: Literal['low', 'medium', 'high'] | None = Field(
         default=None,
         description="Model reasoning depth level"
@@ -16,4 +18,3 @@ class LLMGenerationConfig(BaseModel):
         le=2.0,
         description="The higher, the more random the answer."
     )
-    
