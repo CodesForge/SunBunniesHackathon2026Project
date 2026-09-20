@@ -1,11 +1,9 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from pydantic import SecretStr, Field
-from functools import lru_cache
+from cachetools import TTLCache, cached
 
 class LLM_settings(BaseSettings):
-    auth_key: SecretStr = Field(min_length=1)
-    scope: str = Field(min_length=1)
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -13,7 +11,10 @@ class LLM_settings(BaseSettings):
         case_sensitive=True
     )
 
-@lru_cache(maxsize=1)
+    auth_key: SecretStr = Field(min_length=1)
+    scope: str = Field(min_length=1)
+
+@cached(cache=TTLCache(maxsize=1, ttl=300))
 def get_llm_settings() -> LLM_settings:
     return LLM_settings()
 
