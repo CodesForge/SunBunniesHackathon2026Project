@@ -16,3 +16,4 @@ class LLMGenerationConfig(BaseModel):
         le=2.0,
         description="The higher, the more random the answer."
     )
+    
