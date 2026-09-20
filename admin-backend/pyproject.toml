@@ -8,8 +8,10 @@ authors = [
     { name = "vafidev", email = "vladvaskin7@gmail.com" }
 ]
 dependencies = [
+    "asyncpg>=0.31.0",
     "pydantic>=2.13.5",
     "pydantic-settings>=2.15.0",
+    "sqlalchemy>=2.0.54",
 ]
 
 [tool.uv]
