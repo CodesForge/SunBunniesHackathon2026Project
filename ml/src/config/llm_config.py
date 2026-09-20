@@ -15,6 +15,6 @@ class LLM_settings(BaseSettings):
 
 @lru_cache(maxsize=1)
 def get_llm_settings() -> LLM_settings:
-    return LLM_settings
+    return LLM_settings()
 
 
