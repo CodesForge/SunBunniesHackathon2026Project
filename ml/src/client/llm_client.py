@@ -14,7 +14,7 @@ async def generate_llm_completion(
         async with GigaChatAsyncClient(
             credentials=s.auth_key,
             scope=s.scope,
-            verify_ssl_certs=False,
+            verify_ssl_certs=True,
             model="GigaChat-3-Lightning",
             timeout=16,
             max_retries=3,
