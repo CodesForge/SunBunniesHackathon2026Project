@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Play } from "lucide-react-native";
 import { ONB } from "./scene";
+import { colors } from "../../theme";
 
 type PillProps = {
   label: string;
@@ -64,7 +65,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 34,
     paddingVertical: 14,
     borderRadius: 999,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
   },
   pillText: {
     fontSize: 26,
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
   round: {
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
   },
   pressed: { opacity: 0.85, transform: [{ scale: 0.97 }] },
   disabled: { opacity: 0.45 },
