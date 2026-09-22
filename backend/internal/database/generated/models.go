@@ -9,6 +9,16 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type Event struct {
+	GlobalOffset  int64              `json:"global_offset"`
+	AggregateID   string             `json:"aggregate_id"`
+	AggregateType string             `json:"aggregate_type"`
+	Version       int64              `json:"version"`
+	EventType     string             `json:"event_type"`
+	Payload       []byte             `json:"payload"`
+	CreatedAt     pgtype.Timestamptz `json:"created_at"`
+}
+
 type User struct {
 	ID        uuid.UUID          `json:"id"`
 	Username  string             `json:"username"`
