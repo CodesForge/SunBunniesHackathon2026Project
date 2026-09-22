@@ -9,6 +9,7 @@ import (
 )
 
 type Querier interface {
+	CreateEvent(ctx context.Context, arg CreateEventParams) error
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 }
 
