@@ -1,14 +1,17 @@
 package events
 
-import "github.com/CodesForge/SunBunniesHackathon2026Project/internal/domain/value_objects"
+import (
+	"github.com/CodesForge/SunBunniesHackathon2026Project/internal/domain/value_objects"
+	"github.com/google/uuid"
+)
 
 const (
 	UserCreatedEventName = "user.created"
 )
 
 type UserCreatedPayloadDTO struct {
-	UserID   string `json:"user_id"`
-	Username string `json:"username"`
+	UserID   uuid.UUID `json:"user_id"`
+	Username string    `json:"username"`
 }
 
 type UserCreatedEvent struct {
@@ -30,8 +33,8 @@ func (e UserCreatedEvent) EventName() string {
 }
 
 func (e UserCreatedEvent) Payload() any {
-	return map[string]string{
-		"user_id":  e.userID.String(),
-		"username": e.username.String(),
+	return UserCreatedPayloadDTO{
+		UserID:   e.ID.UUID(),
+		Username: e.username.String(),
 	}
 }

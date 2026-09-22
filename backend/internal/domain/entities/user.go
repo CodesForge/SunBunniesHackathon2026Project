@@ -12,6 +12,7 @@ type User struct {
 
 	ID        value_objects.IDv7      `json:"id"`
 	Username  *value_objects.Username `json:"username"`
+	Version   int64                   `json:"version"`
 	CreatedAt time.Time               `json:"created_at"`
 	UpdatedAt time.Time               `json:"updated_at"`
 }
@@ -28,6 +29,7 @@ func NewUser(plainUsername string) (*User, error) {
 	user := &User{
 		ID:        id,
 		Username:  username,
+		Version:   1,
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
