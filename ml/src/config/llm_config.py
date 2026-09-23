@@ -13,6 +13,7 @@ class LLMSettings(BaseSettings):
 
     auth_key: SecretStr = Field(min_length=1)
     scope: str = Field(min_length=1)
+    certificate: str = Field(min_length=1)
     verify_ssl_certs: bool = Field(default=False)
     model: str = Field(min_length=1)
     timeout: float = Field(gt=0)
