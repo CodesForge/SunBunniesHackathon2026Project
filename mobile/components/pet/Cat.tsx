@@ -101,13 +101,13 @@ export function Cat({ widthPercent = 58, mouth = "happy", eyesOpen = true, anima
   }, [animated]);
 
   const armLeftStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${arm.value * 1.2}deg` }],
+    transform: [{ rotate: `${arm.value * 0.7}deg` }],
   }));
   const armRightStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${-arm.value * 1.2}deg` }],
+    transform: [{ rotate: `${-arm.value * 0.7}deg` }],
   }));
   const tailStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${tail.value * 9}deg` }],
+    transform: [{ rotate: `${tail.value * 5}deg` }],
   }));
 
   const showOpenEyes = eyesOpen && !blinking;
