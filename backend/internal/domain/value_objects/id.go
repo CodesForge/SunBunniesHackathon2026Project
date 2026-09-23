@@ -1,6 +1,10 @@
 package value_objects
 
-import "github.com/google/uuid"
+import (
+	"encoding/json"
+
+	"github.com/google/uuid"
+)
 
 type IDv7 struct {
 	value uuid.UUID
@@ -20,4 +24,8 @@ func (i IDv7) UUID() uuid.UUID {
 
 func (i IDv7) String() string {
 	return i.value.String()
+}
+
+func (i IDv7) MarshalJSON() ([]byte, error) {
+	return json.Marshal(i.value.String())
 }
