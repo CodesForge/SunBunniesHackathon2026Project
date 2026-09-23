@@ -3,11 +3,13 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 
 	db "github.com/CodesForge/SunBunniesHackathon2026Project/internal/database/generated"
 	"github.com/CodesForge/SunBunniesHackathon2026Project/internal/domain/entities"
+	domain_errors "github.com/CodesForge/SunBunniesHackathon2026Project/internal/domain/errors"
 	events2 "github.com/CodesForge/SunBunniesHackathon2026Project/internal/domain/events"
 	"github.com/CodesForge/SunBunniesHackathon2026Project/internal/service/dto"
 )
@@ -21,16 +23,23 @@ type EventRepository interface {
 }
 
 type UserService struct {
-	repo     EventRepository
-	producer Producer
-	logger   *slog.Logger
+	userRepo  UserRepository
+	eventRepo EventRepository
+	producer  Producer
+	logger    *slog.Logger
 }
 
-func NewUserService(repo EventRepository, producer Producer, logger *slog.Logger) *UserService {
-	return &UserService{repo: repo, producer: producer, logger: logger}
+func NewUserService(userRepo UserRepository, eventRepo EventRepository, producer Producer, logger *slog.Logger) *UserService {
+	return &UserService{userRepo: userRepo, eventRepo: eventRepo, producer: producer, logger: logger}
 }
 
 func (r *UserService) CreateUser(ctx context.Context, input dto.CreateUserRequestDTO) (dto.CreateUserResponseDTO, error) {
+	if _, err := r.userRepo.GetUserByUsername(ctx, input.Username); err == nil {
+		return dto.CreateUserResponseDTO{}, domain_errors.ErrUsernameAlreadyExists
+	} else if !errors.Is(err, domain_errors.ErrUserNotFound) {
+		return dto.CreateUserResponseDTO{}, err
+	}
+
 	user, err := entities.NewUser(input.Username)
 	if err != nil {
 		r.logger.ErrorContext(ctx, "create user entity", slog.String("error", err.Error()), slog.String("username", input.Username))
@@ -47,16 +56,18 @@ func (r *UserService) CreateUser(ctx context.Context, input dto.CreateUserReques
 
 		payloadBytes, err := json.Marshal(event.Payload())
 		if err != nil {
+			r.logger.ErrorContext(ctx, "marshal payloadBytes", slog.String("error", err.Error()), slog.String("username", input.Username))
 			return dto.CreateUserResponseDTO{}, fmt.Errorf("marshal event payload: %w", err)
 		}
 
-		if err := r.repo.CreateEvent(ctx, db.CreateEventParams{
+		if err := r.eventRepo.CreateEvent(ctx, db.CreateEventParams{
 			AggregateID:   user.ID.String(),
 			AggregateType: "User",
 			Version:       user.Version,
 			EventType:     event.EventName(),
 			Payload:       payloadBytes,
 		}); err != nil {
+			r.logger.ErrorContext(ctx, "create event", slog.String("error", err.Error()), slog.String("username", input.Username))
 			return dto.CreateUserResponseDTO{}, err
 		}
 
