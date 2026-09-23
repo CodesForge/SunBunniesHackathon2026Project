@@ -91,23 +91,15 @@ export function Cat({ widthPercent = 58, mouth = "happy", eyesOpen = true, anima
 
   const blinking = useBlink(animated);
 
-  const ear = useSharedValue(0);
   const arm = useSharedValue(0);
   const tail = useSharedValue(0);
 
   useEffect(() => {
     if (!animated) return;
-    ear.value = idleLoop(900, 1800);
     arm.value = idleLoop(1400, 2800);
     tail.value = idleLoop(500, 1000);
   }, [animated]);
 
-  const earLeftStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${ear.value * 5}deg` }],
-  }));
-  const earRightStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${-ear.value * 5}deg` }],
-  }));
   const armLeftStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${arm.value * 4}deg` }],
   }));
@@ -124,12 +116,12 @@ export function Cat({ widthPercent = 58, mouth = "happy", eyesOpen = true, anima
     <View style={{ width: w, height: h }}>
       <Animated.Image source={TAIL} style={[styles.layer, styles.tailOrigin, tailStyle]} resizeMode="contain" />
       <Image source={LEGS} style={styles.layer} resizeMode="contain" />
-      <Image source={BODY} style={styles.layer} resizeMode="contain" />
-      <Animated.Image source={EAR_LEFT} style={[styles.layer, styles.earLeftOrigin, earLeftStyle]} resizeMode="contain" />
-      <Animated.Image source={EAR_RIGHT} style={[styles.layer, styles.earRightOrigin, earRightStyle]} resizeMode="contain" />
-      <Image source={HEAD} style={styles.layer} resizeMode="contain" />
       <Animated.Image source={ARM_LEFT} style={[styles.layer, styles.armLeftOrigin, armLeftStyle]} resizeMode="contain" />
       <Animated.Image source={ARM_RIGHT} style={[styles.layer, styles.armRightOrigin, armRightStyle]} resizeMode="contain" />
+      <Image source={BODY} style={styles.layer} resizeMode="contain" />
+      <Image source={EAR_LEFT} style={styles.layer} resizeMode="contain" />
+      <Image source={EAR_RIGHT} style={styles.layer} resizeMode="contain" />
+      <Image source={HEAD} style={styles.layer} resizeMode="contain" />
       <Image source={BELLY} style={styles.layer} resizeMode="contain" />
       <Image source={showOpenEyes ? EYES_OPEN : EYES_CLOSED} style={styles.layer} resizeMode="contain" />
       <Image source={MOUTHS[mouth]} style={styles.layer} resizeMode="contain" />
@@ -145,8 +137,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  earLeftOrigin: { transformOrigin: "26% 36%" },
-  earRightOrigin: { transformOrigin: "52% 36%" },
   armLeftOrigin: { transformOrigin: "40% 47%" },
   armRightOrigin: { transformOrigin: "40% 47%" },
   tailOrigin: { transformOrigin: "42% 78%" },
