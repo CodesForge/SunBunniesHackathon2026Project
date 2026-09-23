@@ -93,11 +93,13 @@ export function Cat({ widthPercent = 58, mouth = "happy", eyesOpen = true, anima
 
   const arm = useSharedValue(0);
   const tail = useSharedValue(0);
+  const belly = useSharedValue(0);
 
   useEffect(() => {
     if (!animated) return;
     arm.value = sway(1400);
-    tail.value = sway(1100);
+    tail.value = sway(1400);
+    belly.value = sway(2200);
   }, [animated]);
 
   const armLeftStyle = useAnimatedStyle(() => ({
@@ -108,6 +110,9 @@ export function Cat({ widthPercent = 58, mouth = "happy", eyesOpen = true, anima
   }));
   const tailStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${tail.value * 5}deg` }],
+  }));
+  const bellyStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: 1 + belly.value * 0.035 }],
   }));
 
   const showOpenEyes = eyesOpen && !blinking;
@@ -123,7 +128,7 @@ export function Cat({ widthPercent = 58, mouth = "happy", eyesOpen = true, anima
         <Image source={EAR_RIGHT} style={styles.layer} resizeMode="contain" />
         <Image source={EAR_LEFT} style={styles.layer} resizeMode="contain" />
         <Image source={HEAD} style={styles.layer} resizeMode="contain" />
-        <Image source={BELLY} style={styles.layer} resizeMode="contain" />
+        <Animated.Image source={BELLY} style={[styles.layer, bellyStyle]} resizeMode="contain" />
         <Image source={showOpenEyes ? EYES_OPEN : EYES_CLOSED} style={styles.layer} resizeMode="contain" />
         <Image source={MOUTHS[mouth]} style={styles.layer} resizeMode="contain" />
       </View>
