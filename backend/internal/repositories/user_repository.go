@@ -8,6 +8,7 @@ import (
 	db "github.com/CodesForge/SunBunniesHackathon2026Project/internal/database/generated"
 	domain_errors "github.com/CodesForge/SunBunniesHackathon2026Project/internal/domain/errors"
 	"github.com/jackc/pgerrcode"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -30,5 +31,16 @@ func (r *UserRepository) CreateUser(ctx context.Context, params db.CreateUserPar
 		return db.User{}, fmt.Errorf("create user: %w", err)
 	}
 
+	return user, nil
+}
+
+func (r *UserRepository) GetUserByUsername(ctx context.Context, username string) (db.User, error) {
+	user, err := r.q.GetUserByUsername(ctx, username)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return db.User{}, domain_errors.ErrUserNotFound
+		}
+		return db.User{}, fmt.Errorf("get user by username: %w", err)
+	}
 	return user, nil
 }
