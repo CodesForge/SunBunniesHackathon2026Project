@@ -76,14 +76,10 @@ function useBlink(enabled: boolean) {
   return blinking;
 }
 
-function idleLoop(mid: number, out: number) {
-  return withRepeat(
-    withSequence(
-      withTiming(1, { duration: mid, easing: Easing.inOut(Easing.sin) }),
-      withTiming(-1, { duration: out, easing: Easing.inOut(Easing.sin) }),
-      withTiming(0, { duration: mid, easing: Easing.inOut(Easing.sin) }),
-    ),
-    -1,
+function sway(duration: number) {
+  return withSequence(
+    withTiming(-1, { duration: 0 }),
+    withRepeat(withTiming(1, { duration, easing: Easing.inOut(Easing.sin) }), -1, true),
   );
 }
 
@@ -100,8 +96,8 @@ export function Cat({ widthPercent = 58, mouth = "happy", eyesOpen = true, anima
 
   useEffect(() => {
     if (!animated) return;
-    arm.value = idleLoop(1000, 2000);
-    tail.value = idleLoop(500, 1000);
+    arm.value = sway(700);
+    tail.value = sway(550);
   }, [animated]);
 
   const armLeftStyle = useAnimatedStyle(() => ({
