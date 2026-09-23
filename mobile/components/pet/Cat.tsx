@@ -112,7 +112,7 @@ export function Cat({ widthPercent = 58, mouth = "happy", eyesOpen = true, anima
     transform: [{ rotate: `${tail.value * 5}deg` }],
   }));
   const bellyStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: 1 + belly.value * 0.035 }],
+    transform: [{ scale: 1 + belly.value * 0.015 }],
   }));
 
   const showOpenEyes = eyesOpen && !blinking;
