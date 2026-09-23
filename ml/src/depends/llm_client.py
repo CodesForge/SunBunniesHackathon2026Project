@@ -8,6 +8,7 @@ async def create_llm_client() -> GigaChatAsyncClient:
     return GigaChatAsyncClient(
         credentials=settings.auth_key,
         scope=settings.scope,
+        ca_bundle_file=settings.certificate,
         verify_ssl_certs=settings.verify_ssl_certs,
         model=settings.model,
         timeout=settings.timeout,
