@@ -1,6 +1,7 @@
 package value_objects
 
 import (
+	"encoding/json"
 	"regexp"
 
 	domain_errors "github.com/CodesForge/SunBunniesHackathon2026Project/internal/domain/errors"
@@ -39,4 +40,8 @@ func validateUsername(value string) error {
 
 func (u *Username) String() string {
 	return u.value
+}
+
+func (u Username) MarshalJSON() ([]byte, error) {
+	return json.Marshal(u.value)
 }
