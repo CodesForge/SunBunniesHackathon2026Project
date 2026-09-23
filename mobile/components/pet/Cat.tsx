@@ -26,6 +26,9 @@ const MOUTH_SAD = require("../../assets/pets/cat/mouth-sad.png");
 
 export const CAT_ASPECT = 1217 / 900;
 
+const CORE_LEFT = 29 / 900;
+const CORE_WIDTH = (691 - 29) / 900;
+
 const MOUTHS = {
   happy: MOUTH_HAPPY,
   neutral: MOUTH_NEUTRAL,
@@ -88,6 +91,7 @@ export function Cat({ widthPercent = 58, mouth = "happy", eyesOpen = true, anima
   const { width } = useWindowDimensions();
   const w = (width * widthPercent) / 100;
   const h = w * CAT_ASPECT;
+  const coreW = w * CORE_WIDTH;
 
   const blinking = useBlink(animated);
 
@@ -96,15 +100,15 @@ export function Cat({ widthPercent = 58, mouth = "happy", eyesOpen = true, anima
 
   useEffect(() => {
     if (!animated) return;
-    arm.value = idleLoop(1400, 2800);
+    arm.value = idleLoop(1800, 3600);
     tail.value = idleLoop(500, 1000);
   }, [animated]);
 
   const armLeftStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${arm.value * 4}deg` }],
+    transform: [{ rotate: `${arm.value * 2}deg` }],
   }));
   const armRightStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${-arm.value * 4}deg` }],
+    transform: [{ rotate: `${-arm.value * 2}deg` }],
   }));
   const tailStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${tail.value * 9}deg` }],
@@ -113,18 +117,20 @@ export function Cat({ widthPercent = 58, mouth = "happy", eyesOpen = true, anima
   const showOpenEyes = eyesOpen && !blinking;
 
   return (
-    <View style={{ width: w, height: h }}>
-      <Animated.Image source={TAIL} style={[styles.layer, styles.tailOrigin, tailStyle]} resizeMode="contain" />
-      <Image source={LEGS} style={styles.layer} resizeMode="contain" />
-      <Animated.Image source={ARM_LEFT} style={[styles.layer, styles.armLeftOrigin, armLeftStyle]} resizeMode="contain" />
-      <Animated.Image source={ARM_RIGHT} style={[styles.layer, styles.armRightOrigin, armRightStyle]} resizeMode="contain" />
-      <Image source={BODY} style={styles.layer} resizeMode="contain" />
-      <Image source={EAR_LEFT} style={styles.layer} resizeMode="contain" />
-      <Image source={EAR_RIGHT} style={styles.layer} resizeMode="contain" />
-      <Image source={HEAD} style={styles.layer} resizeMode="contain" />
-      <Image source={BELLY} style={styles.layer} resizeMode="contain" />
-      <Image source={showOpenEyes ? EYES_OPEN : EYES_CLOSED} style={styles.layer} resizeMode="contain" />
-      <Image source={MOUTHS[mouth]} style={styles.layer} resizeMode="contain" />
+    <View style={{ width: coreW, height: h, overflow: "visible" }}>
+      <View style={{ position: "absolute", left: -w * CORE_LEFT, top: 0, width: w, height: h }}>
+        <Animated.Image source={TAIL} style={[styles.layer, styles.tailOrigin, tailStyle]} resizeMode="contain" />
+        <Image source={LEGS} style={styles.layer} resizeMode="contain" />
+        <Animated.Image source={ARM_LEFT} style={[styles.layer, styles.armLeftOrigin, armLeftStyle]} resizeMode="contain" />
+        <Animated.Image source={ARM_RIGHT} style={[styles.layer, styles.armRightOrigin, armRightStyle]} resizeMode="contain" />
+        <Image source={BODY} style={styles.layer} resizeMode="contain" />
+        <Image source={EAR_LEFT} style={styles.layer} resizeMode="contain" />
+        <Image source={EAR_RIGHT} style={styles.layer} resizeMode="contain" />
+        <Image source={HEAD} style={styles.layer} resizeMode="contain" />
+        <Image source={BELLY} style={styles.layer} resizeMode="contain" />
+        <Image source={showOpenEyes ? EYES_OPEN : EYES_CLOSED} style={styles.layer} resizeMode="contain" />
+        <Image source={MOUTHS[mouth]} style={styles.layer} resizeMode="contain" />
+      </View>
     </View>
   );
 }
