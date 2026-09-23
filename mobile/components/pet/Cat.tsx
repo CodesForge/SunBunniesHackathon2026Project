@@ -100,15 +100,15 @@ export function Cat({ widthPercent = 58, mouth = "happy", eyesOpen = true, anima
 
   useEffect(() => {
     if (!animated) return;
-    arm.value = idleLoop(1800, 3600);
+    arm.value = idleLoop(1000, 2000);
     tail.value = idleLoop(500, 1000);
   }, [animated]);
 
   const armLeftStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${arm.value * 2}deg` }],
+    transform: [{ rotate: `${arm.value * 1.2}deg` }],
   }));
   const armRightStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${-arm.value * 2}deg` }],
+    transform: [{ rotate: `${-arm.value * 1.2}deg` }],
   }));
   const tailStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${tail.value * 9}deg` }],
