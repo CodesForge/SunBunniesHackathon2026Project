@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     height: 38,
     borderRadius: radius.pill,
     overflow: "hidden",
-    paddingHorizontal: 8,
+    paddingHorizontal: 16,
   },
 
   scalesFrame: {
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     borderRadius: radius.pill,
     overflow: "hidden",
-    paddingHorizontal: 8,
+    paddingHorizontal: 16,
     gap: 10,
   },
   scale: { flex: 1, flexDirection: "row", alignItems: "center", gap: 4 },

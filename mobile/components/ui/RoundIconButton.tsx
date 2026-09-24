@@ -20,7 +20,9 @@ export default function RoundIconButton({
     <Pressable style={styles.tapArea} {...pressableProps}>
       <View style={styles.circle}>
         <Image source={CIRCLE_BG} style={styles.circleBg} resizeMode="contain" />
-        <Icon size={ICON_SIZE} color={colors.iconBorder} strokeWidth={3} />
+        <View style={styles.iconWrap}>
+          <Icon size={ICON_SIZE} color={colors.iconBorder} strokeWidth={3} />
+        </View>
       </View>
     </Pressable>
   );
@@ -44,5 +46,10 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: CIRCLE_SIZE,
     height: CIRCLE_SIZE,
+    zIndex: 0,
+  },
+  iconWrap: {
+    zIndex: 1,
+    elevation: 1,
   },
 });
