@@ -13,14 +13,19 @@ export type FoodPlateItem = {
 type FoodPlateCarouselProps = {
   items: FoodPlateItem[];
   plateSize?: number;
+  visibleCount?: number;
   onSelect?: (item: FoodPlateItem) => void;
 };
 
 const PLATE = require("../../assets/dining/plate.png");
-const VISIBLE = 3;
 
-export function FoodPlateCarousel({ items, plateSize = 96, onSelect }: FoodPlateCarouselProps) {
-  const maxStart = Math.max(0, items.length - VISIBLE);
+export function FoodPlateCarousel({
+  items,
+  plateSize = 96,
+  visibleCount = 2,
+  onSelect,
+}: FoodPlateCarouselProps) {
+  const maxStart = Math.max(0, items.length - visibleCount);
   const [start, setStart] = useState(0);
 
   const canGoLeft = start > 0;
@@ -30,7 +35,7 @@ export function FoodPlateCarousel({ items, plateSize = 96, onSelect }: FoodPlate
     setStart((s) => Math.min(maxStart, Math.max(0, s + delta)));
   };
 
-  const slots = Array.from({ length: VISIBLE }, (_, i) => items[start + i] ?? null);
+  const slots = Array.from({ length: visibleCount }, (_, i) => items[start + i] ?? null);
 
   return (
     <View style={styles.row}>
