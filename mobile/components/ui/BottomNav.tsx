@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 import {
+  Image,
+  type ImageSourcePropType,
   Pressable,
   StyleSheet,
   Text,
@@ -13,39 +15,37 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-import {
-  BookOpen,
-  Home,
-  MoonStar,
-  ShoppingCart,
-  Utensils,
-  type LucideIcon,
-} from "lucide-react-native";
 
 import { colors } from "../../theme";
 
 type Tab = {
   key: string;
-  Icon: LucideIcon;
+  icon: ImageSourcePropType;
   route: string;
   label: string;
   badge?: number;
 };
 
+const ICON_CART = require("../../assets/icons/icon-cart.png");
+const ICON_MOON = require("../../assets/icons/icon-moon.png");
+const ICON_HOME = require("../../assets/icons/icon-home.png");
+const ICON_FOOD = require("../../assets/icons/icon-food.png");
+const ICON_BOOK = require("../../assets/icons/icon-book.png");
+
 const TABS: Tab[] = [
   {
     key: "shop",
-    Icon: ShoppingCart,
+    icon: ICON_CART,
     route: "/shops",
     label: "Гардероб",
     badge: 1,
   },
-  { key: "moon", Icon: MoonStar, route: "/sleep", label: "Спальня" },
-  { key: "home", Icon: Home, route: "/home", label: "Комната" },
-  { key: "food", Icon: Utensils, route: "/dining", label: "Кухня" },
+  { key: "moon", icon: ICON_MOON, route: "/sleep", label: "Спальня" },
+  { key: "home", icon: ICON_HOME, route: "/home", label: "Комната" },
+  { key: "food", icon: ICON_FOOD, route: "/dining", label: "Кухня" },
   {
     key: "book",
-    Icon: BookOpen,
+    icon: ICON_BOOK,
     route: "/glossary",
     label: "Уроки",
     badge: 7,
@@ -56,6 +56,7 @@ const BAR_HEIGHT = 80;
 const HOME_INDEX = 2;
 const ACTIVE_SCALE = 1.25;
 const ACTIVE_LIFT = -10;
+const ICON_SIZE = 38;
 
 const PILL_SPRING = { damping: 22, stiffness: 130, mass: 1 };
 const ICON_SPRING = { damping: 14, stiffness: 170, mass: 1 };
@@ -139,8 +140,6 @@ function TabButton({
     opacity: withTiming(active ? 1 : 0.85, { duration: 150 }),
   }));
 
-  const { Icon } = tab;
-
   return (
     <Pressable
       style={[styles.tab, { width }]}
@@ -155,7 +154,7 @@ function TabButton({
       }
     >
       <Animated.View style={iconStyle}>
-        <Icon size={38} color={colors.surface} strokeWidth={active ? 2.4 : 2.2} />
+        <Image source={tab.icon} style={styles.tabIcon} resizeMode="contain" />
       </Animated.View>
 
       {typeof tab.badge === "number" && (
@@ -179,6 +178,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     zIndex: 2,
   },
+  tabIcon: { width: ICON_SIZE, height: ICON_SIZE },
   pillSlot: {
     position: "absolute",
     top: 0,

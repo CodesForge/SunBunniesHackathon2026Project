@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import {
   Image,
   type ImageSourcePropType,
@@ -30,6 +29,8 @@ type FoodPlateCarouselProps = {
 };
 
 const PLATE = require("../../assets/dining/plate.png");
+const ARROW_LEFT = require("../../assets/icons/arrow-left.png");
+const ARROW_RIGHT = require("../../assets/icons/arrow-right.png");
 
 const SIDE_SCALE = 0.68;
 const FOOD_SCALE = 0.55;
@@ -114,10 +115,10 @@ export function FoodPlateCarousel({
             accessibilityRole="button"
             accessibilityLabel="Предыдущая еда"
           >
-            <ChevronLeft
-              size={ARROW_SIZE}
-              color={colors.surface}
-              strokeWidth={3.5}
+            <Image
+              source={ARROW_LEFT}
+              style={{ width: ARROW_SIZE, height: ARROW_SIZE }}
+              resizeMode="contain"
             />
           </Pressable>
 
@@ -128,10 +129,10 @@ export function FoodPlateCarousel({
             accessibilityRole="button"
             accessibilityLabel="Следующая еда"
           >
-            <ChevronRight
-              size={ARROW_SIZE}
-              color={colors.surface}
-              strokeWidth={3.5}
+            <Image
+              source={ARROW_RIGHT}
+              style={{ width: ARROW_SIZE, height: ARROW_SIZE }}
+              resizeMode="contain"
             />
           </Pressable>
         </View>

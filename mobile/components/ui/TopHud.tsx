@@ -1,15 +1,6 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { Link } from "expo-router";
-import {
-  Apple,
-  MessageCircle,
-  MoonStar,
-  PiggyBank,
-  Settings,
-  Shirt,
-  Utensils,
-  Wallet,
-} from "lucide-react-native";
+import { MessageCircle, MoonStar, Settings, Utensils, Wallet } from "lucide-react-native";
 
 import { usePet } from "../../store/pet";
 import { fullness, sleepiness } from "../../lib/time";
@@ -21,6 +12,12 @@ import RoundIconButton from "./RoundIconButton";
 
 const LOW = 20;
 const BUBBLE_SIZE = 130;
+
+const COIN_NEED = require("../../assets/icons/coin-need.png");
+const COIN_WANT = require("../../assets/icons/coin-want.png");
+const COIN_DREAM = require("../../assets/icons/coin-dream.png");
+const CIRCLE_LARGE = require("../../assets/icons/circle-large.png");
+const PILL_BG = require("../../assets/icons/pill-long.png");
 
 type TopHudProps = {
   showChatBubble?: boolean;
@@ -46,6 +43,7 @@ export default function TopHud({ showChatBubble = true }: TopHudProps) {
               accessibilityRole="button"
               accessibilityLabel={`Уровень ${level}`}
             >
+              <Image source={CIRCLE_LARGE} style={styles.levelCircleBg} resizeMode="contain" />
               <Text style={styles.levelValue}>{level}</Text>
               <Text style={styles.levelCaption}>Ур.</Text>
             </Pressable>
@@ -69,24 +67,10 @@ export default function TopHud({ showChatBubble = true }: TopHudProps) {
         <View style={styles.rightColumn}>
           <View style={styles.topRightRow}>
             <View style={styles.moneyPill}>
-              <CoinValue
-                icon={Apple}
-                color={colors.coinNeed}
-                background={colors.coinNeedBg}
-                value={jars.need}
-              />
-              <CoinValue
-                icon={Shirt}
-                color={colors.coinWant}
-                background={colors.iconBorder}
-                value={jars.want}
-              />
-              <CoinValue
-                icon={PiggyBank}
-                color={colors.coinDream}
-                background={colors.coinDreamBg}
-                value={jars.dream}
-              />
+              <Image source={PILL_BG} style={StyleSheet.absoluteFill} resizeMode="stretch" />
+              <CoinValue image={COIN_NEED} value={jars.need} />
+              <CoinValue image={COIN_WANT} value={jars.want} />
+              <CoinValue image={COIN_DREAM} value={jars.dream} />
             </View>
 
             <Link href={"/settings" as any} asChild>
@@ -99,6 +83,8 @@ export default function TopHud({ showChatBubble = true }: TopHudProps) {
           </View>
 
           <View style={styles.scalesFrame}>
+            <Image source={PILL_BG} style={StyleSheet.absoluteFill} resizeMode="stretch" />
+
             <View
               style={styles.scale}
               accessibilityRole="progressbar"
@@ -142,12 +128,13 @@ const styles = StyleSheet.create({
   levelCircle: {
     width: 80,
     height: 80,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surface,
-    borderWidth: 3,
-    borderColor: colors.iconBorder,
     alignItems: "center",
     justifyContent: "center",
+  },
+  levelCircleBg: {
+    position: "absolute",
+    width: 80,
+    height: 80,
   },
   levelValue: {
     color: colors.coinWant,
@@ -170,10 +157,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     height: 38,
-    backgroundColor: colors.surface,
-    borderWidth: 3,
-    borderColor: colors.iconBorder,
     borderRadius: radius.pill,
+    overflow: "hidden",
     paddingHorizontal: 8,
   },
 
@@ -183,9 +168,7 @@ const styles = StyleSheet.create({
     height: 38,
     marginTop: 8,
     borderRadius: radius.pill,
-    borderWidth: 3,
-    borderColor: colors.iconBorder,
-    backgroundColor: colors.surface,
+    overflow: "hidden",
     paddingHorizontal: 8,
     gap: 10,
   },
