@@ -34,7 +34,7 @@ type RoundProps = {
   size?: number;
 };
 
-export function RoundButton({ onPress, disabled, size = 56 }: RoundProps) {
+export function RoundButton({ onPress, disabled, size = 76 }: RoundProps) {
   return (
     <Pressable
       onPress={onPress}
