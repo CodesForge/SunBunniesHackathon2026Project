@@ -13,11 +13,18 @@ type Props = {
   value: number;
 };
 
-export default function CoinValue({ icon: Icon, color, background, value }: Props) {
+export default function CoinValue({
+  icon: Icon,
+  color,
+  background,
+  value,
+}: Props) {
   return (
     <View style={styles.wrap}>
-      <View style={[styles.badge, { borderColor: color, backgroundColor: background }]}>
-        <Icon size={ICON_SIZE} color={color} strokeWidth={2} />
+      <View
+        style={[styles.badge, { borderColor: color, backgroundColor: background }]}
+      >
+        <Icon size={ICON_SIZE} color={color} strokeWidth={3} />
       </View>
       <Text style={styles.value}>{value}</Text>
     </View>
@@ -36,4 +43,3 @@ const styles = StyleSheet.create({
   },
   value: { fontSize: 14, fontWeight: "800", color: colors.ink },
 });
-
