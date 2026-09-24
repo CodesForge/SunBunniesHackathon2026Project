@@ -3,7 +3,7 @@ import { colors, radius } from "../../theme";
 
 const BAR_HEIGHT = 16;
 const BORDER_WIDTH = 2;
-const ICON_SIZE = 16;
+const ICON_SIZE = 22;
 const ICON_GAP = 6;
 
 const LOW_THRESHOLD = 20;

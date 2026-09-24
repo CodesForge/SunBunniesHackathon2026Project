@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { Link } from "expo-router";
 import { MessageCircle, Settings, Wallet } from "lucide-react-native";
@@ -20,6 +21,34 @@ const CIRCLE_LARGE = require("../../assets/icons/circle-large.png");
 const PILL_BG = require("../../assets/icons/pill-long.png");
 const ICON_MOON_PURPLE = require("../../assets/icons/icon-moon-purple.png");
 const ICON_FOOD_PURPLE = require("../../assets/icons/icon-food-purple.png");
+
+// Image в RN не умеет само растягиваться на 100%/absoluteFill внутри
+// текучего flex-контейнера — ему нужен точный пиксельный размер. Меряем
+// реальный размер полоски через onLayout и уже потом рисуем картинку.
+function PillBackground() {
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
+  return (
+    <View
+      style={StyleSheet.absoluteFill}
+      pointerEvents="none"
+      onLayout={(e) => {
+        const { width, height } = e.nativeEvent.layout;
+        setSize((prev) =>
+          prev.width === width && prev.height === height ? prev : { width, height }
+        );
+      }}
+    >
+      {size.width > 0 && size.height > 0 && (
+        <Image
+          source={PILL_BG}
+          style={{ width: size.width, height: size.height }}
+          resizeMode="cover"
+        />
+      )}
+    </View>
+  );
+}
 
 type TopHudProps = {
   showChatBubble?: boolean;
@@ -69,7 +98,7 @@ export default function TopHud({ showChatBubble = true }: TopHudProps) {
         <View style={styles.rightColumn}>
           <View style={styles.topRightRow}>
             <View style={styles.moneyPill}>
-              <Image source={PILL_BG} style={StyleSheet.absoluteFill} resizeMode="cover" />
+              <PillBackground />
               <CoinValue image={COIN_NEED} value={jars.need} />
               <CoinValue image={COIN_WANT} value={jars.want} />
               <CoinValue image={COIN_DREAM} value={jars.dream} />
@@ -85,7 +114,7 @@ export default function TopHud({ showChatBubble = true }: TopHudProps) {
           </View>
 
           <View style={styles.scalesFrame}>
-            <Image source={PILL_BG} style={StyleSheet.absoluteFill} resizeMode="cover" />
+            <PillBackground />
 
             <View
               style={styles.scale}
