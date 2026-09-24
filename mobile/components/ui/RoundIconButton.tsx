@@ -3,7 +3,7 @@ import type { LucideIcon } from "lucide-react-native";
 import { colors, HIT } from "../../theme";
 
 const CIRCLE_SIZE = 46;
-const ICON_SIZE = 24;
+const ICON_SIZE = 28;
 const TAP_PADDING = (HIT - CIRCLE_SIZE) / 2;
 
 const CIRCLE_BG = require("../../assets/icons/circle-small.png");

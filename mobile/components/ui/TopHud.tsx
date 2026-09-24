@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    height: 38,
+    height: 46,
     borderRadius: radius.pill,
     overflow: "hidden",
     paddingHorizontal: 16,
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   scalesFrame: {
     flexDirection: "row",
     alignItems: "center",
-    height: 38,
+    height: 46,
     marginTop: 8,
     borderRadius: radius.pill,
     overflow: "hidden",
