@@ -26,7 +26,7 @@ export default function ShopsScreen() {
       </View>
 
       <SafeAreaView style={styles.content} edges={["top"]}>
-        <TopHud />
+        <TopHud showChatBubble={false} />
       </SafeAreaView>
 
       <SafeAreaView style={styles.navSlot} edges={["bottom"]}>

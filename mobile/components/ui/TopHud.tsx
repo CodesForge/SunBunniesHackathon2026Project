@@ -22,7 +22,11 @@ import RoundIconButton from "./RoundIconButton";
 const LOW = 20;
 const BUBBLE_SIZE = 130;
 
-export default function TopHud() {
+type TopHudProps = {
+  showChatBubble?: boolean;
+};
+
+export default function TopHud({ showChatBubble = true }: TopHudProps) {
   const jars = usePet((s) => s.jars);
   const xp = usePet((s) => s.xp);
   const lastFedAt = usePet((s) => s.lastFedAt);
@@ -114,14 +118,16 @@ export default function TopHud() {
             </View>
           </View>
 
-          <View style={styles.bubbleRow} pointerEvents="none">
-            <MessageCircle
-              size={BUBBLE_SIZE}
-              color={colors.iconBorder}
-              fill={colors.surface}
-              strokeWidth={0.5}
-            />
-          </View>
+          {showChatBubble && (
+            <View style={styles.bubbleRow} pointerEvents="none">
+              <MessageCircle
+                size={BUBBLE_SIZE}
+                color={colors.iconBorder}
+                fill={colors.surface}
+                strokeWidth={0.5}
+              />
+            </View>
+          )}
         </View>
       </View>
     </View>
