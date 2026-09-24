@@ -5,5 +5,49 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "cachetools>=7.2.0",
+    "gigachat>=0.2.3",
     "pydantic>=2.13.5",
+    "pydantic-settings>=2.15.0",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.16.8",
+]
+
+
+[tool.ruff]
+
+target-version = "py312"
+
+line-length = 100
+
+respect-gitignore = true
+
+force-exclude = true
+
+
+[tool.ruff.lint]
+select = [
+    "W",
+    "E",      # pycodestyle
+    "F",      # Pyflakes
+    "B",      # flake8-bugbear
+    "UP",     # pyupgrade
+    "I",      # isort
+    "SIM",    # flake8-simplify
+    "RUF",    # Ruff-specific
+]
+
+
+preview = false
+
+
+[tool.ruff.format]
+preview = false
+
+quote-style = "double"
+indent-style = "space"
+
+docstring-code-format = true
