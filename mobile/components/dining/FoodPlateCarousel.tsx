@@ -17,46 +17,54 @@ type FoodPlateCarouselProps = {
 };
 
 const PLATE = require("../../assets/dining/plate.png");
+const VISIBLE = 3;
 
-function mod(n: number, m: number) {
-  return ((n % m) + m) % m;
-}
+export function FoodPlateCarousel({ items, plateSize = 96, onSelect }: FoodPlateCarouselProps) {
+  const maxStart = Math.max(0, items.length - VISIBLE);
+  const [start, setStart] = useState(0);
 
-export function FoodPlateCarousel({ items, plateSize = 120, onSelect }: FoodPlateCarouselProps) {
-  const [index, setIndex] = useState(0);
-  const hasItems = items.length > 0;
-  const item = hasItems ? items[mod(index, items.length)] : null;
+  const canGoLeft = start > 0;
+  const canGoRight = start < maxStart;
 
-  const move = (delta: number) => setIndex((i) => i + delta);
+  const move = (delta: number) => {
+    setStart((s) => Math.min(maxStart, Math.max(0, s + delta)));
+  };
+
+  const slots = Array.from({ length: VISIBLE }, (_, i) => items[start + i] ?? null);
 
   return (
     <View style={styles.row}>
-      <Pressable onPress={() => move(-1)} hitSlop={12} disabled={!hasItems} style={styles.arrowHit}>
-        <ChevronLeft size={32} color={colors.surface} strokeWidth={3} />
+      <Pressable onPress={() => move(-1)} hitSlop={12} disabled={!canGoLeft} style={styles.arrowHit}>
+        <ChevronLeft size={28} color={canGoLeft ? colors.surface : "rgba(255,255,255,0.4)"} strokeWidth={3} />
       </Pressable>
 
-      <Pressable
-        style={[styles.plateWrap, { width: plateSize, height: plateSize }]}
-        onPress={() => item && onSelect?.(item)}
-        disabled={!item}
-      >
-        <Image source={PLATE} style={styles.plate} resizeMode="contain" />
-        {item && (
-          <Image
-            source={item.food}
-            style={[styles.food, { width: plateSize * 0.55, height: plateSize * 0.55 }]}
-            resizeMode="contain"
-          />
-        )}
-        {item && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>x{item.quantity}</Text>
-          </View>
-        )}
-      </Pressable>
+      <View style={styles.plates}>
+        {slots.map((item, i) => (
+          <Pressable
+            key={item?.id ?? `empty-${i}`}
+            style={[styles.plateWrap, { width: plateSize, height: plateSize }]}
+            onPress={() => item && onSelect?.(item)}
+            disabled={!item}
+          >
+            <Image source={PLATE} style={styles.plate} resizeMode="contain" />
+            {item && (
+              <Image
+                source={item.food}
+                style={[styles.food, { width: plateSize * 0.55, height: plateSize * 0.55 }]}
+                resizeMode="contain"
+              />
+            )}
+            {item && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>x{item.quantity}</Text>
+              </View>
+            )}
+          </Pressable>
+        ))}
+      </View>
 
-      <Pressable onPress={() => move(1)} hitSlop={12} disabled={!hasItems} style={styles.arrowHit}>
-        <ChevronRight size={32} color={colors.surface} strokeWidth={3} />
+      <Pressable onPress={() => move(1)} hitSlop={12} disabled={!canGoRight} style={styles.arrowHit}>
+        <ChevronRight size={28} color={canGoRight ? colors.surface : "rgba(255,255,255,0.4)"} strokeWidth={3} />
       </Pressable>
     </View>
   );
@@ -67,9 +75,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: space.md,
+    gap: space.sm,
   },
   arrowHit: { padding: 6 },
+  plates: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: space.md,
+  },
   plateWrap: {
     alignItems: "center",
     justifyContent: "center",
