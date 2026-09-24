@@ -36,13 +36,13 @@ const TABS: Tab[] = [
   {
     key: "shop",
     Icon: ShoppingCart,
-    route: "/wardrobe",
+    route: "/shops",
     label: "Гардероб",
     badge: 1,
   },
   { key: "moon", Icon: MoonStar, route: "/sleep", label: "Спальня" },
   { key: "home", Icon: Home, route: "/home", label: "Комната" },
-  { key: "food", Icon: Utensils, route: "/food", label: "Кухня" },
+  { key: "food", Icon: Utensils, route: "/dining", label: "Кухня" },
   {
     key: "book",
     Icon: BookOpen,
