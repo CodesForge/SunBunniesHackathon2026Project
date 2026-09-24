@@ -1,4 +1,5 @@
 import { useRouter } from "expo-router";
+import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import { useState } from "react";
 import Animated, {
   Easing,
@@ -40,10 +41,6 @@ const CAT_FEET = 0.891;
 const CAROUSEL_OFFSETS = [-2, -1, 0, 1, 2];
 const CAROUSEL_SIZES = [34, 46, 60, 46, 34];
 const CAROUSEL_STEP = 54;
-const ARROW_SIZE = 44;
-
-const ARROW_LEFT = require("../../assets/icons/arrow-left.png");
-const ARROW_RIGHT = require("../../assets/icons/arrow-right.png");
 
 type PetOption = {
   key: string;
@@ -154,10 +151,10 @@ export default function ChooseSpeciesScreen() {
 
       <View style={[styles.arrows, { top: arrowsTop }]}>
         <Pressable onPress={() => move(-1)} hitSlop={12} style={styles.arrowHit}>
-          <Image source={ARROW_LEFT} style={{ width: ARROW_SIZE, height: ARROW_SIZE }} resizeMode="contain" />
+          <ChevronLeft size={44} color={colors.surface} strokeWidth={3.5} />
         </Pressable>
         <Pressable onPress={() => move(1)} hitSlop={12} style={styles.arrowHit}>
-          <Image source={ARROW_RIGHT} style={{ width: ARROW_SIZE, height: ARROW_SIZE }} resizeMode="contain" />
+          <ChevronRight size={44} color={colors.surface} strokeWidth={3.5} />
         </Pressable>
       </View>
 
