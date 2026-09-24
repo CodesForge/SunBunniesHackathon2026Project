@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import {
   Pressable,
   StyleSheet,
@@ -54,6 +54,13 @@ const TABS: Tab[] = [
 
 const BAR_HEIGHT = 80;
 const HOME_INDEX = 2;
+const ACTIVE_SCALE = 1.25;
+const ACTIVE_LIFT = -10;
+
+const PILL_SPRING = { damping: 22, stiffness: 130, mass: 1 };
+const ICON_SPRING = { damping: 14, stiffness: 170, mass: 1 };
+
+let lastActiveIndex = -1;
 
 export default function BottomNav() {
   const pathname = usePathname();
@@ -64,14 +71,14 @@ export default function BottomNav() {
   const activeIndex = found === -1 ? HOME_INDEX : found;
   const tabWidth = width / TABS.length;
 
-  const pos = useSharedValue(activeIndex);
+  const fromIndex = lastActiveIndex === -1 ? activeIndex : lastActiveIndex;
+  const fromRef = useRef(fromIndex);
+
+  const pos = useSharedValue(fromIndex);
 
   useEffect(() => {
-    pos.value = withSpring(activeIndex, {
-      damping: 26,
-      stiffness: 140,
-      mass: 1,
-    });
+    pos.value = withSpring(activeIndex, PILL_SPRING);
+    lastActiveIndex = activeIndex;
   }, [activeIndex]);
 
   const pillStyle = useAnimatedStyle(() => ({
@@ -85,6 +92,7 @@ export default function BottomNav() {
           key={tab.key}
           tab={tab}
           active={i === activeIndex}
+          startedActive={i === fromRef.current}
           width={tabWidth}
           onPress={() => {
             if (tab.route !== pathname) router.replace(tab.route as any);
@@ -105,23 +113,22 @@ export default function BottomNav() {
 function TabButton({
   tab,
   active,
+  startedActive,
   width,
   onPress,
 }: {
   tab: Tab;
   active: boolean;
+  startedActive: boolean;
   width: number;
   onPress: () => void;
 }) {
-  const scale = useSharedValue(active ? 1.25 : 1);
-  const lift = useSharedValue(active ? -10 : 0);
+  const scale = useSharedValue(startedActive ? ACTIVE_SCALE : 1);
+  const lift = useSharedValue(startedActive ? ACTIVE_LIFT : 0);
 
   useEffect(() => {
-    scale.value = withSpring(active ? 1.25 : 1, {
-      damping: 12,
-      stiffness: 200,
-    });
-    lift.value = withSpring(active ? -10 : 0, { damping: 14, stiffness: 200 });
+    scale.value = withSpring(active ? ACTIVE_SCALE : 1, ICON_SPRING);
+    lift.value = withSpring(active ? ACTIVE_LIFT : 0, ICON_SPRING);
   }, [active]);
 
   const iconStyle = useAnimatedStyle(() => ({
