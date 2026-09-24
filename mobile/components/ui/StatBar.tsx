@@ -1,5 +1,4 @@
-import { StyleSheet, View } from "react-native";
-import type { LucideIcon } from "lucide-react-native";
+import { Image, StyleSheet, View, type ImageSourcePropType } from "react-native";
 import { colors, radius } from "../../theme";
 
 const BAR_HEIGHT = 16;
@@ -13,16 +12,16 @@ const NORMAL_COLOR = colors.statNormal;
 
 type Props = {
   value: number;
-  icon: LucideIcon;
+  icon: ImageSourcePropType;
 };
 
-export default function StatBar({ value, icon: Icon }: Props) {
+export default function StatBar({ value, icon }: Props) {
   const pct = Math.max(0, Math.min(100, value));
   const fillColor = pct <= LOW_THRESHOLD ? LOW_COLOR : NORMAL_COLOR;
 
   return (
     <View style={styles.wrap}>
-      <Icon size={ICON_SIZE} color={colors.iconBorder} strokeWidth={3} />
+      <Image source={icon} style={styles.icon} resizeMode="contain" />
       <View style={styles.track}>
         <View
           style={[styles.fill, { width: `${pct}%`, backgroundColor: fillColor }]}
@@ -39,6 +38,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: ICON_GAP,
   },
+  icon: { width: ICON_SIZE, height: ICON_SIZE },
   track: {
     flex: 1,
     minWidth: 60,

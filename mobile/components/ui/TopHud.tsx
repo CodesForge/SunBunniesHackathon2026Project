@@ -1,6 +1,6 @@
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { Link } from "expo-router";
-import { MessageCircle, MoonStar, Settings, Utensils, Wallet } from "lucide-react-native";
+import { MessageCircle, Settings, Wallet } from "lucide-react-native";
 
 import { usePet } from "../../store/pet";
 import { fullness, sleepiness } from "../../lib/time";
@@ -18,6 +18,8 @@ const COIN_WANT = require("../../assets/icons/coin-want.png");
 const COIN_DREAM = require("../../assets/icons/coin-dream.png");
 const CIRCLE_LARGE = require("../../assets/icons/circle-large.png");
 const PILL_BG = require("../../assets/icons/pill-long.png");
+const ICON_MOON_PURPLE = require("../../assets/icons/icon-moon-purple.png");
+const ICON_FOOD_PURPLE = require("../../assets/icons/icon-food-purple.png");
 
 type TopHudProps = {
   showChatBubble?: boolean;
@@ -67,7 +69,7 @@ export default function TopHud({ showChatBubble = true }: TopHudProps) {
         <View style={styles.rightColumn}>
           <View style={styles.topRightRow}>
             <View style={styles.moneyPill}>
-              <Image source={PILL_BG} style={StyleSheet.absoluteFill} resizeMode="stretch" />
+              <Image source={PILL_BG} style={StyleSheet.absoluteFill} resizeMode="cover" />
               <CoinValue image={COIN_NEED} value={jars.need} />
               <CoinValue image={COIN_WANT} value={jars.want} />
               <CoinValue image={COIN_DREAM} value={jars.dream} />
@@ -83,14 +85,14 @@ export default function TopHud({ showChatBubble = true }: TopHudProps) {
           </View>
 
           <View style={styles.scalesFrame}>
-            <Image source={PILL_BG} style={StyleSheet.absoluteFill} resizeMode="stretch" />
+            <Image source={PILL_BG} style={StyleSheet.absoluteFill} resizeMode="cover" />
 
             <View
               style={styles.scale}
               accessibilityRole="progressbar"
               accessibilityLabel={`Сон: ${Math.round(sleep)} из 100${sleep <= LOW ? ", мало" : ""}`}
             >
-              <StatBar value={sleep} icon={MoonStar} />
+              <StatBar value={sleep} icon={ICON_MOON_PURPLE} />
               {sleep <= LOW && <Text style={styles.lowMark}>!</Text>}
             </View>
 
@@ -99,7 +101,7 @@ export default function TopHud({ showChatBubble = true }: TopHudProps) {
               accessibilityRole="progressbar"
               accessibilityLabel={`Сытость: ${Math.round(hunger)} из 100${hunger <= LOW ? ", мало" : ""}`}
             >
-              <StatBar value={hunger} icon={Utensils} />
+              <StatBar value={hunger} icon={ICON_FOOD_PURPLE} />
               {hunger <= LOW && <Text style={styles.lowMark}>!</Text>}
             </View>
           </View>
