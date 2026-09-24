@@ -13,6 +13,7 @@ import (
 
 type UserRepository interface {
 	CreateUser(ctx context.Context, params db.CreateUserParams) (db.User, error)
+	GetUserByUsername(ctx context.Context, username string) (db.User, error)
 }
 
 type ProjectorService struct {
