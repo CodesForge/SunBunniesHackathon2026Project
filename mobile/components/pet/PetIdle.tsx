@@ -102,6 +102,8 @@ export function PetIdle({ species, widthPercent = 58, mouth = "happy", eyesOpen 
           style={[styles.layer, { transformOrigin: assets.tailOrigin }, tailStyle]}
           resizeMode="contain"
         />
+        <Image source={assets.body} style={styles.layer} resizeMode="contain" />
+        <Animated.Image source={assets.belly} style={[styles.layer, bellyStyle]} resizeMode="contain" />
         <Animated.Image
           source={assets.armLeft}
           style={[styles.layer, { transformOrigin: assets.armLeftOrigin }, armLeftStyle]}
@@ -112,8 +114,6 @@ export function PetIdle({ species, widthPercent = 58, mouth = "happy", eyesOpen 
           style={[styles.layer, { transformOrigin: assets.armRightOrigin }, armRightStyle]}
           resizeMode="contain"
         />
-        <Image source={assets.body} style={styles.layer} resizeMode="contain" />
-        <Animated.Image source={assets.belly} style={[styles.layer, bellyStyle]} resizeMode="contain" />
         <Image source={showOpenEyes ? assets.eyesOpen : assets.eyesClosed} style={styles.layer} resizeMode="contain" />
         <Image source={assets.mouth[mouth]} style={styles.layer} resizeMode="contain" />
       </View>

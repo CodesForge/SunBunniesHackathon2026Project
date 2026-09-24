@@ -106,10 +106,10 @@ export function PetMini({ species, widthPercent = 58, mouth = "happy", eyesOpen 
           style={[styles.layer, { transformOrigin: assets.tailOrigin }, tailStyle]}
           resizeMode="contain"
         />
-        <Image source={assets.armLeft} style={styles.layer} resizeMode="contain" />
-        <Image source={assets.armRight} style={styles.layer} resizeMode="contain" />
         <Image source={assets.body} style={styles.layer} resizeMode="contain" />
         <Image source={assets.belly} style={styles.layer} resizeMode="contain" />
+        <Image source={assets.armLeft} style={styles.layer} resizeMode="contain" />
+        <Image source={assets.armRight} style={styles.layer} resizeMode="contain" />
         <Image source={showOpenEyes ? assets.eyesOpen : assets.eyesClosed} style={styles.layer} resizeMode="contain" />
         <Image source={assets.mouth[mouth]} style={styles.layer} resizeMode="contain" />
       </View>
