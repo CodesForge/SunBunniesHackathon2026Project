@@ -2,9 +2,10 @@ import { Image, Pressable, StyleSheet, View, type PressableProps } from "react-n
 import type { LucideIcon } from "lucide-react-native";
 import { colors, HIT } from "../../theme";
 
-const CIRCLE_SIZE = 46;
-const ICON_SIZE = 28;
-const TAP_PADDING = (HIT - CIRCLE_SIZE) / 2;
+const CIRCLE_SIZE = 58;
+const ICON_SIZE = 24;
+const TAP_AREA_SIZE = Math.max(HIT, CIRCLE_SIZE);
+const TAP_PADDING = (TAP_AREA_SIZE - CIRCLE_SIZE) / 2;
 
 const CIRCLE_BG = require("../../assets/icons/circle-small.png");
 
@@ -30,8 +31,8 @@ export default function RoundIconButton({
 
 const styles = StyleSheet.create({
   tapArea: {
-    width: HIT,
-    height: HIT,
+    width: TAP_AREA_SIZE,
+    height: TAP_AREA_SIZE,
     padding: TAP_PADDING,
     alignItems: "center",
     justifyContent: "center",
