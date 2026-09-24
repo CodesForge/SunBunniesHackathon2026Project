@@ -8,7 +8,7 @@ const PET_WIDTH_PERCENT = 46;
 const PET_TOP_PERCENT = 0.2;
 const PLATE_WIDTH_PERCENT = 0.22;
 
-// TODO: заменить на реальные Продукты из магазина еды, когда появятся ассеты
+// TODO: заменить на реальные продукты из магазина еды, когда появятся ассеты
 const FOOD_ITEMS: FoodPlateItem[] = [];
 
 export default function DiningScreen() {
@@ -22,7 +22,7 @@ export default function DiningScreen() {
     <View style={styles.root}>
       <Image
         source={require("../assets/dining/background.png")}
-        style={StyleSheet.absoluteFill}
+        style={[styles.layer, { width, height }]}
         resizeMode="cover"
       />
 
@@ -33,7 +33,7 @@ export default function DiningScreen() {
 
       <Image
         source={require("../assets/dining/table.png")}
-        style={StyleSheet.absoluteFill}
+        style={[styles.layer, { width, height }]}
         resizeMode="cover"
       />
 
@@ -48,6 +48,7 @@ export default function DiningScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: "#BEE7FA" },
+  layer: { position: "absolute", top: 0, left: 0 },
   petSlot: { position: "absolute" },
   safe: { flex: 1 },
   carouselSlot: {
