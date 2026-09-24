@@ -4,9 +4,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { FoodPlateCarousel, type FoodPlateItem } from "../components/dining/FoodPlateCarousel";
 import { PetMini } from "../components/pet/PetMini";
 
-const PET_WIDTH_PERCENT = 46;
-const PET_TOP_PERCENT = 0.2;
+const PET_WIDTH_PERCENT = 90;
+const PET_TOP_PERCENT = 0.24;
 const PLATE_WIDTH_PERCENT = 0.22;
+const TABLET_BREAKPOINT = 768;
 
 // TODO: заменить на реальные продукты из магазина еды, когда появятся ассеты
 const FOOD_ITEMS: FoodPlateItem[] = [];
@@ -17,6 +18,8 @@ export default function DiningScreen() {
   const petW = (width * PET_WIDTH_PERCENT) / 100;
   const petTop = height * PET_TOP_PERCENT;
   const plateSize = width * PLATE_WIDTH_PERCENT;
+  const isTablet = width >= TABLET_BREAKPOINT;
+  const visibleCount = isTablet ? 3 : 2;
 
   return (
     <View style={styles.root}>
@@ -39,7 +42,7 @@ export default function DiningScreen() {
 
       <SafeAreaView style={styles.safe} edges={["bottom"]} pointerEvents="box-none">
         <View style={styles.carouselSlot}>
-          <FoodPlateCarousel items={FOOD_ITEMS} plateSize={plateSize} />
+          <FoodPlateCarousel items={FOOD_ITEMS} plateSize={plateSize} visibleCount={visibleCount} />
         </View>
       </SafeAreaView>
     </View>
@@ -55,7 +58,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
-    bottom: "6%",
+    bottom: "25%",
     alignItems: "center",
   },
 });
