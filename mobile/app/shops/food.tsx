@@ -1,164 +1,227 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  FlatList,
   Image,
   Pressable,
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Animated, {
+  Easing,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
-import BottomNav from "../../components/ui/BottomNav";
 import TopHud from "../../components/ui/TopHud";
 import { FOOD_ITEMS, type FoodItem } from "../../data/food";
 import { usePet } from "../../store/pet";
-import { colors, font, radius, space } from "../../theme";
+import { font, space } from "../../theme";
 
-const BACKGROUND = require("../../assets/shops/background.png");
-const ICON_CART = require("../../assets/icons/icon-cart.png");
-const CARD_ICON_SIZE = 64;
-const CART_ICON_SIZE = 22;
-const NUM_COLUMNS = 3;
+const BACKGROUND = require("../../assets/food/shop-background.png");
+const CART = require("../../assets/food/cart.png");
+const COIN_NEED = require("../../assets/icons/coin-need.png");
+
+// Доли высоты картинки фона, на которых начинаются деревянные полки —
+// вымерено по самому фону, чтобы еда легла ровно на полку.
+const SHELF_TOP_FRACTIONS = [0.1466, 0.3208, 0.4949];
+const FLOOR_TOP_FRACTION = 0.7426;
+
+const ITEM_SIZE_PERCENT = 0.22;
+const CART_WIDTH_PERCENT = 0.5;
+const CART_ASPECT = 1681 / 2111; // высота / ширина картинки тележки
+const FLIGHT_DURATION = 480;
+
+type Flight = {
+  id: string;
+  image: FoodItem["image"];
+  from: { x: number; y: number };
+  to: { x: number; y: number };
+};
 
 export default function FoodShopScreen() {
+  const { width, height } = useWindowDimensions();
   const jarsNeed = usePet((s) => s.jars.need);
-  const foodOwned = usePet((s) => s.foodOwned);
   const buyFood = usePet((s) => s.buyFood);
+
+  const [flights, setFlights] = useState<Flight[]>([]);
+  const cartRef = useRef<View>(null);
+  const itemRefs = useRef<Record<string, View | null>>({});
+
+  const itemSize = width * ITEM_SIZE_PERCENT;
+  const cartWidth = width * CART_WIDTH_PERCENT;
+  const cartHeight = cartWidth * CART_ASPECT;
+
+  const rows = [FOOD_ITEMS.slice(0, 3), FOOD_ITEMS.slice(3, 6), FOOD_ITEMS.slice(6, 9)];
+
+  const removeFlight = useCallback((id: string) => {
+    setFlights((prev) => prev.filter((f) => f.id !== id));
+  }, []);
+
+  const handleBuy = (item: FoodItem) => {
+    if (jarsNeed < item.price) return;
+
+    const node = itemRefs.current[item.id];
+    if (!node || !cartRef.current) {
+      buyFood(item);
+      return;
+    }
+
+    node.measureInWindow((fx, fy, fw, fh) => {
+      cartRef.current?.measureInWindow((cx, cy, cw, ch) => {
+        const bought = buyFood(item);
+        if (!bought) return;
+        setFlights((prev) => [
+          ...prev,
+          {
+            id: `${item.id}-${Date.now()}`,
+            image: item.image,
+            from: { x: fx + fw / 2, y: fy + fh / 2 },
+            to: { x: cx + cw / 2, y: cy + ch * 0.35 },
+          },
+        ]);
+      });
+    });
+  };
 
   return (
     <View style={styles.root}>
       <Image source={BACKGROUND} style={StyleSheet.absoluteFill} resizeMode="cover" />
 
-      <SafeAreaView style={styles.content} edges={["top"]}>
-        <TopHud showChatBubble={false} />
+      {rows.map((row, rowIndex) => (
+        <View
+          key={rowIndex}
+          style={[
+            styles.shelfRow,
+            { top: height * SHELF_TOP_FRACTIONS[rowIndex] - itemSize - space.md },
+          ]}
+        >
+          {row.map((item) => {
+            const canAfford = jarsNeed >= item.price;
+            return (
+              <Pressable
+                key={item.id}
+                ref={(node) => {
+                  itemRefs.current[item.id] = node as unknown as View | null;
+                }}
+                onPress={() => handleBuy(item)}
+                style={[styles.foodSlot, { width: itemSize }, !canAfford && styles.foodSlotDisabled]}
+                accessibilityRole="button"
+                accessibilityLabel={`Купить ${item.title} за ${item.price}`}
+              >
+                <Image
+                  source={item.image}
+                  style={{ width: itemSize, height: itemSize }}
+                  resizeMode="contain"
+                />
+                <View style={styles.priceRow}>
+                  <Image source={COIN_NEED} style={styles.coinIcon} resizeMode="contain" />
+                  <Text style={styles.priceText}>{item.price}</Text>
+                </View>
+              </Pressable>
+            );
+          })}
+        </View>
+      ))}
 
-        <FlatList
-          data={FOOD_ITEMS}
-          key={NUM_COLUMNS}
-          numColumns={NUM_COLUMNS}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.grid}
-          columnWrapperStyle={styles.row}
-          renderItem={({ item }) => (
-            <FoodCard
-              item={item}
-              owned={foodOwned[item.id] ?? 0}
-              canAfford={jarsNeed >= item.price}
-              onBuy={() => buyFood(item)}
-            />
-          )}
-        />
-      </SafeAreaView>
+      <View
+        ref={cartRef}
+        style={[
+          styles.cartSlot,
+          {
+            top:
+              height * FLOOR_TOP_FRACTION +
+              (height * (1 - FLOOR_TOP_FRACTION) - cartHeight) / 2,
+            left: (width - cartWidth) / 2,
+            width: cartWidth,
+            height: cartHeight,
+          },
+        ]}
+        pointerEvents="none"
+      >
+        <Image source={CART} style={{ width: cartWidth, height: cartHeight }} resizeMode="contain" />
+      </View>
 
-      <SafeAreaView style={styles.navSlot} edges={["bottom"]}>
-        <BottomNav />
+      {flights.map((f) => (
+        <FlyingFood key={f.id} flight={f} size={itemSize} onDone={() => removeFlight(f.id)} />
+      ))}
+
+      <SafeAreaView style={styles.hudSlot} edges={["top"]} pointerEvents="box-none">
+        <TopHud backHref="/shops" showStats={false} showChatBubble={false} />
       </SafeAreaView>
     </View>
   );
 }
 
-type FoodCardProps = {
-  item: FoodItem;
-  owned: number;
-  canAfford: boolean;
-  onBuy: () => boolean;
+type FlyingFoodProps = {
+  flight: Flight;
+  size: number;
+  onDone: () => void;
 };
 
-function FoodCard({ item, owned, canAfford, onBuy }: FoodCardProps) {
-  const [justBought, setJustBought] = useState(false);
+function FlyingFood({ flight, size, onDone }: FlyingFoodProps) {
+  const progress = useSharedValue(0);
 
-  const handlePress = () => {
-    const bought = onBuy();
-    if (!bought) return;
-    setJustBought(true);
-    setTimeout(() => setJustBought(false), 500);
-  };
+  useEffect(() => {
+    progress.value = withTiming(
+      1,
+      { duration: FLIGHT_DURATION, easing: Easing.in(Easing.cubic) },
+      (finished) => {
+        if (finished) runOnJS(onDone)();
+      },
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const x = flight.from.x + (flight.to.x - flight.from.x) * progress.value;
+    const y = flight.from.y + (flight.to.y - flight.from.y) * progress.value;
+    const scale = 1 - progress.value * 0.65;
+    return {
+      position: "absolute",
+      left: x - size / 2,
+      top: y - size / 2,
+      width: size,
+      height: size,
+      opacity: 1 - progress.value * 0.2,
+      transform: [{ scale }],
+    };
+  });
 
   return (
-    <View style={styles.card}>
-      {owned > 0 && (
-        <View style={styles.ownedBadge}>
-          <Text style={styles.ownedBadgeText}>x{owned}</Text>
-        </View>
-      )}
-
-      <Image source={item.image} style={styles.cardIcon} resizeMode="contain" />
-      <Text style={styles.cardTitle}>{item.title}</Text>
-
-      <Pressable
-        onPress={handlePress}
-        disabled={!canAfford}
-        style={({ pressed }) => [
-          styles.buyButton,
-          !canAfford && styles.buyButtonDisabled,
-          pressed && canAfford && styles.buyButtonPressed,
-          justBought && styles.buyButtonBought,
-        ]}
-        accessibilityRole="button"
-        accessibilityLabel={`Купить ${item.title} за ${item.price}`}
-      >
-        <Image source={ICON_CART} style={styles.cartIcon} resizeMode="contain" />
-        <Text style={styles.buyButtonText}>{item.price}</Text>
-      </Pressable>
-    </View>
+    <Animated.View style={animatedStyle} pointerEvents="none">
+      <Image source={flight.image} style={{ width: "100%", height: "100%" }} resizeMode="contain" />
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#BEE7FA" },
-  content: { flex: 1 },
-  grid: { padding: space.md, paddingBottom: space.xl },
-  row: { justifyContent: "space-between", marginBottom: space.md },
+  root: { flex: 1, backgroundColor: "#7ACBF7" },
+  hudSlot: { flex: 1 },
 
-  card: {
-    width: "31%",
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 2,
-    borderColor: colors.line,
-    alignItems: "center",
-    paddingVertical: space.md,
-    paddingHorizontal: space.xs,
-  },
-  cardIcon: { width: CARD_ICON_SIZE, height: CARD_ICON_SIZE, marginBottom: space.xs },
-  cardTitle: {
-    ...font.small,
-    fontWeight: "700",
-    color: colors.ink,
-    marginBottom: space.sm,
-    textAlign: "center",
-  },
-
-  ownedBadge: {
+  shelfRow: {
     position: "absolute",
-    top: -6,
-    right: -6,
-    backgroundColor: colors.surface,
-    borderRadius: radius.pill,
-    borderWidth: 2,
-    borderColor: colors.iconBorder,
-    paddingHorizontal: space.sm,
-    paddingVertical: 1,
-    zIndex: 1,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignItems: "flex-end",
+    paddingHorizontal: space.md,
   },
-  ownedBadgeText: { ...font.small, fontWeight: "800", color: colors.ink },
+  foodSlot: { alignItems: "center" },
+  foodSlotDisabled: { opacity: 0.4 },
 
-  buyButton: {
+  priceRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: space.xs,
-    backgroundColor: colors.coinNeedBg,
-    borderRadius: radius.pill,
-    paddingHorizontal: space.md,
-    paddingVertical: space.xs,
+    gap: 4,
+    marginTop: 2,
   },
-  buyButtonDisabled: { backgroundColor: colors.disabled },
-  buyButtonPressed: { opacity: 0.8 },
-  buyButtonBought: { backgroundColor: colors.good },
-  cartIcon: { width: CART_ICON_SIZE, height: CART_ICON_SIZE },
-  buyButtonText: { ...font.small, fontWeight: "800", color: colors.ink },
+  coinIcon: { width: 18, height: 18 },
+  priceText: { ...font.small, fontWeight: "800", color: "#3A2E22" },
 
-  navSlot: { backgroundColor: colors.navActive },
+  cartSlot: { position: "absolute" },
 });
