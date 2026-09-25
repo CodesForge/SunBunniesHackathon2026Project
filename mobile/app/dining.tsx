@@ -8,20 +8,31 @@ import {
 import { PetMini } from "../components/pet/PetMini";
 import BottomNav from "../components/ui/BottomNav";
 import TopHud from "../components/ui/TopHud";
+import { FOOD_ITEMS } from "../data/food";
+import { usePet } from "../store/pet";
 import { colors, space } from "../theme";
 
 const PET_WIDTH_PERCENT = 62;
 const PET_TOP_PERCENT = 0.29;
 const PLATE_WIDTH_PERCENT = 0.3;
 
-const FOOD_ITEMS: FoodPlateItem[] = [];
-
 export default function DiningScreen() {
   const { width, height } = useWindowDimensions();
+  const foodOwned = usePet((s) => s.foodOwned);
+  const feed = usePet((s) => s.feed);
 
   const petW = (width * PET_WIDTH_PERCENT) / 100;
   const petTop = height * PET_TOP_PERCENT;
   const plateSize = width * PLATE_WIDTH_PERCENT;
+
+  // На стол попадают только реально купленные продукты (foodOwned > 0).
+  const foodItems: FoodPlateItem[] = FOOD_ITEMS.filter(
+    (item) => (foodOwned[item.id] ?? 0) > 0,
+  ).map((item) => ({
+    id: item.id,
+    food: item.image,
+    quantity: foodOwned[item.id],
+  }));
 
   return (
     <View style={styles.root}>
@@ -54,9 +65,9 @@ export default function DiningScreen() {
 
         <View style={styles.carouselSlot} pointerEvents="box-none">
           <FoodPlateCarousel
-            items={FOOD_ITEMS}
+            items={foodItems}
             plateSize={plateSize}
-            onSelect={() => {}}
+            onSelect={(item) => feed(item.id)}
           />
         </View>
       </SafeAreaView>
