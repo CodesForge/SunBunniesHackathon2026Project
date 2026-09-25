@@ -33,6 +33,7 @@ type State = {
   doneQuests: string[];
 
   owned: string[];
+  foodOwned: Record<string, number>;
   worn: { body?: string; head?: string; face?: string };
 
   goalId: string | null;
@@ -72,6 +73,7 @@ const initial: State = {
   xp: 0,
   doneQuests: [],
   owned: [],
+  foodOwned: {},
   worn: {},
   goalId: null,
   dayKey: todayKey(),
@@ -98,9 +100,10 @@ const initial: State = {
 type Actions = {
   hatch: (species: "dog" | "cat", name: string, goalId: string) => void;
   setPlan: (p: Jars) => void;
-  feed: () => boolean;
+  feed: (foodId?: string) => boolean;
   putToSleep: () => void;
   buy: (item: Item) => boolean;
+  buyFood: (item: Item) => boolean;
   wear: (slot: "body" | "head" | "face", id: string) => void;
   putToDream: (amount: number) => boolean;
   withdrawFromDream: (amount: number) => boolean;
@@ -163,8 +166,20 @@ export const usePet = create<State & Actions>()(
           };
         }),
 
-      feed: () => {
+      // Без foodId — старое поведение (плоский расход из "надо").
+      // С foodId — списывает конкретный купленный продукт со стола.
+      feed: (foodId) => {
         const s = get();
+        if (foodId) {
+          const qty = s.foodOwned[foodId] ?? 0;
+          if (qty <= 0) return false;
+          set({
+            foodOwned: { ...s.foodOwned, [foodId]: qty - 1 },
+            lastFedAt: Date.now(),
+            dirty: true,
+          });
+          return true;
+        }
         if (s.jars.need < ECONOMY.mealCost) return false;
         set({
           jars: { ...s.jars, need: s.jars.need - ECONOMY.mealCost },
@@ -182,6 +197,23 @@ export const usePet = create<State & Actions>()(
         set({
           jars: { ...s.jars, [item.jar]: s.jars[item.jar] - item.price },
           owned: s.owned.includes(item.id) ? s.owned : [...s.owned, item.id],
+          dirty: true,
+        });
+        return true;
+      },
+
+      // Покупка продукта в магазине еды: списывает цену из копилки товара
+      // и добавляет +1 к количеству на столе (foodOwned), в отличие от
+      // buy() — тут можно купить один и тот же продукт много раз.
+      buyFood: (item) => {
+        const s = get();
+        if (s.jars[item.jar] < item.price) return false;
+        set({
+          jars: { ...s.jars, [item.jar]: s.jars[item.jar] - item.price },
+          foodOwned: {
+            ...s.foodOwned,
+            [item.id]: (s.foodOwned[item.id] ?? 0) + 1,
+          },
           dirty: true,
         });
         return true;
