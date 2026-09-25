@@ -55,6 +55,8 @@ type TopHudProps = {
   // Показывать ли полоски сна/сытости — на экранах вроде магазина они
   // не нужны.
   showStats?: boolean;
+  // Показывать ли кнопку чата (сообщения) в левой колонке.
+  showChat?: boolean;
   // Если задано — вместо кружка с уровнем показываем кнопку "назад",
   // ведущую по этому адресу (используется на подэкранах вроде магазина).
   backHref?: string;
@@ -63,6 +65,7 @@ type TopHudProps = {
 export default function TopHud({
   showChatBubble = true,
   showStats = true,
+  showChat = true,
   backHref,
 }: TopHudProps) {
   const jars = usePet((s) => s.jars);
@@ -107,11 +110,13 @@ export default function TopHud({
             />
           </Link>
 
-          <RoundIconButton
-            icon={MessageCircle}
-            accessibilityRole="button"
-            accessibilityLabel="Сообщения"
-          />
+          {showChat && (
+            <RoundIconButton
+              icon={MessageCircle}
+              accessibilityRole="button"
+              accessibilityLabel="Сообщения"
+            />
+          )}
         </View>
 
         <View style={styles.rightColumn}>
