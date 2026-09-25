@@ -19,6 +19,15 @@ export type PetAssetSet = {
   armLeftOrigin: string;
   armRightOrigin: string;
   tailOrigin: string;
+  // Область под надетую на тело вещь из гардероба (подгузник и т.п.) —
+  // рисуется поверх пузика, но под ручками. Доли от ширины/высоты общего
+  // холста питомца (того же "w"/"h", что и у остальных слоёв), картинка
+  // вписывается через resizeMode="contain", так что реальные пропорции
+  // самой вещи не важны — main её не растянет.
+  bodyWearLeft: number;
+  bodyWearTop: number;
+  bodyWearWidth: number;
+  bodyWearHeight: number;
 };
 
 const CAT_MINI: PetAssetSet = {
@@ -40,6 +49,10 @@ const CAT_MINI: PetAssetSet = {
   armLeftOrigin: "46% 61%",
   armRightOrigin: "55% 62%",
   tailOrigin: "53% 87%",
+  bodyWearLeft: 0.32,
+  bodyWearTop: 0.70,
+  bodyWearWidth: 0.36,
+  bodyWearHeight: 0.16,
 };
 
 const CAT_IDLE: PetAssetSet = {
@@ -61,6 +74,10 @@ const CAT_IDLE: PetAssetSet = {
   armLeftOrigin: "46% 61%",
   armRightOrigin: "55% 62%",
   tailOrigin: "53% 87%",
+  bodyWearLeft: 0.32,
+  bodyWearTop: 0.70,
+  bodyWearWidth: 0.36,
+  bodyWearHeight: 0.16,
 };
 
 export const PET_ASSETS: Record<PetSpecies, Record<PetStage, PetAssetSet>> = {
