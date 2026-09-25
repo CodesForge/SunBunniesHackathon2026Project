@@ -19,7 +19,7 @@ import Animated, {
 import TopHud from "../../components/ui/TopHud";
 import { FOOD_ITEMS, type FoodItem } from "../../data/food";
 import { usePet } from "../../store/pet";
-import { colors, font, radius, space } from "../../theme";
+import { font, space } from "../../theme";
 
 const BACKGROUND = require("../../assets/food/shop-background.png");
 const CART = require("../../assets/food/cart.png");
@@ -41,13 +41,15 @@ const CART_WIDTH_PERCENT = 0.7;
 const CART_ASPECT = 1681 / 2111; // высота / ширина картинки тележки
 const FLIGHT_DURATION = 480;
 
-// Куда именно внутри картинки тележки складывать купленную еду (доли
-// от ширины/высоты самой тележки) — это её "корзинка" сверху, до колёс.
-const BASKET_TOP_RATIO = 0.2;
-const BASKET_LEFT_RATIO = 0.18;
-const BASKET_WIDTH_RATIO = 0.66;
-const BASKET_HEIGHT_RATIO = 0.42;
-const BOUGHT_ICON_RATIO = 0.42; // размер иконки в корзине относительно размера еды на полке
+// Купленная еда складывается горкой прямо НАД тележкой (как в Talking
+// Tom), обычного размера, а не мелкими значками. Чтобы горка не разрослась
+// до бесконечности, показываем максимум MAX_PILE_ITEMS штук — все покупки
+// сверх этого числа всё равно летят анимацией, просто больше не
+// добавляются в саму кучу.
+const MAX_PILE_ITEMS = 15;
+const PILE_ICON_RATIO = 0.8; // размер иконки в кучке относительно размера еды на полке
+const PILE_WIDTH_RATIO = 0.85; // ширина зоны кучки относительно ширины тележки
+const PILE_BOTTOM_RATIO = 0.55; // где "дно" кучки внутри тележки (доля высоты тележки)
 
 type Flight = {
   id: string;
@@ -73,8 +75,18 @@ export default function FoodShopScreen() {
   const cartHeight = cartWidth * CART_ASPECT;
 
   const rows = [FOOD_ITEMS.slice(0, 3), FOOD_ITEMS.slice(3, 6), FOOD_ITEMS.slice(6, 9)];
-  const boughtItems = FOOD_ITEMS.filter((item) => (foodOwned[item.id] ?? 0) > 0);
-  const boughtIconSize = itemSize * BOUGHT_ICON_RATIO;
+  const pileIconSize = itemSize * PILE_ICON_RATIO;
+  const pileWidth = cartWidth * PILE_WIDTH_RATIO;
+
+  // Плоский список отдельных купленных штук (не по одной иконке на вид
+  // еды, а именно по штуке на каждую покупку) — обрезанный по MAX_PILE_ITEMS.
+  const pile: { key: string; image: FoodItem["image"] }[] = [];
+  for (const item of FOOD_ITEMS) {
+    const qty = foodOwned[item.id] ?? 0;
+    for (let i = 0; i < qty && pile.length < MAX_PILE_ITEMS; i++) {
+      pile.push({ key: `${item.id}-${i}`, image: item.image });
+    }
+  }
 
   const removeFlight = useCallback((id: string) => {
     setFlights((prev) => prev.filter((f) => f.id !== id));
@@ -166,36 +178,27 @@ export default function FoodShopScreen() {
         <View
           style={{
             position: "absolute",
-            top: cartHeight * BASKET_TOP_RATIO,
-            left: cartWidth * BASKET_LEFT_RATIO,
-            width: cartWidth * BASKET_WIDTH_RATIO,
-            height: cartHeight * BASKET_HEIGHT_RATIO,
+            bottom: cartHeight * (1 - PILE_BOTTOM_RATIO),
+            left: (cartWidth - pileWidth) / 2,
+            width: pileWidth,
             flexDirection: "row",
-            flexWrap: "wrap",
-            alignContent: "flex-start",
+            flexWrap: "wrap-reverse",
             justifyContent: "center",
+            alignContent: "flex-end",
           }}
         >
-          {boughtItems.map((item) => {
-            const qty = foodOwned[item.id] ?? 0;
-            return (
-              <View
-                key={item.id}
-                style={{ width: boughtIconSize, alignItems: "center", margin: 1 }}
-              >
-                <Image
-                  source={item.image}
-                  style={{ width: boughtIconSize, height: boughtIconSize }}
-                  resizeMode="contain"
-                />
-                {qty > 1 && (
-                  <View style={styles.qtyBadge}>
-                    <Text style={styles.qtyBadgeText}>x{qty}</Text>
-                  </View>
-                )}
-              </View>
-            );
-          })}
+          {pile.map((p) => (
+            <Image
+              key={p.key}
+              source={p.image}
+              style={{
+                width: pileIconSize,
+                height: pileIconSize,
+                margin: -pileIconSize * 0.14,
+              }}
+              resizeMode="contain"
+            />
+          ))}
         </View>
       </View>
 
@@ -278,14 +281,4 @@ const styles = StyleSheet.create({
   priceText: { ...font.small, fontWeight: "800", color: "#3A2E22" },
 
   cartSlot: { position: "absolute" },
-  qtyBadge: {
-    position: "absolute",
-    bottom: -4,
-    backgroundColor: colors.surface,
-    borderRadius: radius.pill,
-    borderWidth: 1,
-    borderColor: colors.iconBorder,
-    paddingHorizontal: 4,
-  },
-  qtyBadgeText: { fontSize: 9, fontWeight: "800", color: colors.ink },
 });
