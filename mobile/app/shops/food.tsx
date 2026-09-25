@@ -49,7 +49,7 @@ const FLIGHT_DURATION = 480;
 // MAX_PILE_ITEMS штук — все покупки сверх этого числа всё равно летят
 // анимацией, просто больше не добавляются в саму кучу.
 const MAX_PILE_ITEMS = 15;
-const PILE_ICON_RATIO = 0.34; // размер иконки в кучке относительно размера еды на полке
+const PILE_ICON_RATIO = 0.5; // размер иконки в кучке относительно размера еды на полке
 const BASKET_LEFT_RATIO = 0.2;
 const BASKET_TOP_RATIO = 0.08;
 const BASKET_WIDTH_RATIO = 0.6;
