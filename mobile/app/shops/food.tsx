@@ -30,6 +30,12 @@ const COIN_NEED = require("../../assets/icons/coin-need.png");
 const SHELF_TOP_FRACTIONS = [0.2578, 0.432, 0.6063];
 const FLOOR_TOP_FRACTION = 0.7383;
 
+// Насколько низ картинки еды заходит "под" полку (в пикселях). Чем
+// БОЛЬШЕ число — тем НИЖЕ и плотнее еда сидит на полке (может слегка
+// перекрыть саму доску). Чем МЕНЬШЕ (или отрицательное) — тем выше и
+// "воздушнее" еда висит над полкой. Крути и смотри, что нравится.
+const SHELF_SINK_PX = 10;
+
 const ITEM_SIZE_PERCENT = 0.16;
 const CART_WIDTH_PERCENT = 0.7;
 const CART_ASPECT = 1681 / 2111; // высота / ширина картинки тележки
@@ -98,7 +104,7 @@ export default function FoodShopScreen() {
           key={rowIndex}
           style={[
             styles.shelfRow,
-            { top: height * SHELF_TOP_FRACTIONS[rowIndex] - itemSize - space.md },
+            { top: height * SHELF_TOP_FRACTIONS[rowIndex] - itemSize + SHELF_SINK_PX },
           ]}
         >
           {row.map((item) => {
