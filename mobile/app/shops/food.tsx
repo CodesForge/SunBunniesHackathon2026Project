@@ -19,7 +19,7 @@ import Animated, {
 import TopHud from "../../components/ui/TopHud";
 import { FOOD_ITEMS, type FoodItem } from "../../data/food";
 import { usePet } from "../../store/pet";
-import { font, space } from "../../theme";
+import { colors, font, radius, space } from "../../theme";
 
 const BACKGROUND = require("../../assets/food/shop-background.png");
 const CART = require("../../assets/food/cart.png");
@@ -41,6 +41,14 @@ const CART_WIDTH_PERCENT = 0.7;
 const CART_ASPECT = 1681 / 2111; // высота / ширина картинки тележки
 const FLIGHT_DURATION = 480;
 
+// Куда именно внутри картинки тележки складывать купленную еду (доли
+// от ширины/высоты самой тележки) — это её "корзинка" сверху, до колёс.
+const BASKET_TOP_RATIO = 0.2;
+const BASKET_LEFT_RATIO = 0.18;
+const BASKET_WIDTH_RATIO = 0.66;
+const BASKET_HEIGHT_RATIO = 0.42;
+const BOUGHT_ICON_RATIO = 0.42; // размер иконки в корзине относительно размера еды на полке
+
 type Flight = {
   id: string;
   image: FoodItem["image"];
@@ -51,6 +59,7 @@ type Flight = {
 export default function FoodShopScreen() {
   const { width, height } = useWindowDimensions();
   const jarsNeed = usePet((s) => s.jars.need);
+  const foodOwned = usePet((s) => s.foodOwned);
   const buyFood = usePet((s) => s.buyFood);
 
   const backgroundStyle = { position: "absolute" as const, top: 0, left: 0, width, height };
@@ -64,6 +73,8 @@ export default function FoodShopScreen() {
   const cartHeight = cartWidth * CART_ASPECT;
 
   const rows = [FOOD_ITEMS.slice(0, 3), FOOD_ITEMS.slice(3, 6), FOOD_ITEMS.slice(6, 9)];
+  const boughtItems = FOOD_ITEMS.filter((item) => (foodOwned[item.id] ?? 0) > 0);
+  const boughtIconSize = itemSize * BOUGHT_ICON_RATIO;
 
   const removeFlight = useCallback((id: string) => {
     setFlights((prev) => prev.filter((f) => f.id !== id));
@@ -151,6 +162,41 @@ export default function FoodShopScreen() {
         pointerEvents="none"
       >
         <Image source={CART} style={{ width: cartWidth, height: cartHeight }} resizeMode="contain" />
+
+        <View
+          style={{
+            position: "absolute",
+            top: cartHeight * BASKET_TOP_RATIO,
+            left: cartWidth * BASKET_LEFT_RATIO,
+            width: cartWidth * BASKET_WIDTH_RATIO,
+            height: cartHeight * BASKET_HEIGHT_RATIO,
+            flexDirection: "row",
+            flexWrap: "wrap",
+            alignContent: "flex-start",
+            justifyContent: "center",
+          }}
+        >
+          {boughtItems.map((item) => {
+            const qty = foodOwned[item.id] ?? 0;
+            return (
+              <View
+                key={item.id}
+                style={{ width: boughtIconSize, alignItems: "center", margin: 1 }}
+              >
+                <Image
+                  source={item.image}
+                  style={{ width: boughtIconSize, height: boughtIconSize }}
+                  resizeMode="contain"
+                />
+                {qty > 1 && (
+                  <View style={styles.qtyBadge}>
+                    <Text style={styles.qtyBadgeText}>x{qty}</Text>
+                  </View>
+                )}
+              </View>
+            );
+          })}
+        </View>
       </View>
 
       {flights.map((f) => (
@@ -232,4 +278,14 @@ const styles = StyleSheet.create({
   priceText: { ...font.small, fontWeight: "800", color: "#3A2E22" },
 
   cartSlot: { position: "absolute" },
+  qtyBadge: {
+    position: "absolute",
+    bottom: -4,
+    backgroundColor: colors.surface,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.iconBorder,
+    paddingHorizontal: 4,
+  },
+  qtyBadgeText: { fontSize: 9, fontWeight: "800", color: colors.ink },
 });
