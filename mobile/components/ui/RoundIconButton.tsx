@@ -1,11 +1,13 @@
-import { Pressable, StyleSheet, View, type PressableProps } from "react-native";
+import { Image, Pressable, StyleSheet, View, type PressableProps } from "react-native";
 import type { LucideIcon } from "lucide-react-native";
-import { colors, radius, HIT } from "../../theme";
+import { colors, HIT } from "../../theme";
 
-const CIRCLE_SIZE = 46;
-const BORDER_WIDTH = 3;
+const CIRCLE_SIZE = 58;
 const ICON_SIZE = 24;
-const TAP_PADDING = (HIT - CIRCLE_SIZE) / 2;
+const TAP_AREA_SIZE = Math.max(HIT, CIRCLE_SIZE);
+const TAP_PADDING = (TAP_AREA_SIZE - CIRCLE_SIZE) / 2;
+
+const CIRCLE_BG = require("../../assets/icons/circle-small.png");
 
 type Props = PressableProps & {
   icon: LucideIcon;
@@ -18,7 +20,10 @@ export default function RoundIconButton({
   return (
     <Pressable style={styles.tapArea} {...pressableProps}>
       <View style={styles.circle}>
-        <Icon size={ICON_SIZE} color={colors.iconBorder} strokeWidth={3} />
+        <Image source={CIRCLE_BG} style={styles.circleBg} resizeMode="contain" />
+        <View style={styles.iconWrap}>
+          <Icon size={ICON_SIZE} color={colors.iconBorder} strokeWidth={3} />
+        </View>
       </View>
     </Pressable>
   );
@@ -26,8 +31,8 @@ export default function RoundIconButton({
 
 const styles = StyleSheet.create({
   tapArea: {
-    width: HIT,
-    height: HIT,
+    width: TAP_AREA_SIZE,
+    height: TAP_AREA_SIZE,
     padding: TAP_PADDING,
     alignItems: "center",
     justifyContent: "center",
@@ -35,11 +40,17 @@ const styles = StyleSheet.create({
   circle: {
     width: CIRCLE_SIZE,
     height: CIRCLE_SIZE,
-    borderRadius: radius.pill,
-    borderWidth: BORDER_WIDTH,
-    borderColor: colors.iconBorder,
-    backgroundColor: colors.surface,
     alignItems: "center",
     justifyContent: "center",
+  },
+  circleBg: {
+    position: "absolute",
+    width: CIRCLE_SIZE,
+    height: CIRCLE_SIZE,
+    zIndex: 0,
+  },
+  iconWrap: {
+    zIndex: 1,
+    elevation: 1,
   },
 });

@@ -1,31 +1,17 @@
-import { StyleSheet, Text, View } from "react-native";
-import type { LucideIcon } from "lucide-react-native";
-import { colors, radius } from "../../theme";
+import { Image, StyleSheet, Text, View, type ImageSourcePropType } from "react-native";
+import { colors } from "../../theme";
 
 const BADGE_SIZE = 28;
-const BORDER_WIDTH = 2;
-const ICON_SIZE = 16;
 
 type Props = {
-  icon: LucideIcon;
-  color: string;
-  background: string;
+  image: ImageSourcePropType;
   value: number;
 };
 
-export default function CoinValue({
-  icon: Icon,
-  color,
-  background,
-  value,
-}: Props) {
+export default function CoinValue({ image, value }: Props) {
   return (
     <View style={styles.wrap}>
-      <View
-        style={[styles.badge, { borderColor: color, backgroundColor: background }]}
-      >
-        <Icon size={ICON_SIZE} color={color} strokeWidth={3} />
-      </View>
+      <Image source={image} style={styles.badge} resizeMode="contain" />
       <Text style={styles.value}>{value}</Text>
     </View>
   );
@@ -33,13 +19,6 @@ export default function CoinValue({
 
 const styles = StyleSheet.create({
   wrap: { flexDirection: "row", alignItems: "center", gap: 8 },
-  badge: {
-    width: BADGE_SIZE,
-    height: BADGE_SIZE,
-    borderRadius: radius.pill,
-    borderWidth: BORDER_WIDTH,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  badge: { width: BADGE_SIZE, height: BADGE_SIZE },
   value: { fontSize: 14, fontWeight: "800", color: colors.ink },
 });

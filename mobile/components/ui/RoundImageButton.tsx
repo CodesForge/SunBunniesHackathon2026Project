@@ -7,11 +7,12 @@ import {
   type PressableProps,
 } from "react-native";
 
-import { colors, radius, HIT } from "../../theme";
+import { HIT } from "../../theme";
 
 const CIRCLE_SIZE = 88;
-const BORDER_WIDTH = 6;
 const ICON_SIZE = 58;
+
+const CIRCLE_LARGE = require("../../assets/icons/circle-large.png");
 
 export const ROUND_IMAGE_BUTTON_SIZE = Math.max(HIT, CIRCLE_SIZE);
 const TAP_PADDING = (ROUND_IMAGE_BUTTON_SIZE - CIRCLE_SIZE) / 2;
@@ -24,7 +25,10 @@ export default function RoundImageButton({ image, ...pressableProps }: Props) {
   return (
     <Pressable style={styles.tapArea} {...pressableProps}>
       <View style={styles.circle}>
-        <Image source={image} style={styles.icon} resizeMode="contain" />
+        <Image source={CIRCLE_LARGE} style={styles.circleBg} resizeMode="contain" />
+        <View style={styles.iconWrap}>
+          <Image source={image} style={styles.icon} resizeMode="contain" />
+        </View>
       </View>
     </Pressable>
   );
@@ -41,12 +45,15 @@ const styles = StyleSheet.create({
   circle: {
     width: CIRCLE_SIZE,
     height: CIRCLE_SIZE,
-    borderRadius: radius.pill,
-    borderWidth: BORDER_WIDTH,
-    borderColor: colors.iconBorder,
-    backgroundColor: colors.surface,
     alignItems: "center",
     justifyContent: "center",
   },
+  circleBg: {
+    position: "absolute",
+    width: CIRCLE_SIZE,
+    height: CIRCLE_SIZE,
+    zIndex: 0,
+  },
+  iconWrap: { zIndex: 1, elevation: 1 },
   icon: { width: ICON_SIZE, height: ICON_SIZE },
 });

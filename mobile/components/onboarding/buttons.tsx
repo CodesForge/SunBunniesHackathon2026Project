@@ -1,7 +1,9 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { Play } from "lucide-react-native";
 import { ONB } from "./scene";
 import { colors } from "../../theme";
+
+const CIRCLE_LARGE = require("../../assets/icons/circle-large.png");
 
 type PillProps = {
   label: string;
@@ -32,18 +34,23 @@ type RoundProps = {
   size?: number;
 };
 
-export function RoundButton({ onPress, disabled, size = 56 }: RoundProps) {
+export function RoundButton({ onPress, disabled, size = 76 }: RoundProps) {
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled}
       style={({ pressed }) => [
         styles.round,
-        { width: size, height: size, borderRadius: size / 2 },
+        { width: size, height: size },
         pressed && styles.pressed,
         disabled && styles.disabled,
       ]}
     >
+      <Image
+        source={CIRCLE_LARGE}
+        style={{ position: "absolute", width: size, height: size }}
+        resizeMode="contain"
+      />
       <View style={{ marginLeft: size * 0.06 }}>
         <Play
           size={size * 0.42}
@@ -76,7 +83,6 @@ const styles = StyleSheet.create({
   round: {
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: colors.surface,
   },
   pressed: { opacity: 0.85, transform: [{ scale: 0.97 }] },
   disabled: { opacity: 0.45 },

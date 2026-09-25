@@ -1,15 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { Link } from "expo-router";
-import {
-  Apple,
-  MessageCircle,
-  MoonStar,
-  PiggyBank,
-  Settings,
-  Shirt,
-  Utensils,
-  Wallet,
-} from "lucide-react-native";
+import { MessageCircle, Settings, Wallet } from "lucide-react-native";
 
 import { usePet } from "../../store/pet";
 import { fullness, sleepiness } from "../../lib/time";
@@ -21,6 +13,42 @@ import RoundIconButton from "./RoundIconButton";
 
 const LOW = 20;
 const BUBBLE_SIZE = 130;
+
+const COIN_NEED = require("../../assets/icons/coin-need.png");
+const COIN_WANT = require("../../assets/icons/coin-want.png");
+const COIN_DREAM = require("../../assets/icons/coin-dream.png");
+const CIRCLE_LARGE = require("../../assets/icons/circle-large.png");
+const PILL_BG = require("../../assets/icons/pill-long.png");
+const ICON_MOON_PURPLE = require("../../assets/icons/icon-moon-purple.png");
+const ICON_FOOD_PURPLE = require("../../assets/icons/icon-food-purple.png");
+
+// Image в RN не умеет само растягиваться на 100%/absoluteFill внутри
+// текучего flex-контейнера — ему нужен точный пиксельный размер. Меряем
+// реальный размер полоски через onLayout и уже потом рисуем картинку.
+function PillBackground() {
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
+  return (
+    <View
+      style={StyleSheet.absoluteFill}
+      pointerEvents="none"
+      onLayout={(e) => {
+        const { width, height } = e.nativeEvent.layout;
+        setSize((prev) =>
+          prev.width === width && prev.height === height ? prev : { width, height }
+        );
+      }}
+    >
+      {size.width > 0 && size.height > 0 && (
+        <Image
+          source={PILL_BG}
+          style={{ width: size.width, height: size.height }}
+          resizeMode="cover"
+        />
+      )}
+    </View>
+  );
+}
 
 type TopHudProps = {
   showChatBubble?: boolean;
@@ -46,6 +74,7 @@ export default function TopHud({ showChatBubble = true }: TopHudProps) {
               accessibilityRole="button"
               accessibilityLabel={`Уровень ${level}`}
             >
+              <Image source={CIRCLE_LARGE} style={styles.levelCircleBg} resizeMode="contain" />
               <Text style={styles.levelValue}>{level}</Text>
               <Text style={styles.levelCaption}>Ур.</Text>
             </Pressable>
@@ -69,24 +98,10 @@ export default function TopHud({ showChatBubble = true }: TopHudProps) {
         <View style={styles.rightColumn}>
           <View style={styles.topRightRow}>
             <View style={styles.moneyPill}>
-              <CoinValue
-                icon={Apple}
-                color={colors.coinNeed}
-                background={colors.coinNeedBg}
-                value={jars.need}
-              />
-              <CoinValue
-                icon={Shirt}
-                color={colors.coinWant}
-                background={colors.iconBorder}
-                value={jars.want}
-              />
-              <CoinValue
-                icon={PiggyBank}
-                color={colors.coinDream}
-                background={colors.coinDreamBg}
-                value={jars.dream}
-              />
+              <PillBackground />
+              <CoinValue image={COIN_NEED} value={jars.need} />
+              <CoinValue image={COIN_WANT} value={jars.want} />
+              <CoinValue image={COIN_DREAM} value={jars.dream} />
             </View>
 
             <Link href={"/settings" as any} asChild>
@@ -99,12 +114,14 @@ export default function TopHud({ showChatBubble = true }: TopHudProps) {
           </View>
 
           <View style={styles.scalesFrame}>
+            <PillBackground />
+
             <View
               style={styles.scale}
               accessibilityRole="progressbar"
               accessibilityLabel={`Сон: ${Math.round(sleep)} из 100${sleep <= LOW ? ", мало" : ""}`}
             >
-              <StatBar value={sleep} icon={MoonStar} />
+              <StatBar value={sleep} icon={ICON_MOON_PURPLE} />
               {sleep <= LOW && <Text style={styles.lowMark}>!</Text>}
             </View>
 
@@ -113,7 +130,7 @@ export default function TopHud({ showChatBubble = true }: TopHudProps) {
               accessibilityRole="progressbar"
               accessibilityLabel={`Сытость: ${Math.round(hunger)} из 100${hunger <= LOW ? ", мало" : ""}`}
             >
-              <StatBar value={hunger} icon={Utensils} />
+              <StatBar value={hunger} icon={ICON_FOOD_PURPLE} />
               {hunger <= LOW && <Text style={styles.lowMark}>!</Text>}
             </View>
           </View>
@@ -142,12 +159,13 @@ const styles = StyleSheet.create({
   levelCircle: {
     width: 80,
     height: 80,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surface,
-    borderWidth: 3,
-    borderColor: colors.iconBorder,
     alignItems: "center",
     justifyContent: "center",
+  },
+  levelCircleBg: {
+    position: "absolute",
+    width: 80,
+    height: 80,
   },
   levelValue: {
     color: colors.coinWant,
@@ -169,24 +187,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    height: 38,
-    backgroundColor: colors.surface,
-    borderWidth: 3,
-    borderColor: colors.iconBorder,
+    height: 46,
     borderRadius: radius.pill,
-    paddingHorizontal: 8,
+    overflow: "hidden",
+    paddingHorizontal: 16,
   },
 
   scalesFrame: {
     flexDirection: "row",
     alignItems: "center",
-    height: 38,
+    height: 46,
     marginTop: 8,
     borderRadius: radius.pill,
-    borderWidth: 3,
-    borderColor: colors.iconBorder,
-    backgroundColor: colors.surface,
-    paddingHorizontal: 8,
+    overflow: "hidden",
+    paddingHorizontal: 16,
     gap: 10,
   },
   scale: { flex: 1, flexDirection: "row", alignItems: "center", gap: 4 },
