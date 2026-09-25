@@ -27,11 +27,11 @@ const COIN_NEED = require("../../assets/icons/coin-need.png");
 
 // Доли высоты картинки фона, на которых начинаются деревянные полки —
 // вымерено по самому фону, чтобы еда легла ровно на полку.
-const SHELF_TOP_FRACTIONS = [0.1466, 0.3208, 0.4949];
-const FLOOR_TOP_FRACTION = 0.7426;
+const SHELF_TOP_FRACTIONS = [0.2578, 0.432, 0.6063];
+const FLOOR_TOP_FRACTION = 0.7383;
 
 const ITEM_SIZE_PERCENT = 0.16;
-const CART_WIDTH_PERCENT = 0.62;
+const CART_WIDTH_PERCENT = 0.7;
 const CART_ASPECT = 1681 / 2111; // высота / ширина картинки тележки
 const FLIGHT_DURATION = 480;
 
