@@ -30,8 +30,8 @@ const COIN_NEED = require("../../assets/icons/coin-need.png");
 const SHELF_TOP_FRACTIONS = [0.1466, 0.3208, 0.4949];
 const FLOOR_TOP_FRACTION = 0.7426;
 
-const ITEM_SIZE_PERCENT = 0.22;
-const CART_WIDTH_PERCENT = 0.5;
+const ITEM_SIZE_PERCENT = 0.16;
+const CART_WIDTH_PERCENT = 0.62;
 const CART_ASPECT = 1681 / 2111; // высота / ширина картинки тележки
 const FLIGHT_DURATION = 480;
 
@@ -46,6 +46,8 @@ export default function FoodShopScreen() {
   const { width, height } = useWindowDimensions();
   const jarsNeed = usePet((s) => s.jars.need);
   const buyFood = usePet((s) => s.buyFood);
+
+  const backgroundStyle = { position: "absolute" as const, top: 0, left: 0, width, height };
 
   const [flights, setFlights] = useState<Flight[]>([]);
   const cartRef = useRef<View>(null);
@@ -89,7 +91,7 @@ export default function FoodShopScreen() {
 
   return (
     <View style={styles.root}>
-      <Image source={BACKGROUND} style={StyleSheet.absoluteFill} resizeMode="cover" />
+      <Image source={BACKGROUND} style={backgroundStyle} resizeMode="cover" />
 
       {rows.map((row, rowIndex) => (
         <View
