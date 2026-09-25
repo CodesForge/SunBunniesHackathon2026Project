@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { Link } from "expo-router";
-import { MessageCircle, Settings, Wallet } from "lucide-react-native";
+import { ArrowLeft, MessageCircle, Settings, Wallet } from "lucide-react-native";
 
 import { usePet } from "../../store/pet";
 import { fullness, sleepiness } from "../../lib/time";
@@ -52,9 +52,19 @@ function PillBackground() {
 
 type TopHudProps = {
   showChatBubble?: boolean;
+  // Показывать ли полоски сна/сытости — на экранах вроде магазина они
+  // не нужны.
+  showStats?: boolean;
+  // Если задано — вместо кружка с уровнем показываем кнопку "назад",
+  // ведущую по этому адресу (используется на подэкранах вроде магазина).
+  backHref?: string;
 };
 
-export default function TopHud({ showChatBubble = true }: TopHudProps) {
+export default function TopHud({
+  showChatBubble = true,
+  showStats = true,
+  backHref,
+}: TopHudProps) {
   const jars = usePet((s) => s.jars);
   const xp = usePet((s) => s.xp);
   const lastFedAt = usePet((s) => s.lastFedAt);
@@ -68,17 +78,26 @@ export default function TopHud({ showChatBubble = true }: TopHudProps) {
     <View style={styles.root} pointerEvents="box-none">
       <View style={styles.row}>
         <View style={styles.leftColumn}>
-          <Link href={"/pet-level" as any} asChild>
-            <Pressable
-              style={styles.levelCircle}
-              accessibilityRole="button"
-              accessibilityLabel={`Уровень ${level}`}
-            >
-              <Image source={CIRCLE_LARGE} style={styles.levelCircleBg} resizeMode="contain" />
-              <Text style={styles.levelValue}>{level}</Text>
-              <Text style={styles.levelCaption}>Ур.</Text>
-            </Pressable>
-          </Link>
+          {backHref ? (
+            <Link href={backHref as any} asChild>
+              <RoundIconButton
+                icon={ArrowLeft}
+                accessibilityRole="button"
+                accessibilityLabel="Назад"
+              />
+            </Link>
+          ) : (
+            <Link href={"/pet-level" as any} asChild>
+              <Pressable
+                style={styles.levelCircle}
+                accessibilityRole="button"
+                accessibilityLabel={`Уровень ${level}`}
+              >
+                <Image source={CIRCLE_LARGE} style={styles.levelCircleBg} resizeMode="contain" />
+                <Text style={styles.levelValue}>{level} Ур.</Text>
+              </Pressable>
+            </Link>
+          )}
 
           <Link href={"/plan" as any} asChild>
             <RoundIconButton
@@ -113,27 +132,29 @@ export default function TopHud({ showChatBubble = true }: TopHudProps) {
             </Link>
           </View>
 
-          <View style={styles.scalesFrame}>
-            <PillBackground />
+          {showStats && (
+            <View style={styles.scalesFrame}>
+              <PillBackground />
 
-            <View
-              style={styles.scale}
-              accessibilityRole="progressbar"
-              accessibilityLabel={`Сон: ${Math.round(sleep)} из 100${sleep <= LOW ? ", мало" : ""}`}
-            >
-              <StatBar value={sleep} icon={ICON_MOON_PURPLE} />
-              {sleep <= LOW && <Text style={styles.lowMark}>!</Text>}
-            </View>
+              <View
+                style={styles.scale}
+                accessibilityRole="progressbar"
+                accessibilityLabel={`Сон: ${Math.round(sleep)} из 100${sleep <= LOW ? ", мало" : ""}`}
+              >
+                <StatBar value={sleep} icon={ICON_MOON_PURPLE} />
+                {sleep <= LOW && <Text style={styles.lowMark}>!</Text>}
+              </View>
 
-            <View
-              style={styles.scale}
-              accessibilityRole="progressbar"
-              accessibilityLabel={`Сытость: ${Math.round(hunger)} из 100${hunger <= LOW ? ", мало" : ""}`}
-            >
-              <StatBar value={hunger} icon={ICON_FOOD_PURPLE} />
-              {hunger <= LOW && <Text style={styles.lowMark}>!</Text>}
+              <View
+                style={styles.scale}
+                accessibilityRole="progressbar"
+                accessibilityLabel={`Сытость: ${Math.round(hunger)} из 100${hunger <= LOW ? ", мало" : ""}`}
+              >
+                <StatBar value={hunger} icon={ICON_FOOD_PURPLE} />
+                {hunger <= LOW && <Text style={styles.lowMark}>!</Text>}
+              </View>
             </View>
-          </View>
+          )}
 
           {showChatBubble && (
             <View style={styles.bubbleRow} pointerEvents="none">
@@ -169,7 +190,7 @@ const styles = StyleSheet.create({
   },
   levelValue: {
     color: colors.coinWant,
-    fontSize: 30,
+    fontSize: 20,
     fontWeight: "800",
     lineHeight: 34,
   },
@@ -187,7 +208,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    height: 46,
+    height: 36,
     borderRadius: radius.pill,
     overflow: "hidden",
     paddingHorizontal: 16,
