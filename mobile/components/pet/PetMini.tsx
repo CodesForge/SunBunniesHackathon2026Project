@@ -8,6 +8,7 @@ import Animated, {
   withTiming,
   type SharedValue,
 } from "react-native-reanimated";
+import type { ImageSourcePropType } from "react-native";
 import { MouthKey, PET_ASSETS, PetSpecies } from "./petAssets";
 
 type PetMiniProps = {
@@ -16,6 +17,8 @@ type PetMiniProps = {
   mouth?: MouthKey;
   eyesOpen?: boolean;
   animated?: boolean;
+  // Надетая на тело вещь из гардероба (подгузник и т.п.), если есть.
+  bodyWear?: ImageSourcePropType;
 };
 
 function useBlink(enabled: boolean) {
@@ -80,7 +83,7 @@ function useTailFlick(enabled: boolean, tail: SharedValue<number>) {
   }, [enabled]);
 }
 
-export function PetMini({ species, widthPercent = 58, mouth = "happy", eyesOpen = true, animated = true }: PetMiniProps) {
+export function PetMini({ species, widthPercent = 58, mouth = "happy", eyesOpen = true, animated = true, bodyWear }: PetMiniProps) {
   const assets = PET_ASSETS[species].mini;
   const { width } = useWindowDimensions();
   const w = (width * widthPercent) / 100;
@@ -108,6 +111,19 @@ export function PetMini({ species, widthPercent = 58, mouth = "happy", eyesOpen 
         />
         <Image source={assets.body} style={styles.layer} resizeMode="contain" />
         <Image source={assets.belly} style={styles.layer} resizeMode="contain" />
+        {bodyWear && (
+          <Image
+            source={bodyWear}
+            style={{
+              position: "absolute",
+              left: w * assets.bodyWearLeft,
+              top: h * assets.bodyWearTop,
+              width: w * assets.bodyWearWidth,
+              height: h * assets.bodyWearHeight,
+            }}
+            resizeMode="contain"
+          />
+        )}
         <Image source={assets.armLeft} style={styles.layer} resizeMode="contain" />
         <Image source={assets.armRight} style={styles.layer} resizeMode="contain" />
         <Image source={showOpenEyes ? assets.eyesOpen : assets.eyesClosed} style={styles.layer} resizeMode="contain" />

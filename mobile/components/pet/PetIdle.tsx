@@ -8,6 +8,7 @@ import Animated, {
   withSequence,
   withTiming,
 } from "react-native-reanimated";
+import type { ImageSourcePropType } from "react-native";
 import { MouthKey, PET_ASSETS, PetSpecies } from "./petAssets";
 
 type PetIdleProps = {
@@ -16,6 +17,8 @@ type PetIdleProps = {
   mouth?: MouthKey;
   eyesOpen?: boolean;
   animated?: boolean;
+  // Надетая на тело вещь из гардероба (подгузник и т.п.), если есть.
+  bodyWear?: ImageSourcePropType;
 };
 
 function useBlink(enabled: boolean) {
@@ -59,7 +62,7 @@ function sway(duration: number) {
   );
 }
 
-export function PetIdle({ species, widthPercent = 58, mouth = "happy", eyesOpen = true, animated = true }: PetIdleProps) {
+export function PetIdle({ species, widthPercent = 58, mouth = "happy", eyesOpen = true, animated = true, bodyWear }: PetIdleProps) {
   const assets = PET_ASSETS[species].idle;
   const { width } = useWindowDimensions();
   const w = (width * widthPercent) / 100;
@@ -104,6 +107,19 @@ export function PetIdle({ species, widthPercent = 58, mouth = "happy", eyesOpen 
         />
         <Image source={assets.body} style={styles.layer} resizeMode="contain" />
         <Animated.Image source={assets.belly} style={[styles.layer, bellyStyle]} resizeMode="contain" />
+        {bodyWear && (
+          <Image
+            source={bodyWear}
+            style={{
+              position: "absolute",
+              left: w * assets.bodyWearLeft,
+              top: h * assets.bodyWearTop,
+              width: w * assets.bodyWearWidth,
+              height: h * assets.bodyWearHeight,
+            }}
+            resizeMode="contain"
+          />
+        )}
         <Animated.Image
           source={assets.armLeft}
           style={[styles.layer, { transformOrigin: assets.armLeftOrigin }, armLeftStyle]}
