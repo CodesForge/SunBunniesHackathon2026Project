@@ -41,15 +41,31 @@ const CART_WIDTH_PERCENT = 0.7;
 const CART_ASPECT = 1681 / 2111; // высота / ширина картинки тележки
 const FLIGHT_DURATION = 480;
 
-// Купленная еда складывается горкой прямо НАД тележкой (как в Talking
-// Tom), обычного размера, а не мелкими значками. Чтобы горка не разрослась
-// до бесконечности, показываем максимум MAX_PILE_ITEMS штук — все покупки
-// сверх этого числа всё равно летят анимацией, просто больше не
-// добавляются в саму кучу.
+// Купленная еда складывается кучкой ВНУТРИ корзины тележки (за
+// сеточкой, а не поверх неё — это создаёт эффект "лежит в корзине"), в
+// произвольных местах и с небольшим поворотом, а не ровной сеткой. Область
+// вымерена по самой картинке тележки (где у неё открытая "корзинка").
+// Чтобы куча не разрослась до бесконечности, показываем максимум
+// MAX_PILE_ITEMS штук — все покупки сверх этого числа всё равно летят
+// анимацией, просто больше не добавляются в саму кучу.
 const MAX_PILE_ITEMS = 15;
-const PILE_ICON_RATIO = 0.8; // размер иконки в кучке относительно размера еды на полке
-const PILE_WIDTH_RATIO = 0.85; // ширина зоны кучки относительно ширины тележки
-const PILE_BOTTOM_RATIO = 0.55; // где "дно" кучки внутри тележки (доля высоты тележки)
+const PILE_ICON_RATIO = 0.34; // размер иконки в кучке относительно размера еды на полке
+const BASKET_LEFT_RATIO = 0.2;
+const BASKET_TOP_RATIO = 0.08;
+const BASKET_WIDTH_RATIO = 0.6;
+const BASKET_HEIGHT_RATIO = 0.58;
+
+// Стабильный "случайный" разброс позиций/поворотов — считается один раз,
+// а не при каждом рендере, чтобы куча не дёргалась туда-сюда.
+function seededRandom(seed: number) {
+  const x = Math.sin(seed * 9973) * 43758.5453;
+  return x - Math.floor(x);
+}
+const PILE_SLOTS = Array.from({ length: MAX_PILE_ITEMS }, (_, i) => ({
+  leftRatio: seededRandom(i * 2 + 1),
+  topRatio: seededRandom(i * 2 + 2),
+  rotateDeg: (seededRandom(i * 2 + 3) - 0.5) * 50,
+}));
 
 type Flight = {
   id: string;
@@ -76,7 +92,8 @@ export default function FoodShopScreen() {
 
   const rows = [FOOD_ITEMS.slice(0, 3), FOOD_ITEMS.slice(3, 6), FOOD_ITEMS.slice(6, 9)];
   const pileIconSize = itemSize * PILE_ICON_RATIO;
-  const pileWidth = cartWidth * PILE_WIDTH_RATIO;
+  const basketWidth = cartWidth * BASKET_WIDTH_RATIO;
+  const basketHeight = cartHeight * BASKET_HEIGHT_RATIO;
 
   // Плоский список отдельных купленных штук (не по одной иконке на вид
   // еды, а именно по штуке на каждую покупку) — обрезанный по MAX_PILE_ITEMS.
@@ -173,33 +190,38 @@ export default function FoodShopScreen() {
         ]}
         pointerEvents="none"
       >
-        <Image source={CART} style={{ width: cartWidth, height: cartHeight }} resizeMode="contain" />
-
+        {/* Еда лежит ЗА картинкой тележки (внутри её "сеточки"), поэтому
+            рисуем кучу раньше самой картинки тележки — та ляжет поверх. */}
         <View
           style={{
             position: "absolute",
-            bottom: cartHeight * (1 - PILE_BOTTOM_RATIO),
-            left: (cartWidth - pileWidth) / 2,
-            width: pileWidth,
-            flexDirection: "row",
-            flexWrap: "wrap-reverse",
-            justifyContent: "center",
-            alignContent: "flex-end",
+            left: cartWidth * BASKET_LEFT_RATIO,
+            top: cartHeight * BASKET_TOP_RATIO,
+            width: basketWidth,
+            height: basketHeight,
           }}
         >
-          {pile.map((p) => (
-            <Image
-              key={p.key}
-              source={p.image}
-              style={{
-                width: pileIconSize,
-                height: pileIconSize,
-                margin: -pileIconSize * 0.14,
-              }}
-              resizeMode="contain"
-            />
-          ))}
+          {pile.map((p, index) => {
+            const slot = PILE_SLOTS[index];
+            return (
+              <Image
+                key={p.key}
+                source={p.image}
+                style={{
+                  position: "absolute",
+                  left: slot.leftRatio * (basketWidth - pileIconSize),
+                  top: slot.topRatio * (basketHeight - pileIconSize),
+                  width: pileIconSize,
+                  height: pileIconSize,
+                  transform: [{ rotate: `${slot.rotateDeg}deg` }],
+                }}
+                resizeMode="contain"
+              />
+            );
+          })}
         </View>
+
+        <Image source={CART} style={{ width: cartWidth, height: cartHeight }} resizeMode="contain" />
       </View>
 
       {flights.map((f) => (
