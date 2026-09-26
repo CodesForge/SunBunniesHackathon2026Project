@@ -3,7 +3,8 @@ import { ECONOMY } from "../data/economy";
 export const TIME_SCALE = 1;
 
 export const HOUR = 3_600_000;
-const WEEK = 7 * 24 * HOUR;
+const DAY = 24 * HOUR;
+const WEEK = 7 * DAY;
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 
@@ -25,6 +26,12 @@ export function pendingIncomes(lastIncomeAt: number, now = Date.now()) {
   if (!lastIncomeAt) return 0;
   const passed = Math.floor(((now - lastIncomeAt) * TIME_SCALE) / WEEK);
   return clamp(passed, 0, 1);
+}
+
+export function daysUntilIncome(lastIncomeAt: number, now = Date.now()) {
+  if (!lastIncomeAt) return 0;
+  const passed = (now - lastIncomeAt) * TIME_SCALE;
+  return Math.max(0, Math.ceil((WEEK - passed) / DAY));
 }
 
 export function todayKey(now = new Date()) {
