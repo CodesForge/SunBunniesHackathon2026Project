@@ -1,0 +1,20 @@
+[
+  {
+    "id": "goal-ball",
+    "title": "Мяч",
+    "price": 800,
+    "art": "ball"
+  },
+  {
+    "id": "goal-skate",
+    "title": "Ролики",
+    "price": 1600,
+    "art": "skate"
+  },
+  {
+    "id": "goal-bike",
+    "title": "Велосипед",
+    "price": 3400,
+    "art": "bike"
+  }
+]
