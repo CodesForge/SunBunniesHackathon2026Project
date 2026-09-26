@@ -118,6 +118,7 @@ type Actions = {
   addSeconds: (s: number) => void;
   parentBonus: () => void;
   grantJars: (amount: Partial<Jars>) => void;
+  addXp: (amount: number) => void;
   setSetting: (k: "sound" | "motion", v: boolean) => void;
   toggleDemo: () => void;
   reset: () => void;
@@ -317,6 +318,8 @@ export const usePet = create<State & Actions>()(
           },
           dirty: true,
         })),
+
+      addXp: (amount) => set((s) => ({ xp: s.xp + amount, dirty: true })),
 
       setSetting: (k, v) =>
         set((s) => ({ settings: { ...s.settings, [k]: v } })),
