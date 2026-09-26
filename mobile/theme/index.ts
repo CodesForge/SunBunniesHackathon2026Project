@@ -27,6 +27,9 @@ export const colors = {
   coinWant: "#5948B8",
   coinDream: "#C07000",
   coinDreamBg: "#FFA600",
+  jarNeedBg: "#E8F7DA",
+  jarWantBg: "#E9E5F9",
+  jarDreamBg: "#FDEBD3",
 } as const;
 
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 } as const;
