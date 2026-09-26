@@ -17,25 +17,27 @@ import SpeechBubble from "../components/ui/SpeechBubble";
 import { daysUntilIncome } from "../lib/time";
 import { usePet } from "../store/pet";
 import { ECONOMY } from "../data/economy";
+import goals from "../data/goals.json";
 import { colors, font, radius, space, HIT } from "../theme";
 
 const STEP = 100;
 const MEALS_PER_DAY = 2;
 const PERIOD_DAYS = ECONOMY.minNeed / (ECONOMY.mealCost * MEALS_PER_DAY);
+const MAX_COINS = 12;
 const BORDER = 4;
 
 const JAR_INFO = {
   need: {
     title: "Надо",
-    text: `Отсюда питомец ест. Он кушает ${MEALS_PER_DAY} раза в день, одно кормление — ${ECONOMY.mealCost} монет. На все ${PERIOD_DAYS} дней нужно ${ECONOMY.minNeed}.`,
+    text: `Отсюда покупают еду. Питомец кушает ${MEALS_PER_DAY} раза в день, одна порция стоит около ${ECONOMY.mealCost} монет. На все ${PERIOD_DAYS} дней нужно примерно ${ECONOMY.minNeed}.`,
   },
   want: {
     title: "Хочу",
-    text: "Отсюда покупают вкусняшки и наряды. Можно ничего не покупать и оставить на потом — это не ошибка.",
+    text: "Отсюда покупают вкусняшки и наряды. Сюда же приходят монетки за пройденные задания. Можно ничего не покупать и оставить на потом — это не ошибка.",
   },
   dream: {
     title: "Мечта",
-    text: "Здесь копятся деньги на большую цель. Чем больше откладываешь, тем ближе она становится.",
+    text: "Здесь копятся деньги на большую цель. Банка наполняется по мере того, как ты приближаешься к ней.",
   },
 } as const;
 
@@ -44,53 +46,76 @@ type JarKey = "need" | "want" | "dream";
 export default function PlanScreen() {
   const router = useRouter();
 
-  const unallocated = usePet((s) => s.unallocated);
   const jars = usePet((s) => s.jars);
-  const setPlan = usePet((s) => s.setPlan);
+  const unallocated = usePet((s) => s.unallocated);
+  const goalId = usePet((s) => s.goalId);
   const lastIncomeAt = usePet((s) => s.lastIncomeAt);
+  const setPlan = usePet((s) => s.setPlan);
+  const rebalance = usePet((s) => s.rebalance);
 
-  const [draft, setDraft] = useState({ need: 0, want: 0, dream: 0 });
+  const [draft, setDraft] = useState({ ...jars });
   const [info, setInfo] = useState<JarKey | null>(null);
   const [confirming, setConfirming] = useState(false);
 
-  const editable = unallocated > 0;
+  const planning = unallocated > 0;
+  const budget = jars.need + jars.want + jars.dream + unallocated;
   const placed = draft.need + draft.want + draft.dream;
-  const left = unallocated - placed;
-  const ready = editable && left === 0;
+  const left = budget - placed;
 
-  const shown = {
-    need: editable ? draft.need : jars.need,
-    want: editable ? draft.want : jars.want,
-    dream: editable ? draft.dream : jars.dream,
-  };
+  const changed =
+    draft.need !== jars.need ||
+    draft.want !== jars.want ||
+    draft.dream !== jars.dream;
+  const ready = left === 0 && changed;
+
+  const goal = goals.find((g) => g.id === goalId) ?? null;
+  const dreamStep = goal ? Math.max(1, Math.round(goal.price / MAX_COINS)) : STEP;
 
   const change = (key: JarKey, delta: number) =>
     setDraft((d) => {
-      const next = d[key] + delta;
-      if (next < 0) return d;
-      if (delta > 0 && delta > left) return d;
-      return { ...d, [key]: next };
+      if (delta > 0 && left < delta) return d;
+      if (delta < 0 && d[key] < -delta) return d;
+      return { ...d, [key]: d[key] + delta };
     });
 
   const days = Math.floor(draft.need / (ECONOMY.mealCost * MEALS_PER_DAY));
   const enoughFood = draft.need >= ECONOMY.minNeed;
-
   const daysLeft = daysUntilIncome(lastIncomeAt);
+  const takenFromDream = Math.max(0, jars.dream - draft.dream);
 
-  const hint = !editable
-    ? daysLeft > 0
-      ? `Деньги уже разложены. Новые монеты придут через ${daysLeft} ${dayWord(daysLeft)}.`
-      : "Деньги уже разложены. Новые монеты придут совсем скоро."
-    : left > 0
-      ? `Осталось разложить ${left} монет`
-      : enoughFood
-        ? "Всё разложено! Можно подтверждать."
-        : `На еду отложено ${draft.need}. Этого хватит на ${days} ${dayWord(days)} из ${PERIOD_DAYS}.`;
+  const hint =
+    left > 0
+      ? planning
+        ? `Осталось разложить ${left} монет`
+        : `В руках ${left} монет — разложи их по банкам`
+      : !changed
+        ? daysLeft > 0
+          ? `Монеты разложены. Новые придут через ${daysLeft} ${dayWord(daysLeft)}. Переложить можно в любой момент.`
+          : "Монеты разложены. Новые придут совсем скоро."
+        : enoughFood
+          ? planning
+            ? "Всё разложено! Можно подтверждать."
+            : "Готово, можно перекладывать."
+          : `На еду отложено ${draft.need}. Этого хватит на ${days} ${dayWord(days)} из ${PERIOD_DAYS}.`;
 
   const confirm = () => {
-    setPlan({ ...draft });
+    if (planning) setPlan({ ...draft });
+    else rebalance({ ...draft });
     setConfirming(false);
     router.back();
+  };
+
+  const confirmText = () => {
+    if (takenFromDream > 0) {
+      const restLine = goal
+        ? ` До цели «${goal.title}» останется ${Math.max(0, goal.price - draft.dream)} монет.`
+        : "";
+      return `Ты забираешь из Мечты ${takenFromDream} монет.${restLine} Цель станет дальше, но копить можно снова.`;
+    }
+    if (!enoughFood) {
+      return `На еду отложено ${draft.need} — хватит на ${days} ${dayWord(days)} из ${PERIOD_DAYS}. Можно оставить так, а можно переложить.`;
+    }
+    return `Надо ${draft.need}, Хочу ${draft.want}, Мечта ${draft.dream}.`;
   };
 
   return (
@@ -139,10 +164,10 @@ export default function PlanScreen() {
           </View>
 
           <View style={styles.budgetText}>
-            <Text style={styles.budgetLabel}>Бюджет</Text>
-            <Text style={styles.budgetValue}>
-              {editable ? left : jars.need + jars.want + jars.dream}
+            <Text style={styles.budgetLabel}>
+              {left > 0 ? "В руках" : "Всего монет"}
             </Text>
+            <Text style={styles.budgetValue}>{left > 0 ? left : budget}</Text>
           </View>
 
           <Pressable
@@ -163,10 +188,10 @@ export default function PlanScreen() {
             title="Надо"
             color={colors.coinNeed}
             background={colors.jarNeedBg}
-            value={shown.need}
+            value={draft.need}
             coinStep={STEP}
-            canAdd={editable && left >= STEP}
-            canRemove={editable && draft.need > 0}
+            canAdd={left >= STEP}
+            canRemove={draft.need >= STEP}
             onAdd={() => change("need", STEP)}
             onRemove={() => change("need", -STEP)}
             onInfo={() => setInfo("need")}
@@ -175,10 +200,10 @@ export default function PlanScreen() {
             title="Хочу"
             color={colors.coinWant}
             background={colors.jarWantBg}
-            value={shown.want}
+            value={draft.want}
             coinStep={STEP}
-            canAdd={editable && left >= STEP}
-            canRemove={editable && draft.want > 0}
+            canAdd={left >= STEP}
+            canRemove={draft.want >= STEP}
             onAdd={() => change("want", STEP)}
             onRemove={() => change("want", -STEP)}
             onInfo={() => setInfo("want")}
@@ -187,10 +212,10 @@ export default function PlanScreen() {
             title="Мечта"
             color={colors.coinDream}
             background={colors.jarDreamBg}
-            value={shown.dream}
-            coinStep={STEP}
-            canAdd={editable && left >= STEP}
-            canRemove={editable && draft.dream > 0}
+            value={draft.dream}
+            coinStep={dreamStep}
+            canAdd={left >= STEP}
+            canRemove={draft.dream >= STEP}
             onAdd={() => change("dream", STEP)}
             onRemove={() => change("dream", -STEP)}
             onInfo={() => setInfo("dream")}
@@ -208,21 +233,23 @@ export default function PlanScreen() {
           <SpeechBubble text={hint} />
         </View>
 
-        {editable && (
-          <Pressable
-            style={({ pressed }) => [
-              styles.confirm,
-              !ready && styles.confirmOff,
-              pressed && styles.pressed,
-            ]}
-            onPress={() => setConfirming(true)}
-            disabled={!ready}
-            accessibilityRole="button"
-            accessibilityLabel="Подтвердить распределение"
-          >
-            <Text style={styles.confirmText}>Подтвердить</Text>
-          </Pressable>
-        )}
+        <Pressable
+          style={({ pressed }) => [
+            styles.confirm,
+            !ready && styles.confirmOff,
+            pressed && styles.pressed,
+          ]}
+          onPress={() => setConfirming(true)}
+          disabled={!ready}
+          accessibilityRole="button"
+          accessibilityLabel={
+            planning ? "Подтвердить распределение" : "Переложить монеты"
+          }
+        >
+          <Text style={styles.confirmText}>
+            {planning ? "Подтвердить" : "Переложить"}
+          </Text>
+        </Pressable>
       </SafeAreaView>
 
       <Modal
@@ -234,13 +261,9 @@ export default function PlanScreen() {
 
       <Modal
         visible={confirming}
-        title="Разложить так?"
-        text={
-          enoughFood
-            ? `Надо ${draft.need}, Хочу ${draft.want}, Мечта ${draft.dream}. Поменять можно будет, когда придут новые монеты.`
-            : `На еду отложено ${draft.need} — хватит на ${days} ${dayWord(days)} из ${PERIOD_DAYS}. Можно оставить так, а можно переложить.`
-        }
-        confirmLabel="Да, разложить"
+        title={takenFromDream > 0 ? "Точно забрать из Мечты?" : "Разложить так?"}
+        text={confirmText()}
+        confirmLabel={takenFromDream > 0 ? "Да, забрать" : "Да, разложить"}
         cancelLabel="Ещё подумаю"
         onConfirm={confirm}
         onCancel={() => setConfirming(false)}
