@@ -10,6 +10,8 @@ export const ECONOMY = {
   xpPerQuest: 1,
   stages: [0, 1, 3],
   parentBonus: 200,
+  chestReward: 150,
+  mistakePenalty: 5,
 } as const;
 
 export type Jar = "need" | "want" | "dream";
