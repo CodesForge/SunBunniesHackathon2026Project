@@ -117,6 +117,7 @@ type Actions = {
   nextPeriod: () => void;
   addSeconds: (s: number) => void;
   parentBonus: () => void;
+  grantJars: (amount: Partial<Jars>) => void;
   setSetting: (k: "sound" | "motion", v: boolean) => void;
   toggleDemo: () => void;
   reset: () => void;
@@ -288,7 +289,7 @@ export const usePet = create<State & Actions>()(
           ].slice(-8),
           periodIndex: s.periodIndex + 1,
           plan: { ...EMPTY },
-          unallocated: s.unallocated + ECONOMY.weeklyIncome,
+          jars: { ...s.jars, want: s.jars.want + ECONOMY.weeklyIncome },
           lastIncomeAt: Date.now(),
           dirty: true,
         })),
@@ -303,7 +304,17 @@ export const usePet = create<State & Actions>()(
 
       parentBonus: () =>
         set((s) => ({
-          unallocated: s.unallocated + ECONOMY.parentBonus,
+          jars: { ...s.jars, want: s.jars.want + ECONOMY.parentBonus },
+          dirty: true,
+        })),
+
+      grantJars: (amount) =>
+        set((s) => ({
+          jars: {
+            need: s.jars.need + (amount.need ?? 0),
+            want: s.jars.want + (amount.want ?? 0),
+            dream: s.jars.dream + (amount.dream ?? 0),
+          },
           dirty: true,
         })),
 

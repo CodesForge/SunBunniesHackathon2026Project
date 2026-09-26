@@ -15,6 +15,7 @@ export const colors = {
   iconBorder: "#A99FE4",
   sceneSky: "#C2DDFB",
   sceneOval: "#818BFE",
+  sceneOvalLight: "#E6E8FF",
   sceneArrow: "#838DFC",
   placeholder: "#A8B0FF",
   petCard: "#FDF0DC",
