@@ -5,7 +5,6 @@ import { ArrowLeft, MessageCircle, Settings, Wallet } from "lucide-react-native"
 
 import { usePet } from "../../store/pet";
 import { fullness, sleepiness } from "../../lib/time";
-import { ECONOMY } from "../../data/economy";
 import { colors, radius } from "../../theme";
 import CoinValue from "./CoinValue";
 import StatBar from "./StatBar";
@@ -57,6 +56,7 @@ type TopHudProps = {
   showStats?: boolean;
   // Показывать ли кнопку чата (сообщения) в левой колонке.
   showChat?: boolean;
+  showWallet?: boolean;
   // Если задано — вместо кружка с уровнем показываем кнопку "назад",
   // ведущую по этому адресу (используется на подэкранах вроде магазина).
   backHref?: string;
@@ -66,6 +66,7 @@ export default function TopHud({
   showChatBubble = true,
   showStats = true,
   showChat = true,
+  showWallet = true,
   backHref,
 }: TopHudProps) {
   const jars = usePet((s) => s.jars);
@@ -76,7 +77,7 @@ export default function TopHud({
 
   const needsPlan = unallocated > 0;
 
-  const level = xp >= ECONOMY.stages[2] ? 3 : xp >= ECONOMY.stages[1] ? 2 : 1;
+  const level = xp;
   const hunger = fullness(lastFedAt);
   const sleep = sleepiness(lastSleptAt);
 
@@ -105,22 +106,24 @@ export default function TopHud({
             </Link>
           )}
 
-          <View>
-            <Link href={"/plan" as any} asChild>
-              <RoundIconButton
-                icon={Wallet}
-                accessibilityRole="button"
-                accessibilityLabel={
-                  needsPlan ? "Бюджет, деньги ещё не разложены" : "Бюджет"
-                }
-              />
-            </Link>
-            {needsPlan && (
-              <View style={styles.alert} pointerEvents="none">
-                <Text style={styles.alertText}>!</Text>
-              </View>
-            )}
-          </View>
+          {showWallet && (
+            <View>
+              <Link href={"/plan" as any} asChild>
+                <RoundIconButton
+                  icon={Wallet}
+                  accessibilityRole="button"
+                  accessibilityLabel={
+                    needsPlan ? "Бюджет, деньги ещё не разложены" : "Бюджет"
+                  }
+                />
+              </Link>
+              {needsPlan && (
+                <View style={styles.alert} pointerEvents="none">
+                  <Text style={styles.alertText}>!</Text>
+                </View>
+              )}
+            </View>
+          )}
 
           {showChat && (
             <RoundIconButton
