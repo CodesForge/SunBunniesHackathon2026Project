@@ -69,9 +69,12 @@ export default function TopHud({
   backHref,
 }: TopHudProps) {
   const jars = usePet((s) => s.jars);
+  const unallocated = usePet((s) => s.unallocated);
   const xp = usePet((s) => s.xp);
   const lastFedAt = usePet((s) => s.lastFedAt);
   const lastSleptAt = usePet((s) => s.lastSleptAt);
+
+  const needsPlan = unallocated > 0;
 
   const level = xp >= ECONOMY.stages[2] ? 3 : xp >= ECONOMY.stages[1] ? 2 : 1;
   const hunger = fullness(lastFedAt);
@@ -102,13 +105,22 @@ export default function TopHud({
             </Link>
           )}
 
-          <Link href={"/plan" as any} asChild>
-            <RoundIconButton
-              icon={Wallet}
-              accessibilityRole="button"
-              accessibilityLabel="Бюджет"
-            />
-          </Link>
+          <View>
+            <Link href={"/plan" as any} asChild>
+              <RoundIconButton
+                icon={Wallet}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  needsPlan ? "Бюджет, деньги ещё не разложены" : "Бюджет"
+                }
+              />
+            </Link>
+            {needsPlan && (
+              <View style={styles.alert} pointerEvents="none">
+                <Text style={styles.alertText}>!</Text>
+              </View>
+            )}
+          </View>
 
           {showChat && (
             <RoundIconButton
@@ -233,4 +245,17 @@ const styles = StyleSheet.create({
   lowMark: { fontSize: 16, fontWeight: "800", color: colors.statLow },
 
   bubbleRow: { alignItems: "flex-end", marginTop: 4 },
+
+  alert: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: colors.navBadge,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  alertText: { color: colors.surface, fontSize: 13, fontWeight: "800" },
 });
