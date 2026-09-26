@@ -34,6 +34,7 @@ const ARROW_RIGHT = require("../../assets/icons/arrow-right.png");
 
 const SIDE_SCALE = 0.68;
 const FOOD_SCALE = 0.55;
+const FOOD_LIFT = 14;
 const SHIFT_RATIO = 0.9;
 const MOVE_DURATION = 260;
 const ARROW_SIZE = 34;
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
   },
   plateWrap: { alignItems: "center", justifyContent: "center" },
   plate: { position: "absolute", width: "100%", height: "100%" },
-  food: { position: "absolute" },
+  food: { position: "absolute", transform: [{ translateY: -FOOD_LIFT }] },
   badge: {
     position: "absolute",
     bottom: -6,

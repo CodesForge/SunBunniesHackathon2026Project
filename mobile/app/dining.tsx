@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Image, StyleSheet, View, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -7,19 +8,37 @@ import {
 } from "../components/dining/FoodPlateCarousel";
 import { PetMini } from "../components/pet/PetMini";
 import BottomNav from "../components/ui/BottomNav";
+import Modal from "../components/ui/Modal";
 import TopHud from "../components/ui/TopHud";
 import { FOOD_ITEMS } from "../data/food";
+import { fullness } from "../lib/time";
 import { usePet } from "../store/pet";
 import { colors, space } from "../theme";
 
 const PET_WIDTH_PERCENT = 62;
 const PET_TOP_PERCENT = 0.29;
 const PLATE_WIDTH_PERCENT = 0.3;
+const FULL_ENOUGH = 80;
 
 export default function DiningScreen() {
   const { width, height } = useWindowDimensions();
   const foodOwned = usePet((s) => s.foodOwned);
   const feed = usePet((s) => s.feed);
+  const lastFedAt = usePet((s) => s.lastFedAt);
+  const petName = usePet((s) => s.name);
+
+  const [fullAsked, setFullAsked] = useState(false);
+
+  const full = fullness(lastFedAt);
+  const mouth = full >= 60 ? "happy" : full >= 25 ? "neutral" : "sad";
+
+  const onSelect = (item: FoodPlateItem) => {
+    if (fullness(lastFedAt) >= FULL_ENOUGH) {
+      setFullAsked(true);
+      return;
+    }
+    feed(item.id);
+  };
 
   const petW = (width * PET_WIDTH_PERCENT) / 100;
   const petTop = height * PET_TOP_PERCENT;
@@ -49,7 +68,7 @@ export default function DiningScreen() {
         <PetMini
           species="cat"
           widthPercent={PET_WIDTH_PERCENT}
-          mouth="happy"
+          mouth={mouth}
           eyesOpen
         />
       </View>
@@ -67,7 +86,7 @@ export default function DiningScreen() {
           <FoodPlateCarousel
             items={foodItems}
             plateSize={plateSize}
-            onSelect={(item) => feed(item.id)}
+            onSelect={onSelect}
           />
         </View>
       </SafeAreaView>
@@ -75,6 +94,13 @@ export default function DiningScreen() {
       <SafeAreaView style={styles.navSlot} edges={["bottom"]}>
         <BottomNav />
       </SafeAreaView>
+
+      <Modal
+        visible={fullAsked}
+        title={`${petName || "Питомец"} уже сыт`}
+        text="Пусть немного проголодается — тогда еда пригодится больше. Она никуда не денется, останется на столе."
+        onCancel={() => setFullAsked(false)}
+      />
     </View>
   );
 }
