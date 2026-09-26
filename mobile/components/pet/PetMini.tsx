@@ -4,14 +4,14 @@ import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
+  withRepeat,
   withSequence,
   withTiming,
-  type SharedValue,
 } from "react-native-reanimated";
 import type { ImageSourcePropType } from "react-native";
 import { MouthKey, PET_ASSETS, PetSpecies } from "./petAssets";
 
-type PetMiniProps = {
+type PetIdleProps = {
   species: PetSpecies;
   widthPercent?: number;
   mouth?: MouthKey;
@@ -55,36 +55,15 @@ function useBlink(enabled: boolean) {
   return blinking;
 }
 
-function useTailFlick(enabled: boolean, tail: SharedValue<number>) {
-  useEffect(() => {
-    if (!enabled) return;
-
-    let cancelled = false;
-    let timer: ReturnType<typeof setTimeout>;
-
-    const loop = () => {
-      const delay = 1600 + Math.random() * 2200;
-      timer = setTimeout(() => {
-        if (cancelled) return;
-        tail.value = withSequence(
-          withTiming(1, { duration: 90, easing: Easing.out(Easing.quad) }),
-          withTiming(-0.4, { duration: 130, easing: Easing.inOut(Easing.quad) }),
-          withTiming(0, { duration: 160, easing: Easing.out(Easing.quad) }),
-        );
-        loop();
-      }, delay);
-    };
-
-    loop();
-    return () => {
-      cancelled = true;
-      clearTimeout(timer);
-    };
-  }, [enabled]);
+function sway(duration: number) {
+  return withSequence(
+    withTiming(-1, { duration: 0 }),
+    withRepeat(withTiming(1, { duration, easing: Easing.inOut(Easing.sin) }), -1, true),
+  );
 }
 
-export function PetMini({ species, widthPercent = 58, mouth = "happy", eyesOpen = true, animated = true, bodyWear }: PetMiniProps) {
-  const assets = PET_ASSETS[species].mini;
+export function PetIdle({ species, widthPercent = 58, mouth = "happy", eyesOpen = true, animated = true, bodyWear }: PetIdleProps) {
+  const assets = PET_ASSETS[species];
   const { width } = useWindowDimensions();
   const w = (width * widthPercent) / 100;
   const h = w * assets.aspect;
@@ -92,11 +71,28 @@ export function PetMini({ species, widthPercent = 58, mouth = "happy", eyesOpen 
 
   const blinking = useBlink(animated);
 
+  const arm = useSharedValue(0);
   const tail = useSharedValue(0);
-  useTailFlick(animated, tail);
+  const belly = useSharedValue(0);
 
+  useEffect(() => {
+    if (!animated) return;
+    arm.value = sway(1400);
+    tail.value = sway(1400);
+    belly.value = sway(2200);
+  }, [animated]);
+
+  const armLeftStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${arm.value * 0.7}deg` }],
+  }));
+  const armRightStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${-arm.value * 0.7}deg` }],
+  }));
   const tailStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${tail.value * 6}deg` }],
+    transform: [{ rotate: `${tail.value * 5}deg` }],
+  }));
+  const bellyStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: 1 + belly.value * 0.015 }],
   }));
 
   const showOpenEyes = eyesOpen && !blinking;
@@ -110,7 +106,7 @@ export function PetMini({ species, widthPercent = 58, mouth = "happy", eyesOpen 
           resizeMode="contain"
         />
         <Image source={assets.body} style={styles.layer} resizeMode="contain" />
-        <Image source={assets.belly} style={styles.layer} resizeMode="contain" />
+        <Animated.Image source={assets.belly} style={[styles.layer, bellyStyle]} resizeMode="contain" />
         {bodyWear && (
           <Image
             source={bodyWear}
@@ -124,8 +120,16 @@ export function PetMini({ species, widthPercent = 58, mouth = "happy", eyesOpen 
             resizeMode="contain"
           />
         )}
-        <Image source={assets.armLeft} style={styles.layer} resizeMode="contain" />
-        <Image source={assets.armRight} style={styles.layer} resizeMode="contain" />
+        <Animated.Image
+          source={assets.armLeft}
+          style={[styles.layer, { transformOrigin: assets.armLeftOrigin }, armLeftStyle]}
+          resizeMode="contain"
+        />
+        <Animated.Image
+          source={assets.armRight}
+          style={[styles.layer, { transformOrigin: assets.armRightOrigin }, armRightStyle]}
+          resizeMode="contain"
+        />
         <Image source={showOpenEyes ? assets.eyesOpen : assets.eyesClosed} style={styles.layer} resizeMode="contain" />
         <Image source={assets.mouth[mouth]} style={styles.layer} resizeMode="contain" />
       </View>
