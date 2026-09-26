@@ -3,7 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { usePet } from "../store/pet";
 import { fullness } from "../lib/time";
-import { PetIdle } from "../components/pet/PetIdle";
+import { PetMini } from "../components/pet/PetMini";
 import type { MouthKey } from "../components/pet/petAssets";
 import TopHud from "../components/ui/TopHud";
 import BottomNav from "../components/ui/BottomNav";
@@ -32,7 +32,7 @@ export default function HomeScreen() {
         <TopHud />
 
         <View style={styles.petSlot} pointerEvents="none">
-          <PetIdle
+          <PetMini
             species="cat"
             widthPercent={65}
             mouth={mouth}
