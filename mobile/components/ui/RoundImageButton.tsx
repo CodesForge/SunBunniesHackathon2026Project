@@ -19,15 +19,16 @@ const TAP_PADDING = (ROUND_IMAGE_BUTTON_SIZE - CIRCLE_SIZE) / 2;
 
 type Props = PressableProps & {
   image: ImageSourcePropType;
+  iconSize?: number;
 };
 
-export default function RoundImageButton({ image, ...pressableProps }: Props) {
+export default function RoundImageButton({ image, iconSize = ICON_SIZE, ...pressableProps }: Props) {
   return (
     <Pressable style={styles.tapArea} {...pressableProps}>
       <View style={styles.circle}>
         <Image source={CIRCLE_LARGE} style={styles.circleBg} resizeMode="contain" />
         <View style={styles.iconWrap}>
-          <Image source={image} style={styles.icon} resizeMode="contain" />
+          <Image source={image} style={{ width: iconSize, height: iconSize }} resizeMode="contain" />
         </View>
       </View>
     </Pressable>
