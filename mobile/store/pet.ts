@@ -41,7 +41,13 @@ type State = {
   dayKey: string;
   secondsToday: number;
 
-  history: { n: number; plan: Jars; spent: Jars; saved: number }[];
+  history: {
+    n: number;
+    plan: Jars;
+    spent: Jars;
+    saved: number;
+    kept: boolean;
+  }[];
 
   themeStats: Record<Theme, { right: number; wrong: number }>;
   behavior: {
@@ -266,33 +272,42 @@ export const usePet = create<State & Actions>()(
           return {
             doneQuests: [...s.doneQuests, id],
             jars: { ...s.jars, want: s.jars.want + reward },
-            xp: s.xp + ECONOMY.xpPerQuest,
             themeStats,
             dirty: true,
           };
         }),
 
       nextPeriod: () =>
-        set((s) => ({
-          history: [
-            ...s.history,
-            {
-              n: s.periodIndex,
-              plan: s.plan,
-              spent: {
-                need: s.plan.need - s.jars.need,
-                want: s.plan.want - s.jars.want,
-                dream: 0,
+        set((s) => {
+          const saved = Math.max(0, s.jars.dream - s.plan.dream);
+          const kept =
+            s.plan.need >= ECONOMY.minNeed &&
+            s.jars.dream >= s.plan.dream &&
+            saved > 0;
+
+          return {
+            history: [
+              ...s.history,
+              {
+                n: s.periodIndex,
+                plan: s.plan,
+                spent: {
+                  need: s.plan.need - s.jars.need,
+                  want: s.plan.want - s.jars.want,
+                  dream: 0,
+                },
+                saved,
+                kept,
               },
-              saved: Math.max(0, s.jars.dream - s.plan.dream),
-            },
-          ].slice(-8),
-          periodIndex: s.periodIndex + 1,
-          plan: { ...EMPTY },
-          jars: { ...s.jars, want: s.jars.want + ECONOMY.weeklyIncome },
-          lastIncomeAt: Date.now(),
-          dirty: true,
-        })),
+            ].slice(-8),
+            xp: kept ? s.xp + 1 : s.xp,
+            periodIndex: s.periodIndex + 1,
+            plan: { ...EMPTY },
+            unallocated: s.unallocated + ECONOMY.weeklyIncome,
+            lastIncomeAt: Date.now(),
+            dirty: true,
+          };
+        }),
 
       addSeconds: (sec) =>
         set((s) => {
@@ -304,7 +319,7 @@ export const usePet = create<State & Actions>()(
 
       parentBonus: () =>
         set((s) => ({
-          jars: { ...s.jars, want: s.jars.want + ECONOMY.parentBonus },
+          unallocated: s.unallocated + ECONOMY.parentBonus,
           dirty: true,
         })),
 
