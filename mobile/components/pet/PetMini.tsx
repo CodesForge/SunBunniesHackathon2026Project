@@ -11,7 +11,7 @@ import Animated, {
 import type { ImageSourcePropType } from "react-native";
 import { MouthKey, PET_ASSETS, PetSpecies } from "./petAssets";
 
-type PetIdleProps = {
+type PetMiniProps = {
   species: PetSpecies;
   widthPercent?: number;
   mouth?: MouthKey;
@@ -62,7 +62,7 @@ function sway(duration: number) {
   );
 }
 
-export function PetIdle({ species, widthPercent = 58, mouth = "happy", eyesOpen = true, animated = true, bodyWear }: PetIdleProps) {
+export function PetMini({ species, widthPercent = 58, mouth = "happy", eyesOpen = true, animated = true, bodyWear }: PetMiniProps) {
   const assets = PET_ASSETS[species];
   const { width } = useWindowDimensions();
   const w = (width * widthPercent) / 100;
