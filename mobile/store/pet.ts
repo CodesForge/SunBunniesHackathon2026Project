@@ -100,7 +100,8 @@ const initial: State = {
 type Actions = {
   hatch: (species: "dog" | "cat", name: string, goalId: string) => void;
   setPlan: (p: Jars) => void;
-  feed: (foodId?: string) => boolean;
+  rebalance: (next: Jars) => void;
+  feed: (foodId: string) => boolean;
   putToSleep: () => void;
   buy: (item: Item) => boolean;
   buyFood: (item: Item) => boolean;
@@ -145,44 +146,41 @@ export const usePet = create<State & Actions>()(
       },
 
       setPlan: (p) =>
-        set((s) => {
-          const jars = {
-            need: s.jars.need + p.need,
-            want: s.jars.want + p.want,
-            dream: s.jars.dream + p.dream,
-          };
-          return {
-            jars,
-            plan: p,
-            unallocated: 0,
-            behavior:
-              p.need < ECONOMY.minNeed
-                ? {
-                    ...s.behavior,
-                    planUnderMinNeed: s.behavior.planUnderMinNeed + 1,
-                  }
-                : s.behavior,
-            dirty: true,
-          };
-        }),
+        set((s) => ({
+          jars: { ...p },
+          plan: { ...p },
+          unallocated: 0,
+          behavior:
+            p.need < ECONOMY.minNeed
+              ? {
+                  ...s.behavior,
+                  planUnderMinNeed: s.behavior.planUnderMinNeed + 1,
+                }
+              : s.behavior,
+          dirty: true,
+        })),
+
+      rebalance: (next) =>
+        set((s) => ({
+          jars: { ...next },
+          behavior:
+            next.dream < s.jars.dream
+              ? {
+                  ...s.behavior,
+                  withdrewFromDream: s.behavior.withdrewFromDream + 1,
+                }
+              : s.behavior,
+          dirty: true,
+        })),
 
       // Без foodId — старое поведение (плоский расход из "надо").
       // С foodId — списывает конкретный купленный продукт со стола.
       feed: (foodId) => {
         const s = get();
-        if (foodId) {
-          const qty = s.foodOwned[foodId] ?? 0;
-          if (qty <= 0) return false;
-          set({
-            foodOwned: { ...s.foodOwned, [foodId]: qty - 1 },
-            lastFedAt: Date.now(),
-            dirty: true,
-          });
-          return true;
-        }
-        if (s.jars.need < ECONOMY.mealCost) return false;
+        const qty = s.foodOwned[foodId] ?? 0;
+        if (qty <= 0) return false;
         set({
-          jars: { ...s.jars, need: s.jars.need - ECONOMY.mealCost },
+          foodOwned: { ...s.foodOwned, [foodId]: qty - 1 },
           lastFedAt: Date.now(),
           dirty: true,
         });
@@ -266,7 +264,7 @@ export const usePet = create<State & Actions>()(
           if (s.doneQuests.includes(id)) return { themeStats, dirty: true };
           return {
             doneQuests: [...s.doneQuests, id],
-            unallocated: s.unallocated + reward,
+            jars: { ...s.jars, want: s.jars.want + reward },
             xp: s.xp + ECONOMY.xpPerQuest,
             themeStats,
             dirty: true,
@@ -285,12 +283,12 @@ export const usePet = create<State & Actions>()(
                 want: s.plan.want - s.jars.want,
                 dream: 0,
               },
-              saved: s.jars.dream,
+              saved: Math.max(0, s.jars.dream - s.plan.dream),
             },
           ].slice(-8),
           periodIndex: s.periodIndex + 1,
           plan: { ...EMPTY },
-          unallocated: ECONOMY.weeklyIncome,
+          unallocated: s.unallocated + ECONOMY.weeklyIncome,
           lastIncomeAt: Date.now(),
           dirty: true,
         })),
