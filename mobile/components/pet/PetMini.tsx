@@ -9,7 +9,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import type { ImageSourcePropType } from "react-native";
-import { getPetStage, MouthKey, PET_ASSETS, PetSpecies } from "./petAssets";
+import { getPetStage, MouthKey, PET_ASSETS, PetAssetSet, PetSpecies } from "./petAssets";
 import { usePet } from "../../store/pet";
 
 type OutfitLayers = {
@@ -83,8 +83,13 @@ export function PetMini({
 }: PetMiniProps) {
   const xp = usePet((s) => s.xp);
   const stage = getPetStage(xp);
-  const assets = PET_ASSETS[species][stage];
+  const speciesAssets = PET_ASSETS[species];
+  const assets = (speciesAssets[stage] ??
+    speciesAssets.adult ??
+    speciesAssets.teen ??
+    speciesAssets.mini) as PetAssetSet;
   const { width } = useWindowDimensions();
+
   const w = (width * widthPercent) / 100;
   const h = w * assets.aspect;
   const coreW = w * assets.coreWidth;
@@ -200,6 +205,7 @@ export function PetMini({
             <Image source={outfit.base} style={styles.layer} resizeMode="contain" />
           </>
         )}
+        {assets.head && <Image source={assets.head} style={styles.layer} resizeMode="contain" />}
         <Image source={showOpenEyes ? assets.eyesOpen : assets.eyesClosed} style={styles.layer} resizeMode="contain" />
         <Image source={assets.mouth[mouth]} style={styles.layer} resizeMode="contain" />
         {headWear && <Image source={headWear} style={styles.layer} resizeMode="contain" />}

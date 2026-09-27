@@ -102,7 +102,7 @@ export default function ChooseSpeciesScreen() {
   const coinTop = height * COIN_TOP;
 
   const catW = (width * CAT_WIDTH) / 100;
-  const catH = catW * PET_ASSETS.cat.mini.aspect;
+  const catH = catW * PET_ASSETS.cat.mini!.aspect;
   const catTop = coinTop + coinH * COIN_SURFACE - catH * CAT_FEET;
 
   const arrowsTop = coinTop - coinH * 0.2;
