@@ -81,13 +81,9 @@ export default function SortTask({ data, onDone }: Props) {
         {(["a", "b"] as const).map((basket) => {
           const accent = basket === "a" ? colors.sceneOval : LESSON_ORANGE;
           return (
-            <Pressable
+            <View
               key={basket}
-              onPress={() => place(basket)}
-              disabled={!selectedId}
               style={[styles.basket, { borderColor: accent }, !selectedId && styles.basketDisabled]}
-              accessibilityRole="button"
-              accessibilityLabel={basket === "a" ? data.basketA : data.basketB}
             >
               <Text style={[styles.basketTitle, { color: accent }]}>
                 {basket === "a" ? data.basketA : data.basketB}
@@ -113,7 +109,16 @@ export default function SortTask({ data, onDone }: Props) {
                   </Pressable>
                 ))}
               </View>
-            </Pressable>
+
+              {!!selectedId && !checked && (
+                <Pressable
+                  style={StyleSheet.absoluteFill}
+                  onPress={() => place(basket)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Положить в «${basket === "a" ? data.basketA : data.basketB}»`}
+                />
+              )}
+            </View>
           );
         })}
       </View>
