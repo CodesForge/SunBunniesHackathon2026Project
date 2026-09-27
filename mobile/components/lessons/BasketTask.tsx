@@ -3,19 +3,17 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Check } from "lucide-react-native";
 
 import type { BasketStepData } from "../../data/lessons";
-import { ECONOMY } from "../../data/economy";
-import { usePet } from "../../store/pet";
 import { colors, font, radius, space, HIT } from "../../theme";
 
 type Props = {
   data: BasketStepData;
-  onDone: () => void;
+  onDone: (mistakes: number) => void;
 };
 
 export default function BasketTask({ data, onDone }: Props) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [checked, setChecked] = useState(false);
-  const grantJars = usePet((s) => s.grantJars);
+  const [mistakes, setMistakes] = useState(0);
 
   const total = useMemo(
     () =>
@@ -43,7 +41,7 @@ export default function BasketTask({ data, onDone }: Props) {
     const missedRequired = data.items.filter(
       (i) => i.required && !selected.has(i.id),
     ).length;
-    if (missedRequired > 0) grantJars({ want: -ECONOMY.mistakePenalty * missedRequired });
+    setMistakes(missedRequired);
     setChecked(true);
   };
 
@@ -92,7 +90,11 @@ export default function BasketTask({ data, onDone }: Props) {
       ) : (
         <View style={styles.explanationCard}>
           <Text style={styles.explanationText}>{data.explanation}</Text>
-          <Pressable style={styles.primaryButton} onPress={onDone} accessibilityRole="button">
+          <Pressable
+            style={styles.primaryButton}
+            onPress={() => onDone(mistakes)}
+            accessibilityRole="button"
+          >
             <Text style={styles.primaryButtonText}>Далее</Text>
           </Pressable>
         </View>
