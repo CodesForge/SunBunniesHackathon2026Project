@@ -331,6 +331,7 @@ const styles = StyleSheet.create({
   },
   moneyPillTiny: {
     height: MONEY_PILL_HEIGHT_TINY,
+    paddingHorizontal: 10,
   },
   moneyPillTablet: {
     maxWidth: MONEY_PILL_WIDTH_TABLET,
