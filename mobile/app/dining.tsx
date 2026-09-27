@@ -19,7 +19,7 @@ import { colors, space } from "../theme";
 
 const PET_WIDTH_PERCENT = 76;
 const PET_TOP_PERCENT = 0.29;
-const PET_RIGHT_SHIFT_PERCENT = 6;
+const PET_RIGHT_SHIFT_PERCENT = 15;
 const PLATE_WIDTH_PERCENT = 0.3;
 const FULL_ENOUGH = 80;
 
