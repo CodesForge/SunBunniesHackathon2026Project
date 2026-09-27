@@ -12,9 +12,15 @@
     "art": "skate"
   },
   {
-    "id": "goal-bike",
-    "title": "Велосипед",
+    "id": "goal-scooter",
+    "title": "Самокат",
+    "price": 2400,
+    "art": "scooter"
+  },
+  {
+    "id": "goal-guitar",
+    "title": "Гитара",
     "price": 3400,
-    "art": "bike"
+    "art": "guitar"
   }
 ]
