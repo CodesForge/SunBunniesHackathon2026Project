@@ -27,6 +27,7 @@ export default function SleepScreen() {
   const { width, height } = useWindowDimensions();
   const motion = usePet((s) => s.settings.motion);
   const petName = usePet((s) => s.name);
+  const species = usePet((s) => s.species);
   const energyBase = usePet((s) => s.energyBase);
   const energyAt = usePet((s) => s.energyAt);
   const asleep = usePet((s) => s.asleep);
@@ -65,7 +66,7 @@ export default function SleepScreen() {
         style={[styles.petSlot, { top: petTop, left: (width - petWidth) / 2 }]}
         pointerEvents="none"
       >
-        <PetSleeping widthPercent={PET_WIDTH_PERCENT} animated={motion} asleep={asleep} />
+        <PetSleeping species={species ?? "cat"} widthPercent={PET_WIDTH_PERCENT} animated={motion} asleep={asleep} />
       </View>
 
       <Image

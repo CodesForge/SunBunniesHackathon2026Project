@@ -1,18 +1,9 @@
 import { useEffect, useState } from "react";
 import { Image, StyleSheet, View, useWindowDimensions } from "react-native";
-
-const BODY = require("../../assets/sleep/body.png");
-const EYES_CLOSED = require("../../assets/sleep/eyes-closed.png");
-const EYES_OPEN = require("../../assets/sleep/eyes-open.png");
-const MOUTH_CLOSED = require("../../assets/sleep/mouth-closed.png");
-const MOUTH_OPEN = require("../../assets/sleep/mouth-open.png");
-
-const ASPECT = 1025 / 1772;
-const EYES = { left: 0.3832, top: 0.4712, width: 0.2297, height: 0.0829 };
-const MOUTH_CLOSED_RECT = { left: 0.4024, top: 0.4976, width: 0.1868, height: 0.1698 };
-const MOUTH_OPEN_RECT = { left: 0.4024, top: 0.4976, width: 0.1868, height: 0.2351 };
+import { PetSpecies, SLEEP_ASSETS } from "./petAssets";
 
 type PetSleepingProps = {
+  species?: PetSpecies;
   widthPercent?: number;
   animated?: boolean;
   asleep?: boolean;
@@ -88,35 +79,36 @@ function useBlink(enabled: boolean) {
   return blinking;
 }
 
-export function PetSleeping({ widthPercent = 70, animated = true, asleep = true }: PetSleepingProps) {
+export function PetSleeping({ species = "cat", widthPercent = 70, animated = true, asleep = true }: PetSleepingProps) {
+  const assets = SLEEP_ASSETS[species];
   const { width } = useWindowDimensions();
   const w = (width * widthPercent) / 100;
-  const h = w * ASPECT;
+  const h = w * assets.aspect;
 
   const snoring = useSnore(animated && asleep);
   const blinking = useBlink(animated && !asleep);
 
   const eyesOpen = !asleep && !blinking;
   const mouthOpen = asleep && snoring;
-  const mouthRect = mouthOpen ? MOUTH_OPEN_RECT : MOUTH_CLOSED_RECT;
+  const mouthRect = mouthOpen ? assets.mouthOpenRect : assets.mouthClosedRect;
 
   return (
     <View style={{ width: w, height: h }}>
       <View style={styles.stack}>
-        <Image source={BODY} style={styles.layer} resizeMode="contain" />
+        <Image source={assets.body} style={styles.layer} resizeMode="contain" />
         <Image
-          source={eyesOpen ? EYES_OPEN : EYES_CLOSED}
+          source={eyesOpen ? assets.eyesOpen : assets.eyesClosed}
           style={{
             position: "absolute",
-            left: w * EYES.left,
-            top: h * EYES.top,
-            width: w * EYES.width,
-            height: h * EYES.height,
+            left: w * assets.eyesRect.left,
+            top: h * assets.eyesRect.top,
+            width: w * assets.eyesRect.width,
+            height: h * assets.eyesRect.height,
           }}
           resizeMode="contain"
         />
         <Image
-          source={mouthOpen ? MOUTH_OPEN : MOUTH_CLOSED}
+          source={mouthOpen ? assets.mouthOpen : assets.mouthClosed}
           style={{
             position: "absolute",
             left: w * mouthRect.left,

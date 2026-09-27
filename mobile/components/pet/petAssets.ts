@@ -209,3 +209,44 @@ export function getPetStage(xp: number): PetAgeStage {
   if (xp >= ECONOMY.teenLevel) return "teen";
   return "mini";
 }
+
+export type SleepAssetSet = {
+  body: ImageSourcePropType;
+  eyesOpen: ImageSourcePropType;
+  eyesClosed: ImageSourcePropType;
+  mouthOpen: ImageSourcePropType;
+  mouthClosed: ImageSourcePropType;
+  aspect: number;
+  eyesRect: { left: number; top: number; width: number; height: number };
+  mouthClosedRect: { left: number; top: number; width: number; height: number };
+  mouthOpenRect: { left: number; top: number; width: number; height: number };
+};
+
+const CAT_SLEEP: SleepAssetSet = {
+  body: require("../../assets/sleep/body.png"),
+  eyesOpen: require("../../assets/sleep/eyes-open.png"),
+  eyesClosed: require("../../assets/sleep/eyes-closed.png"),
+  mouthOpen: require("../../assets/sleep/mouth-open.png"),
+  mouthClosed: require("../../assets/sleep/mouth-closed.png"),
+  aspect: 1025 / 1772,
+  eyesRect: { left: 0.3832, top: 0.4712, width: 0.2297, height: 0.0829 },
+  mouthClosedRect: { left: 0.4024, top: 0.4976, width: 0.1868, height: 0.1698 },
+  mouthOpenRect: { left: 0.4024, top: 0.4976, width: 0.1868, height: 0.2351 },
+};
+
+const DOG_SLEEP: SleepAssetSet = {
+  body: require("../../assets/sleep/dog/body.png"),
+  eyesOpen: require("../../assets/sleep/dog/eyes-open.png"),
+  eyesClosed: require("../../assets/sleep/dog/eyes-closed.png"),
+  mouthOpen: require("../../assets/sleep/dog/mouth-open.png"),
+  mouthClosed: require("../../assets/sleep/dog/mouth-closed.png"),
+  aspect: 1161 / 1772,
+  eyesRect: { left: 0.3877, top: 0.4936, width: 0.2229, height: 0.0603 },
+  mouthClosedRect: { left: 0.4261, top: 0.5116, width: 0.1445, height: 0.1275 },
+  mouthOpenRect: { left: 0.4244, top: 0.5150, width: 0.1507, height: 0.1981 },
+};
+
+export const SLEEP_ASSETS: Record<PetSpecies, SleepAssetSet> = {
+  cat: CAT_SLEEP,
+  dog: DOG_SLEEP,
+};
