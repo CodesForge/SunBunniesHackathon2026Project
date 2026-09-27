@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Image, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { Image, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { Link } from "expo-router";
 import { ArrowLeft, MessageCircle, Settings, Wallet } from "lucide-react-native";
 
@@ -157,22 +157,20 @@ export default function TopHud({
               />
             </Link>
           ) : (
-            <Link href={"/pet-level" as any} asChild>
-              <Pressable
-                style={[styles.levelCircle, isTablet && styles.levelCircleTablet]}
-                accessibilityRole="button"
-                accessibilityLabel={`Уровень ${level}`}
-              >
-                <Image
-                  source={CIRCLE_LARGE}
-                  style={[styles.levelCircleBg, isTablet && styles.levelCircleBgTablet]}
-                  resizeMode="contain"
-                />
-                <Text style={[styles.levelValue, isTablet && styles.levelValueTablet]}>
-                  {level} Ур.
-                </Text>
-              </Pressable>
-            </Link>
+            <View
+              style={[styles.levelCircle, isTablet && styles.levelCircleTablet]}
+              accessibilityRole="text"
+              accessibilityLabel={`Уровень ${level}`}
+            >
+              <Image
+                source={CIRCLE_LARGE}
+                style={[styles.levelCircleBg, isTablet && styles.levelCircleBgTablet]}
+                resizeMode="contain"
+              />
+              <Text style={[styles.levelValue, isTablet && styles.levelValueTablet]}>
+                {level} Ур.
+              </Text>
+            </View>
           )}
 
           {showWallet && (
