@@ -1,16 +1,16 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Check, X as XIcon } from "lucide-react-native";
 
 import type { LessonQuestion, QuestionsStepData } from "../../data/lessons";
 import { LESSON_GREEN, LESSON_RED, LESSON_RED_BG, LESSON_TITLE } from "./lessonColors";
-import { ECONOMY } from "../../data/economy";
 import { usePet } from "../../store/pet";
 import { colors, font, radius, HIT } from "../../theme";
 
 type Props = {
   data: QuestionsStepData;
-  onDone: () => void;
+  onDone: (mistakes: number) => void;
+  onStep?: () => void;
 };
 
 function resolveDynamicOptionIndex(
@@ -26,9 +26,10 @@ function resolveDynamicOptionIndex(
   return 0;
 }
 
-export default function QuestionsTask({ data, onDone }: Props) {
+export default function QuestionsTask({ data, onDone, onStep }: Props) {
   const [index, setIndex] = useState(0);
   const [answeredIndex, setAnsweredIndex] = useState<number | null>(null);
+  const mistakes = useRef(0);
   const history = usePet((s) => s.history);
   const grantJars = usePet((s) => s.grantJars);
 
@@ -53,17 +54,18 @@ export default function QuestionsTask({ data, onDone }: Props) {
     const delta = question.optionsCoinsDelta?.[optionIndex];
     if (delta) {
       grantJars({ want: delta });
-    } else if (!isCorrect(optionIndex)) {
-      grantJars({ want: -ECONOMY.mistakePenalty });
+      return;
     }
+    if (!isCorrect(optionIndex)) mistakes.current += 1;
   };
 
   const next = () => {
     setAnsweredIndex(null);
     if (index + 1 < total) {
       setIndex(index + 1);
+      onStep?.();
     } else {
-      onDone();
+      onDone(mistakes.current);
     }
   };
 
@@ -84,6 +86,7 @@ export default function QuestionsTask({ data, onDone }: Props) {
               key={i}
               onPress={() => selectOption(i)}
               disabled={answered}
+              hitSlop={TAP_SLOP}
               style={[
                 styles.option,
                 selected && (isCorrect(i) ? styles.optionCorrect : styles.optionWrong),
@@ -117,6 +120,8 @@ export default function QuestionsTask({ data, onDone }: Props) {
     </View>
   );
 }
+
+const TAP_SLOP = { top: 6, bottom: 6, left: 6, right: 6 };
 
 const styles = StyleSheet.create({
   root: { gap: 20, padding: 10 },
