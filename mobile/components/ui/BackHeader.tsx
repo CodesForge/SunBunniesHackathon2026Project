@@ -7,9 +7,23 @@ import { space } from "../../theme";
 
 type BackHeaderProps = {
   backHref: string;
+  onPress?: () => void;
 };
 
-export default function BackHeader({ backHref }: BackHeaderProps) {
+export default function BackHeader({ backHref, onPress }: BackHeaderProps) {
+  if (onPress) {
+    return (
+      <View style={styles.root}>
+        <RoundIconButton
+          icon={ArrowLeft}
+          onPress={onPress}
+          accessibilityRole="button"
+          accessibilityLabel="Назад"
+        />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.root}>
       <Link href={backHref as any} asChild>
