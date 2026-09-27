@@ -12,6 +12,7 @@ import RoundIconButton from "./RoundIconButton";
 const LOW = 20;
 
 const TABLET_BREAKPOINT = 768;
+const SMALL_PHONE_BREAKPOINT = 440;
 
 const ROOT_PADDING_H = 16;
 const ROOT_PADDING_H_TABLET = 28;
@@ -44,6 +45,7 @@ const MONEY_PILL_WIDTH_TABLET = 340;
 
 const TABLET_COIN_BADGE_SIZE = 38;
 const TABLET_COIN_FONT_SIZE = 18;
+const SMALL_PHONE_COIN_FONT_SIZE = 12;
 
 const SCALES_FRAME_HEIGHT = 46;
 const SCALES_FRAME_HEIGHT_TABLET = 64;
@@ -98,6 +100,7 @@ export default function TopHud({
   const lastSleptAt = usePet((s) => s.lastSleptAt);
   const { width } = useWindowDimensions();
   const isTablet = width >= TABLET_BREAKPOINT;
+  const isSmallPhone = width < SMALL_PHONE_BREAKPOINT;
 
   const needsPlan = unallocated > 0;
 
@@ -108,6 +111,12 @@ export default function TopHud({
   const roundButtonProps = isTablet
     ? { circleSize: ROUND_BUTTON_CIRCLE_TABLET, iconSize: ROUND_BUTTON_ICON_TABLET }
     : {};
+
+  const coinFontSize = isTablet
+    ? TABLET_COIN_FONT_SIZE
+    : isSmallPhone
+      ? SMALL_PHONE_COIN_FONT_SIZE
+      : undefined;
 
   const settingsButton = (
     <Link href={"/settings" as any} asChild>
@@ -192,19 +201,19 @@ export default function TopHud({
                 image={COIN_NEED}
                 value={jars.need}
                 badgeSize={isTablet ? TABLET_COIN_BADGE_SIZE : undefined}
-                fontSize={isTablet ? TABLET_COIN_FONT_SIZE : undefined}
+                fontSize={coinFontSize}
               />
               <CoinValue
                 image={COIN_WANT}
                 value={jars.want}
                 badgeSize={isTablet ? TABLET_COIN_BADGE_SIZE : undefined}
-                fontSize={isTablet ? TABLET_COIN_FONT_SIZE : undefined}
+                fontSize={coinFontSize}
               />
               <CoinValue
                 image={COIN_DREAM}
                 value={jars.dream}
                 badgeSize={isTablet ? TABLET_COIN_BADGE_SIZE : undefined}
-                fontSize={isTablet ? TABLET_COIN_FONT_SIZE : undefined}
+                fontSize={coinFontSize}
               />
             </View>
 
@@ -322,8 +331,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: MONEY_PILL_PADDING_H,
   },
   moneyPillTablet: {
-    flex: 0,
-    width: MONEY_PILL_WIDTH_TABLET,
+    maxWidth: MONEY_PILL_WIDTH_TABLET,
     height: MONEY_PILL_HEIGHT_TABLET,
     paddingHorizontal: MONEY_PILL_PADDING_H_TABLET,
   },
