@@ -18,10 +18,6 @@ export function fullness(lastFedAt: number, now = Date.now()) {
   return levelFromLast(lastFedAt, ECONOMY.hungerPerHour, now);
 }
 
-export function sleepiness(lastSleptAt: number, now = Date.now()) {
-  return levelFromLast(lastSleptAt, ECONOMY.sleepPerHour, now);
-}
-
 export const ENERGY_RECOVER_PER_HOUR = (100 * 60) / ECONOMY.sleepFullMinutes;
 
 export function energyNow(
