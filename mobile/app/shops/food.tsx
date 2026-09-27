@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useFocusEffect } from "expo-router";
 import {
   Image,
   Pressable,
@@ -77,14 +78,20 @@ type Flight = {
 export default function FoodShopScreen() {
   const { width, height } = useWindowDimensions();
   const jarsNeed = usePet((s) => s.jars.need);
-  const foodOwned = usePet((s) => s.foodOwned);
   const buyFood = usePet((s) => s.buyFood);
 
   const backgroundStyle = { position: "absolute" as const, top: 0, left: 0, width, height };
 
   const [flights, setFlights] = useState<Flight[]>([]);
+  const [sessionQty, setSessionQty] = useState<Record<string, number>>({});
   const cartRef = useRef<View>(null);
   const itemRefs = useRef<Record<string, View | null>>({});
+
+  useFocusEffect(() => {
+    return () => {
+      setSessionQty({});
+    };
+  });
 
   const itemSize = width * ITEM_SIZE_PERCENT;
   const cartWidth = width * CART_WIDTH_PERCENT;
@@ -99,7 +106,7 @@ export default function FoodShopScreen() {
   // еды, а именно по штуке на каждую покупку) — обрезанный по MAX_PILE_ITEMS.
   const pile: { key: string; image: FoodItem["image"] }[] = [];
   for (const item of FOOD_ITEMS) {
-    const qty = foodOwned[item.id] ?? 0;
+    const qty = sessionQty[item.id] ?? 0;
     for (let i = 0; i < qty && pile.length < MAX_PILE_ITEMS; i++) {
       pile.push({ key: `${item.id}-${i}`, image: item.image });
     }
@@ -114,7 +121,10 @@ export default function FoodShopScreen() {
 
     const node = itemRefs.current[item.id];
     if (!node || !cartRef.current) {
-      buyFood(item);
+      const bought = buyFood(item);
+      if (bought) {
+        setSessionQty((prev) => ({ ...prev, [item.id]: (prev[item.id] ?? 0) + 1 }));
+      }
       return;
     }
 
@@ -122,6 +132,7 @@ export default function FoodShopScreen() {
       cartRef.current?.measureInWindow((cx, cy, cw, ch) => {
         const bought = buyFood(item);
         if (!bought) return;
+        setSessionQty((prev) => ({ ...prev, [item.id]: (prev[item.id] ?? 0) + 1 }));
         setFlights((prev) => [
           ...prev,
           {
