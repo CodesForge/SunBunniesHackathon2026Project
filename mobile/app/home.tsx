@@ -2,7 +2,7 @@ import { Image, StyleSheet, View, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { usePet } from "../store/pet";
-import { fullness } from "../lib/time";
+import { energyNow, fullness } from "../lib/time";
 import { PetMini } from "../components/pet/PetMini";
 import { getPetStage, type MouthKey } from "../components/pet/petAssets";
 import TopHud from "../components/ui/TopHud";
@@ -16,12 +16,18 @@ export default function HomeScreen() {
   const { width, height } = useWindowDimensions();
 
   const lastFedAt = usePet((s) => s.lastFedAt);
+  const energyBase = usePet((s) => s.energyBase);
+  const energyAt = usePet((s) => s.energyAt);
+  const asleep = usePet((s) => s.asleep);
   const motion = usePet((s) => s.settings.motion);
   const xp = usePet((s) => s.xp);
   const worn = usePet((s) => s.worn);
 
-  const full = fullness(lastFedAt);
-  const mouth: MouthKey = full >= 60 ? "happy" : full >= 25 ? "neutral" : "sad";
+  const worst = Math.min(
+    fullness(lastFedAt),
+    energyNow(energyBase, energyAt, asleep),
+  );
+  const mouth: MouthKey = worst >= 60 ? "happy" : worst >= 25 ? "neutral" : "sad";
 
   const stage = getPetStage(xp);
   const { bodyWear, outfit, headWear } = resolveWornVisuals(worn, stage);
