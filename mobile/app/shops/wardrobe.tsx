@@ -32,10 +32,15 @@ const COIN_WANT = require("../../assets/icons/coin-want.png");
 const PET_WIDTH_PERCENT = 70;
 const PET_BOTTOM_FRACTION = 0.22;
 
+const TABLET_BREAKPOINT = 768;
+
 const DRAWER_HEIGHT = 220;
 const DRAWER_ANIM_DURATION = 220;
 const ARROW_SIZE = 44;
 const CATEGORY_BUTTON_HALF = 28;
+const CATEGORY_BUTTON_HALF_TABLET = 39;
+const CATEGORY_BUTTON_CIRCLE_TABLET = 78;
+const CATEGORY_BUTTON_ICON_TABLET = 32;
 const CAROUSEL_SLIDE_DISTANCE = 56;
 const CAROUSEL_ANIM_DURATION = 800;
 
@@ -53,6 +58,10 @@ function previewImage(item: WardrobeEntry): ImageSourcePropType {
 
 export default function WardrobeShopScreen() {
   const { width, height } = useWindowDimensions();
+  const isTablet = width >= TABLET_BREAKPOINT;
+  const categoryButtonProps = isTablet
+    ? { circleSize: CATEGORY_BUTTON_CIRCLE_TABLET, iconSize: CATEGORY_BUTTON_ICON_TABLET }
+    : {};
   const xp = usePet((s) => s.xp);
   const jars = usePet((s) => s.jars);
   const owned = usePet((s) => s.owned);
@@ -171,32 +180,35 @@ export default function WardrobeShopScreen() {
       </View>
 
       {isBaby && (
-        <View style={styles.categoryButtonLeft}>
+        <View style={[styles.categoryButtonLeft, isTablet && styles.categoryButtonLeftTablet]}>
           <RoundIconButton
             icon={Baby}
             onPress={() => toggleCategory("baby")}
             accessibilityRole="button"
             accessibilityLabel="Вещи для малыша"
+            {...categoryButtonProps}
           />
         </View>
       )}
 
       {isGrownUp && (
         <>
-          <View style={styles.categoryButtonLeft}>
+          <View style={[styles.categoryButtonLeft, isTablet && styles.categoryButtonLeftTablet]}>
             <RoundIconButton
               icon={Ribbon}
               onPress={() => toggleCategory("accessory")}
               accessibilityRole="button"
               accessibilityLabel="Аксессуары"
+              {...categoryButtonProps}
             />
           </View>
-          <View style={styles.categoryButtonRight}>
+          <View style={[styles.categoryButtonRight, isTablet && styles.categoryButtonRightTablet]}>
             <RoundIconButton
               icon={Shirt}
               onPress={() => toggleCategory("clothing")}
               accessibilityRole="button"
               accessibilityLabel="Одежда"
+              {...categoryButtonProps}
             />
           </View>
         </>
@@ -257,7 +269,7 @@ export default function WardrobeShopScreen() {
       )}
 
       <SafeAreaView style={styles.hudSlot} edges={["top"]} pointerEvents="box-none">
-        <TopHud backHref="/shops" showStats={false} showChatBubble={false} showChat={false} />
+        <TopHud backHref="/shops" showStats={false} showChat={false} />
       </SafeAreaView>
     </View>
   );
@@ -278,11 +290,17 @@ const styles = StyleSheet.create({
     top: "50%",
     marginTop: -CATEGORY_BUTTON_HALF,
   },
+  categoryButtonLeftTablet: {
+    marginTop: -CATEGORY_BUTTON_HALF_TABLET,
+  },
   categoryButtonRight: {
     position: "absolute",
     right: space.lg,
     top: "50%",
     marginTop: -CATEGORY_BUTTON_HALF,
+  },
+  categoryButtonRightTablet: {
+    marginTop: -CATEGORY_BUTTON_HALF_TABLET,
   },
   drawer: {
     position: "absolute",

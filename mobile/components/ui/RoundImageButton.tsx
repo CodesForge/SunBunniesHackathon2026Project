@@ -11,24 +11,56 @@ import { HIT } from "../../theme";
 
 const CIRCLE_SIZE = 88;
 const ICON_SIZE = 58;
+const CIRCLE_SIZE_TABLET = 120;
+const ICON_SIZE_TABLET = 78;
 
 const CIRCLE_LARGE = require("../../assets/icons/circle-large.png");
 
 export const ROUND_IMAGE_BUTTON_SIZE = Math.max(HIT, CIRCLE_SIZE);
-const TAP_PADDING = (ROUND_IMAGE_BUTTON_SIZE - CIRCLE_SIZE) / 2;
+export const ROUND_IMAGE_BUTTON_SIZE_TABLET = Math.max(HIT, CIRCLE_SIZE_TABLET);
+export const ROUND_IMAGE_BUTTON_CIRCLE_TABLET = CIRCLE_SIZE_TABLET;
+export const ROUND_IMAGE_BUTTON_ICON_TABLET = ICON_SIZE_TABLET;
 
 type Props = PressableProps & {
   image: ImageSourcePropType;
   iconSize?: number;
+  circleSize?: number;
 };
 
-export default function RoundImageButton({ image, iconSize = ICON_SIZE, ...pressableProps }: Props) {
+export default function RoundImageButton({
+  image,
+  iconSize,
+  circleSize,
+  ...pressableProps
+}: Props) {
+  const resolvedCircleSize = circleSize ?? CIRCLE_SIZE;
+  const resolvedIconSize = iconSize ?? ICON_SIZE;
+  const tapAreaSize = Math.max(HIT, resolvedCircleSize);
+  const tapPadding = (tapAreaSize - resolvedCircleSize) / 2;
+
   return (
-    <Pressable style={styles.tapArea} {...pressableProps}>
-      <View style={styles.circle}>
-        <Image source={CIRCLE_LARGE} style={styles.circleBg} resizeMode="contain" />
+    <Pressable
+      style={[
+        styles.tapArea,
+        { width: tapAreaSize, height: tapAreaSize, padding: tapPadding },
+      ]}
+      {...pressableProps}
+    >
+      <View style={[styles.circle, { width: resolvedCircleSize, height: resolvedCircleSize }]}>
+        <Image
+          source={CIRCLE_LARGE}
+          style={[
+            styles.circleBg,
+            { width: resolvedCircleSize, height: resolvedCircleSize },
+          ]}
+          resizeMode="contain"
+        />
         <View style={styles.iconWrap}>
-          <Image source={image} style={{ width: iconSize, height: iconSize }} resizeMode="contain" />
+          <Image
+            source={image}
+            style={{ width: resolvedIconSize, height: resolvedIconSize }}
+            resizeMode="contain"
+          />
         </View>
       </View>
     </Pressable>
@@ -37,24 +69,19 @@ export default function RoundImageButton({ image, iconSize = ICON_SIZE, ...press
 
 const styles = StyleSheet.create({
   tapArea: {
-    width: ROUND_IMAGE_BUTTON_SIZE,
-    height: ROUND_IMAGE_BUTTON_SIZE,
-    padding: TAP_PADDING,
     alignItems: "center",
     justifyContent: "center",
   },
   circle: {
-    width: CIRCLE_SIZE,
-    height: CIRCLE_SIZE,
     alignItems: "center",
     justifyContent: "center",
   },
   circleBg: {
     position: "absolute",
-    width: CIRCLE_SIZE,
-    height: CIRCLE_SIZE,
     zIndex: 0,
   },
-  iconWrap: { zIndex: 1, elevation: 1 },
-  icon: { width: ICON_SIZE, height: ICON_SIZE },
+  iconWrap: {
+    zIndex: 1,
+    elevation: 1,
+  },
 });

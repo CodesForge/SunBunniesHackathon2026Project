@@ -8,11 +8,12 @@ type Props = {
   value: number;
   badgeSize?: number;
   fontSize?: number;
+  stacked?: boolean;
 };
 
-export default function CoinValue({ image, value, badgeSize, fontSize }: Props) {
+export default function CoinValue({ image, value, badgeSize, fontSize, stacked }: Props) {
   return (
-    <View style={styles.wrap}>
+    <View style={[styles.wrap, stacked && styles.wrapStacked]}>
       <Image
         source={image}
         style={[styles.badge, badgeSize != null && { width: badgeSize, height: badgeSize }]}
@@ -25,6 +26,7 @@ export default function CoinValue({ image, value, badgeSize, fontSize }: Props) 
 
 const styles = StyleSheet.create({
   wrap: { flexDirection: "row", alignItems: "center", gap: 8 },
+  wrapStacked: { flexDirection: "column", gap: 2 },
   badge: { width: BADGE_SIZE, height: BADGE_SIZE },
   value: { fontSize: 14, fontWeight: "800", color: colors.ink },
 });

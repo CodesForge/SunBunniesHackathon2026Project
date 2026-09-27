@@ -1,10 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Image,
   type ImageSourcePropType,
   Pressable,
   StyleSheet,
-  Text,
   View,
   useWindowDimensions,
 } from "react-native";
@@ -13,7 +12,6 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  withTiming,
 } from "react-native-reanimated";
 
 import { colors } from "../../theme";
@@ -23,7 +21,6 @@ type Tab = {
   icon: ImageSourcePropType;
   route: string;
   label: string;
-  badge?: number;
 };
 
 const ICON_CART = require("../../assets/icons/icon-cart.png");
@@ -33,30 +30,27 @@ const ICON_FOOD = require("../../assets/icons/icon-food.png");
 const ICON_BOOK = require("../../assets/icons/icon-book.png");
 
 const TABS: Tab[] = [
-  {
-    key: "shop",
-    icon: ICON_CART,
-    route: "/shops",
-    label: "Гардероб",
-    badge: 1,
-  },
+  { key: "shop", icon: ICON_CART, route: "/shops", label: "Гардероб" },
   { key: "moon", icon: ICON_MOON, route: "/sleep", label: "Спальня" },
   { key: "home", icon: ICON_HOME, route: "/home", label: "Комната" },
   { key: "food", icon: ICON_FOOD, route: "/dining", label: "Кухня" },
-  {
-    key: "book",
-    icon: ICON_BOOK,
-    route: "/glossary",
-    label: "Уроки",
-    badge: 7,
-  },
+  { key: "book", icon: ICON_BOOK, route: "/glossary", label: "Уроки" },
 ];
 
+const TABLET_BREAKPOINT = 768;
+const TABLET_BAR_MAX_WIDTH = 480;
+
 const BAR_HEIGHT = 80;
+const BAR_HEIGHT_TABLET = 104;
 const HOME_INDEX = 2;
 const ACTIVE_SCALE = 1.25;
 const ACTIVE_LIFT = -10;
+const ACTIVE_LIFT_TABLET = -14;
 const ICON_SIZE = 38;
+const ICON_SIZE_TABLET = 52;
+
+const PILL_TOP = -22;
+const PILL_TOP_TABLET = -29;
 
 const PILL_SPRING = { damping: 22, stiffness: 130, mass: 1 };
 const ICON_SPRING = { damping: 14, stiffness: 170, mass: 1 };
@@ -67,10 +61,18 @@ export default function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { width } = useWindowDimensions();
+  const isTablet = width >= TABLET_BREAKPOINT;
+  const [availableWidth, setAvailableWidth] = useState(width);
+
+  const barHeight = isTablet ? BAR_HEIGHT_TABLET : BAR_HEIGHT;
+  const barWidth = isTablet ? Math.min(availableWidth, TABLET_BAR_MAX_WIDTH) : availableWidth;
+  const pillTop = isTablet ? PILL_TOP_TABLET : PILL_TOP;
+  const bumpAllowance = Math.abs(pillTop);
 
   const found = TABS.findIndex((t) => t.route === pathname);
   const activeIndex = found === -1 ? HOME_INDEX : found;
-  const tabWidth = width / TABS.length;
+  const tabWidth = barWidth / TABS.length;
+  const pillSize = Math.min(barHeight, tabWidth);
 
   const fromIndex = lastActiveIndex === -1 ? activeIndex : lastActiveIndex;
   const fromRef = useRef(fromIndex);
@@ -87,26 +89,47 @@ export default function BottomNav() {
   }));
 
   return (
-    <View style={styles.bar}>
-      {TABS.map((tab, i) => (
-        <TabButton
-          key={tab.key}
-          tab={tab}
-          active={i === activeIndex}
-          startedActive={i === fromRef.current}
-          width={tabWidth}
-          onPress={() => {
-            if (tab.route !== pathname) router.replace(tab.route as any);
-          }}
-        />
-      ))}
+    <View
+      style={[styles.bar, { height: barHeight }]}
+      onLayout={(e) => setAvailableWidth(e.nativeEvent.layout.width)}
+    >
+      <View style={[styles.barInner, { width: barWidth, height: barHeight }]}>
+        {TABS.map((tab, i) => (
+          <TabButton
+            key={tab.key}
+            tab={tab}
+            active={i === activeIndex}
+            startedActive={i === fromRef.current}
+            isTablet={isTablet}
+            onPress={() => {
+              if (tab.route !== pathname) router.replace(tab.route as any);
+            }}
+          />
+        ))}
 
-      <Animated.View
-        pointerEvents="none"
-        style={[styles.pillSlot, { width: tabWidth }, pillStyle]}
-      >
-        <View style={styles.pill} />
-      </Animated.View>
+        <View
+          pointerEvents="none"
+          style={[
+            styles.pillClip,
+            { top: -bumpAllowance, width: barWidth, height: barHeight + bumpAllowance },
+          ]}
+        >
+          <Animated.View
+            style={[
+              styles.pillSlot,
+              { top: bumpAllowance, height: barHeight, width: tabWidth },
+              pillStyle,
+            ]}
+          >
+            <View
+              style={[
+                styles.pill,
+                { top: pillTop, width: pillSize, height: pillSize, borderRadius: pillSize / 2 },
+              ]}
+            />
+          </Animated.View>
+        </View>
+      </View>
     </View>
   );
 }
@@ -115,96 +138,78 @@ function TabButton({
   tab,
   active,
   startedActive,
-  width,
+  isTablet,
   onPress,
 }: {
   tab: Tab;
   active: boolean;
   startedActive: boolean;
-  width: number;
+  isTablet: boolean;
   onPress: () => void;
 }) {
+  const activeLift = isTablet ? ACTIVE_LIFT_TABLET : ACTIVE_LIFT;
   const scale = useSharedValue(startedActive ? ACTIVE_SCALE : 1);
-  const lift = useSharedValue(startedActive ? ACTIVE_LIFT : 0);
+  const lift = useSharedValue(startedActive ? activeLift : 0);
 
   useEffect(() => {
     scale.value = withSpring(active ? ACTIVE_SCALE : 1, ICON_SPRING);
-    lift.value = withSpring(active ? ACTIVE_LIFT : 0, ICON_SPRING);
-  }, [active]);
+    lift.value = withSpring(active ? activeLift : 0, ICON_SPRING);
+  }, [active, activeLift]);
 
   const iconStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }, { translateY: lift.value }],
   }));
 
-  const badgeStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(active ? 1 : 0.85, { duration: 150 }),
-  }));
-
   return (
     <Pressable
-      style={[styles.tab, { width }]}
+      style={styles.tab}
       onPress={onPress}
       hitSlop={8}
       accessibilityRole="tab"
       accessibilityState={{ selected: active }}
-      accessibilityLabel={
-        typeof tab.badge === "number"
-          ? `${tab.label}, новых: ${tab.badge}`
-          : tab.label
-      }
+      accessibilityLabel={tab.label}
     >
       <Animated.View style={iconStyle}>
-        <Image source={tab.icon} style={styles.tabIcon} resizeMode="contain" />
+        <Image
+          source={tab.icon}
+          style={[styles.tabIcon, isTablet && styles.tabIconTablet]}
+          resizeMode="contain"
+        />
       </Animated.View>
-
-      {typeof tab.badge === "number" && (
-        <Animated.View style={[styles.badge, badgeStyle]}>
-          <Text style={styles.badgeText}>{tab.badge}</Text>
-        </Animated.View>
-      )}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   bar: {
-    flexDirection: "row",
-    height: BAR_HEIGHT,
+    alignItems: "center",
     backgroundColor: colors.navActive,
   },
+  barInner: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
   tab: {
+    flex: 1,
     height: "100%",
     alignItems: "center",
     justifyContent: "center",
     zIndex: 2,
   },
   tabIcon: { width: ICON_SIZE, height: ICON_SIZE },
+  tabIconTablet: { width: ICON_SIZE_TABLET, height: ICON_SIZE_TABLET },
+  pillClip: {
+    position: "absolute",
+    left: 0,
+    overflow: "hidden",
+  },
   pillSlot: {
     position: "absolute",
-    top: 0,
-    height: "100%",
     alignItems: "center",
     justifyContent: "center",
   },
   pill: {
     position: "absolute",
-    top: -22,
-    width: BAR_HEIGHT,
-    height: BAR_HEIGHT,
-    borderRadius: BAR_HEIGHT / 2,
     backgroundColor: colors.navActive,
   },
-  badge: {
-    position: "absolute",
-    top: 10,
-    right: 18,
-    minWidth: 18,
-    height: 18,
-    paddingHorizontal: 4,
-    borderRadius: 9,
-    backgroundColor: colors.navBadge,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  badgeText: { color: colors.surface, fontSize: 11, fontWeight: "700" },
 });
