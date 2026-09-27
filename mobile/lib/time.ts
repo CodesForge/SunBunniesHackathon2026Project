@@ -22,6 +22,32 @@ export function sleepiness(lastSleptAt: number, now = Date.now()) {
   return levelFromLast(lastSleptAt, ECONOMY.sleepPerHour, now);
 }
 
+export const ENERGY_RECOVER_PER_HOUR = (100 * 60) / ECONOMY.sleepFullMinutes;
+
+export function energyNow(
+  energyBase: number,
+  energyAt: number,
+  asleep: boolean,
+  now = Date.now(),
+) {
+  const base = Number.isFinite(energyBase) ? energyBase : 100;
+  if (!energyAt) return clamp(base, 0, 100);
+  const hours = ((now - energyAt) / HOUR) * TIME_SCALE;
+  const rate = asleep ? ENERGY_RECOVER_PER_HOUR : -ECONOMY.sleepPerHour;
+  return clamp(base + hours * rate, 0, 100);
+}
+
+export function minutesToFull(
+  energyBase: number,
+  energyAt: number,
+  asleep: boolean,
+  now = Date.now(),
+) {
+  if (!asleep) return 0;
+  const left = 100 - energyNow(energyBase, energyAt, asleep, now);
+  return Math.ceil((left / ENERGY_RECOVER_PER_HOUR) * 60);
+}
+
 export function pendingIncomes(lastIncomeAt: number, now = Date.now()) {
   if (!lastIncomeAt) return 0;
   const passed = Math.floor(((now - lastIncomeAt) * TIME_SCALE) / WEEK);
