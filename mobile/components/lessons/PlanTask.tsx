@@ -5,7 +5,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { colors, font, radius, space, HIT } from "../../theme";
 
 type Props = {
-  onDone: () => void;
+  onDone: (mistakes: number) => void;
 };
 
 export default function PlanTask({ onDone }: Props) {
@@ -16,7 +16,7 @@ export default function PlanTask({ onDone }: Props) {
   useFocusEffect(() => {
     if (left.current && !done.current) {
       done.current = true;
-      onDone();
+      onDone(0);
     }
     return () => {
       left.current = true;
