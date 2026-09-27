@@ -105,6 +105,7 @@ const initial: State = {
 
 type Actions = {
   hatch: (species: "dog" | "cat", name: string, goalId: string) => void;
+  setGoal: (goalId: string) => void;
   setPlan: (p: Jars) => void;
   rebalance: (next: Jars) => void;
   feed: (foodId: string) => boolean;
@@ -347,6 +348,7 @@ export const usePet = create<State & Actions>()(
 
       setSetting: (k, v) =>
         set((s) => ({ settings: { ...s.settings, [k]: v } })),
+      setGoal: (goalId) => set({ goalId, dirty: true }),
       toggleDemo: () => set((s) => ({ demoMode: !s.demoMode })),
       reset: () => set({ ...initial, dayKey: todayKey() }),
     }),
