@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { ArrowLeft, ChevronRight } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -18,9 +18,12 @@ export default function SettingsScreen() {
       <SafeAreaView style={styles.content} edges={["top", "bottom"]}>
         <View style={styles.header}>
           <View style={styles.backSlot}>
-            <Link href={"/home" as any} asChild>
-              <RoundIconButton icon={ArrowLeft} accessibilityRole="button" accessibilityLabel="Назад" />
-            </Link>
+            <RoundIconButton
+              icon={ArrowLeft}
+              onPress={() => router.back()}
+              accessibilityRole="button"
+              accessibilityLabel="Назад"
+            />
           </View>
           <Text style={styles.title}>Настройки</Text>
         </View>
