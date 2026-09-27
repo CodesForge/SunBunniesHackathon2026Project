@@ -8,7 +8,7 @@ export const ECONOMY = {
   dailySeconds: 20 * 60,
   questReward: 100,
   xpPerQuest: 1,
-  stages: [0, 1, 3],
+  teenLevel: 6,
   parentBonus: 200,
   chestReward: 150,
   mistakePenalty: 5,
