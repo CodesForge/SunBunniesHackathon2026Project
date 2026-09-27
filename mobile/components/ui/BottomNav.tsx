@@ -117,7 +117,6 @@ export default function BottomNav() {
             tab={tab}
             active={i === activeIndex}
             startedActive={i === fromRef.current}
-            width={tabWidth}
             isTablet={isTablet}
             onPress={() => {
               if (tab.route !== pathname) router.replace(tab.route as any);
@@ -140,14 +139,12 @@ function TabButton({
   tab,
   active,
   startedActive,
-  width,
   isTablet,
   onPress,
 }: {
   tab: Tab;
   active: boolean;
   startedActive: boolean;
-  width: number;
   isTablet: boolean;
   onPress: () => void;
 }) {
@@ -170,7 +167,7 @@ function TabButton({
 
   return (
     <Pressable
-      style={[styles.tab, { width }]}
+      style={styles.tab}
       onPress={onPress}
       hitSlop={8}
       accessibilityRole="tab"
@@ -209,8 +206,10 @@ const styles = StyleSheet.create({
   },
   barInner: {
     flexDirection: "row",
+    justifyContent: "space-between",
   },
   tab: {
+    flex: 1,
     height: "100%",
     alignItems: "center",
     justifyContent: "center",

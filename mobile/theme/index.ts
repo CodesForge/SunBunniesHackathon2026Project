@@ -13,6 +13,7 @@ export const colors = {
   disabled: "#E3DACD",
   accent: "#B4A8EA",
   iconBorder: "#A99FE4",
+  pillBorder: "#A36AFF",
   sceneSky: "#C2DDFB",
   sceneOval: "#818BFE",
   sceneOvalLight: "#E6E8FF",

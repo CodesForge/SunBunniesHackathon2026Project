@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Image, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { Link } from "expo-router";
 import { ArrowLeft, MessageCircle, Settings, Wallet } from "lucide-react-native";
@@ -35,6 +34,8 @@ const ROUND_BUTTON_ICON_TABLET = 32;
 const RIGHT_COLUMN_MARGIN_LEFT = 10;
 const TOP_RIGHT_ROW_GAP = 10;
 
+const PILL_BORDER_WIDTH = 5;
+
 const MONEY_PILL_HEIGHT = 36;
 const MONEY_PILL_HEIGHT_TABLET = 52;
 const MONEY_PILL_PADDING_H = 16;
@@ -69,37 +70,8 @@ const COIN_NEED = require("../../assets/icons/coin-need.png");
 const COIN_WANT = require("../../assets/icons/coin-want.png");
 const COIN_DREAM = require("../../assets/icons/coin-dream.png");
 const CIRCLE_LARGE = require("../../assets/icons/circle-large.png");
-const PILL_BG = require("../../assets/icons/pill-long.png");
 const ICON_MOON_PURPLE = require("../../assets/icons/icon-moon-purple.png");
 const ICON_FOOD_PURPLE = require("../../assets/icons/icon-food-purple.png");
-
-// Image в RN не умеет само растягиваться на 100%/absoluteFill внутри
-// текучего flex-контейнера — ему нужен точный пиксельный размер. Меряем
-// реальный размер полоски через onLayout и уже потом рисуем картинку.
-function PillBackground() {
-  const [size, setSize] = useState({ width: 0, height: 0 });
-
-  return (
-    <View
-      style={StyleSheet.absoluteFill}
-      pointerEvents="none"
-      onLayout={(e) => {
-        const { width, height } = e.nativeEvent.layout;
-        setSize((prev) =>
-          prev.width === width && prev.height === height ? prev : { width, height }
-        );
-      }}
-    >
-      {size.width > 0 && size.height > 0 && (
-        <Image
-          source={PILL_BG}
-          style={{ width: size.width, height: size.height }}
-          resizeMode="cover"
-        />
-      )}
-    </View>
-  );
-}
 
 type TopHudProps = {
   // Показывать ли полоски сна/сытости — на экранах вроде магазина они
@@ -211,14 +183,11 @@ export default function TopHud({
               {...roundButtonProps}
             />
           )}
-
-          {isTablet && settingsButton}
         </View>
 
         <View style={[styles.rightColumn, isTablet && styles.rightColumnTablet]}>
           <View style={[styles.topRightRow, isTablet && styles.topRightRowTablet]}>
             <View style={[styles.moneyPill, isTablet && styles.moneyPillTablet]}>
-              <PillBackground />
               <CoinValue
                 image={COIN_NEED}
                 value={jars.need}
@@ -244,8 +213,6 @@ export default function TopHud({
 
           {showStats && (
             <View style={[styles.scalesFrame, isTablet && styles.scalesFrameTablet]}>
-              <PillBackground />
-
               <View
                 style={styles.scale}
                 accessibilityRole="progressbar"
@@ -280,6 +247,8 @@ export default function TopHud({
             </View>
           )}
         </View>
+
+        {isTablet && <View style={styles.topRightCorner}>{settingsButton}</View>}
       </View>
     </View>
   );
@@ -339,6 +308,7 @@ const styles = StyleSheet.create({
   rightColumnTablet: { marginLeft: 0 },
   topRightRow: { flexDirection: "row", alignItems: "center", gap: TOP_RIGHT_ROW_GAP },
   topRightRowTablet: { justifyContent: "center" },
+  topRightCorner: { position: "absolute", top: 0, right: 0, zIndex: 1 },
   moneyPill: {
     flex: 1,
     flexDirection: "row",
@@ -346,7 +316,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     height: MONEY_PILL_HEIGHT,
     borderRadius: radius.pill,
-    overflow: "hidden",
+    borderWidth: PILL_BORDER_WIDTH,
+    borderColor: colors.pillBorder,
+    backgroundColor: colors.surface,
     paddingHorizontal: MONEY_PILL_PADDING_H,
   },
   moneyPillTablet: {
@@ -362,7 +334,9 @@ const styles = StyleSheet.create({
     height: SCALES_FRAME_HEIGHT,
     marginTop: SCALES_FRAME_MARGIN_TOP,
     borderRadius: radius.pill,
-    overflow: "hidden",
+    borderWidth: PILL_BORDER_WIDTH,
+    borderColor: colors.pillBorder,
+    backgroundColor: colors.surface,
     paddingHorizontal: SCALES_FRAME_PADDING_H,
     gap: SCALES_FRAME_GAP,
   },

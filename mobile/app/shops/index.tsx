@@ -3,7 +3,12 @@ import { Link } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import BottomNav from "../../components/ui/BottomNav";
-import RoundImageButton, { ROUND_IMAGE_BUTTON_SIZE } from "../../components/ui/RoundImageButton";
+import RoundImageButton, {
+  ROUND_IMAGE_BUTTON_SIZE,
+  ROUND_IMAGE_BUTTON_SIZE_TABLET,
+  ROUND_IMAGE_BUTTON_CIRCLE_TABLET,
+  ROUND_IMAGE_BUTTON_ICON_TABLET,
+} from "../../components/ui/RoundImageButton";
 import TopHud from "../../components/ui/TopHud";
 import { colors } from "../../theme";
 
@@ -14,14 +19,23 @@ const BUSHES = require("../../assets/shops/bushes.png");
 const FOOD_ICON = require("../../assets/shops/food-icon.png");
 const WARDROBE_ICON = require("../../assets/shops/wardrobe-icon.png");
 
+const TABLET_BREAKPOINT = 768;
+
 const SIDE_MARGIN = 12;
 const VERTICAL_PERCENT = 0.48;
-const HALF_BUTTON = ROUND_IMAGE_BUTTON_SIZE / 2;
 
 export default function ShopsScreen() {
   const { width, height } = useWindowDimensions();
+  const isTablet = width >= TABLET_BREAKPOINT;
   const size = { width, height };
-  const top = height * VERTICAL_PERCENT - HALF_BUTTON;
+
+  const buttonSize = isTablet ? ROUND_IMAGE_BUTTON_SIZE_TABLET : ROUND_IMAGE_BUTTON_SIZE;
+  const halfButton = buttonSize / 2;
+  const top = height * VERTICAL_PERCENT - halfButton;
+
+  const imageButtonProps = isTablet
+    ? { circleSize: ROUND_IMAGE_BUTTON_CIRCLE_TABLET, iconSize: ROUND_IMAGE_BUTTON_ICON_TABLET }
+    : {};
 
   return (
     <View style={styles.root}>
@@ -32,8 +46,22 @@ export default function ShopsScreen() {
         <Image source={BUSHES} style={[styles.layer, size]} resizeMode="cover" />
       </View>
 
-      <ShopLink href="/shops/food" label="Магазин еды" image={FOOD_ICON} side="left" top={top} />
-      <ShopLink href="/shops/wardrobe" label="Магазин одежды" image={WARDROBE_ICON} side="right" top={top} />
+      <ShopLink
+        href="/shops/food"
+        label="Магазин еды"
+        image={FOOD_ICON}
+        side="left"
+        top={top}
+        imageButtonProps={imageButtonProps}
+      />
+      <ShopLink
+        href="/shops/wardrobe"
+        label="Магазин одежды"
+        image={WARDROBE_ICON}
+        side="right"
+        top={top}
+        imageButtonProps={imageButtonProps}
+      />
 
       <SafeAreaView style={styles.content} edges={["top"]} pointerEvents="box-none">
         <TopHud />
@@ -52,15 +80,21 @@ type ShopLinkProps = {
   image: number;
   side: "left" | "right";
   top: number;
+  imageButtonProps: { circleSize?: number; iconSize?: number };
 };
 
-function ShopLink( { href, label, image, side, top }: ShopLinkProps) {
+function ShopLink({ href, label, image, side, top, imageButtonProps }: ShopLinkProps) {
   const sideStyle = side === "left" ? { left: SIDE_MARGIN } : { right: SIDE_MARGIN };
 
   return (
     <View style={[styles.pin, sideStyle, { top }]} pointerEvents="box-none">
       <Link href={href as any} asChild>
-        <RoundImageButton image={image} accessibilityRole="button" accessibilityLabel={label} />
+        <RoundImageButton
+          image={image}
+          accessibilityRole="button"
+          accessibilityLabel={label}
+          {...imageButtonProps}
+        />
       </Link>
     </View>
   );
