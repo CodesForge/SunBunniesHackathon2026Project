@@ -4,20 +4,18 @@ import { Check, X as XIcon } from "lucide-react-native";
 
 import type { SortStepData } from "../../data/lessons";
 import { LESSON_GREEN, LESSON_ORANGE, LESSON_RED, LESSON_TITLE } from "./lessonColors";
-import { ECONOMY } from "../../data/economy";
-import { usePet } from "../../store/pet";
 import { colors, font, radius, HIT } from "../../theme";
 
 type Props = {
   data: SortStepData;
-  onDone: () => void;
+  onDone: (mistakes: number) => void;
 };
 
 export default function SortTask({ data, onDone }: Props) {
   const [placed, setPlaced] = useState<Record<string, "a" | "b">>({});
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
-  const grantJars = usePet((s) => s.grantJars);
+  const [mistakes, setMistakes] = useState(0);
 
   const remaining = useMemo(
     () => data.cards.filter((c) => !placed[c.id]),
@@ -31,18 +29,30 @@ export default function SortTask({ data, onDone }: Props) {
     setSelectedId(null);
   };
 
+  const takeBack = (id: string) => {
+    if (checked) return;
+    setPlaced((p) => {
+      const next = { ...p };
+      delete next[id];
+      return next;
+    });
+    setSelectedId(null);
+  };
+
   const cardsInBasket = (basket: "a" | "b") =>
     data.cards.filter((c) => placed[c.id] === basket);
 
   const check = () => {
-    const mistakes = data.cards.filter((c) => placed[c.id] !== c.basket).length;
-    if (mistakes > 0) grantJars({ want: -ECONOMY.mistakePenalty * mistakes });
+    setMistakes(data.cards.filter((c) => placed[c.id] !== c.basket).length);
     setChecked(true);
   };
 
   return (
     <View style={styles.root}>
       <Text style={styles.heading}>Расставь пункты в правильные колонки</Text>
+      <Text style={styles.hint}>
+        Передумал? Нажми на карточку в колонке — она вернётся обратно
+      </Text>
 
       <View style={styles.pool}>
         {remaining.length === 0 ? (
@@ -52,6 +62,7 @@ export default function SortTask({ data, onDone }: Props) {
             <Pressable
               key={card.id}
               onPress={() => setSelectedId((id) => (id === card.id ? null : card.id))}
+              hitSlop={TAP_SLOP}
               style={[styles.chip, selectedId === card.id && styles.chipSelected]}
               accessibilityRole="button"
               accessibilityLabel={card.text}
@@ -83,7 +94,15 @@ export default function SortTask({ data, onDone }: Props) {
               </Text>
               <View style={styles.basketItems}>
                 {cardsInBasket(basket).map((c) => (
-                  <View key={c.id} style={styles.placedChip}>
+                  <Pressable
+                    key={c.id}
+                    onPress={() => takeBack(c.id)}
+                    disabled={checked}
+                    hitSlop={TAP_SLOP}
+                    style={styles.placedChip}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${c.text}. Нажми, чтобы вернуть обратно`}
+                  >
                     <Text style={styles.placedChipText}>{c.text}</Text>
                     {checked &&
                       (c.basket === basket ? (
@@ -91,7 +110,7 @@ export default function SortTask({ data, onDone }: Props) {
                       ) : (
                         <XIcon size={16} color={LESSON_RED} strokeWidth={3} />
                       ))}
-                  </View>
+                  </Pressable>
                 ))}
               </View>
             </Pressable>
@@ -108,7 +127,11 @@ export default function SortTask({ data, onDone }: Props) {
       {checked && (
         <View style={styles.explanationCard}>
           <Text style={styles.explanationText}>{data.explanation}</Text>
-          <Pressable style={styles.primaryButton} onPress={onDone} accessibilityRole="button">
+          <Pressable
+            style={styles.primaryButton}
+            onPress={() => onDone(mistakes)}
+            accessibilityRole="button"
+          >
             <Text style={styles.primaryButtonText}>Далее</Text>
           </Pressable>
         </View>
@@ -116,6 +139,8 @@ export default function SortTask({ data, onDone }: Props) {
     </View>
   );
 }
+
+const TAP_SLOP = { top: 6, bottom: 6, left: 6, right: 6 };
 
 const CARD_SHADOW = {
   shadowColor: "#000000",
@@ -128,6 +153,7 @@ const CARD_SHADOW = {
 const styles = StyleSheet.create({
   root: { gap: 20, padding: 10 },
   heading: { ...font.body, fontWeight: "700", color: LESSON_TITLE, fontSize: 20},
+  hint: { ...font.small, color: colors.muted },
   pool: { flexDirection: "row", flexWrap: "wrap", gap: 20 },
   poolHint: { ...font.small, color: colors.muted },
   chip: {
@@ -137,7 +163,7 @@ const styles = StyleSheet.create({
     ...CARD_SHADOW,
   },
   chipSelected: { backgroundColor: colors.sceneOval },
-  chipText: { ...font.small, fontWeight: "700", color: LESSON_TITLE },
+  chipText: { ...font.body, fontWeight: "700", color: LESSON_TITLE },
   chipTextSelected: { color: colors.surface },
 
   baskets: { flexDirection: "row", gap: 5 },
@@ -162,7 +188,7 @@ const styles = StyleSheet.create({
     padding: 10,
     ...CARD_SHADOW,
   },
-  placedChipText: { ...font.small, color: colors.ink, flexShrink: 1 },
+  placedChipText: { ...font.body, color: colors.ink, flexShrink: 1 },
 
   primaryButton: {
     minHeight: HIT,
