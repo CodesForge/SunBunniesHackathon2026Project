@@ -1,5 +1,6 @@
 import type { ImageSourcePropType } from "react-native";
 import type { Item } from "../store/pet";
+import type { PetAgeStage } from "../components/pet/petAssets";
 
 export type WardrobeItem = Item & { image: ImageSourcePropType; preview?: ImageSourcePropType };
 
@@ -153,6 +154,10 @@ export const TEEN_CLOTHING_ITEMS: WardrobeOutfitItem[] = [
   },
 ];
 
+export const ADULT_ACCESSORY_ITEMS: WardrobeItem[] = [];
+
+export const ADULT_CLOTHING_ITEMS: WardrobeOutfitItem[] = [];
+
 export type WornOutfit = { base: ImageSourcePropType; sleeveLeft: ImageSourcePropType; sleeveRight: ImageSourcePropType };
 
 export type WornVisuals = {
@@ -161,11 +166,16 @@ export type WornVisuals = {
   headWear?: ImageSourcePropType;
 };
 
-export function resolveWornVisuals(worn: { body?: string; head?: string }, isTeen: boolean): WornVisuals {
+export function resolveWornVisuals(worn: { body?: string; head?: string }, stage: PetAgeStage): WornVisuals {
   const visuals: WornVisuals = {};
 
   if (worn.body) {
-    if (isTeen) {
+    if (stage === "adult") {
+      const outfitItem = ADULT_CLOTHING_ITEMS.find((i) => i.id === worn.body);
+      if (outfitItem) {
+        visuals.outfit = { base: outfitItem.base, sleeveLeft: outfitItem.sleeveLeft, sleeveRight: outfitItem.sleeveRight };
+      }
+    } else if (stage === "teen") {
       const outfitItem = TEEN_CLOTHING_ITEMS.find((i) => i.id === worn.body);
       if (outfitItem) {
         visuals.outfit = { base: outfitItem.base, sleeveLeft: outfitItem.sleeveLeft, sleeveRight: outfitItem.sleeveRight };
@@ -176,8 +186,9 @@ export function resolveWornVisuals(worn: { body?: string; head?: string }, isTee
     }
   }
 
-  if (worn.head && isTeen) {
-    const headItem = TEEN_ACCESSORY_ITEMS.find((i) => i.id === worn.head);
+  if (worn.head && stage !== "mini") {
+    const accessoryItems = stage === "adult" ? ADULT_ACCESSORY_ITEMS : TEEN_ACCESSORY_ITEMS;
+    const headItem = accessoryItems.find((i) => i.id === worn.head);
     if (headItem) visuals.headWear = headItem.image;
   }
 

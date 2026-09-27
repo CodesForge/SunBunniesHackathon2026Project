@@ -11,7 +11,7 @@ import BottomNav from "../components/ui/BottomNav";
 import Modal from "../components/ui/Modal";
 import TopHud from "../components/ui/TopHud";
 import { FOOD_ITEMS } from "../data/food";
-import { ECONOMY } from "../data/economy";
+import { getPetStage } from "../components/pet/petAssets";
 import { resolveWornVisuals } from "../data/wardrobe";
 import { fullness } from "../lib/time";
 import { usePet } from "../store/pet";
@@ -38,8 +38,8 @@ export default function DiningScreen() {
   const full = fullness(lastFedAt);
   const mouth = full >= 60 ? "happy" : full >= 25 ? "neutral" : "sad";
 
-  const isTeen = xp >= ECONOMY.teenLevel;
-  const { bodyWear, outfit, headWear } = resolveWornVisuals(worn, isTeen);
+  const stage = getPetStage(xp);
+  const { bodyWear, outfit, headWear } = resolveWornVisuals(worn, stage);
 
   const onSelect = (item: FoodPlateItem) => {
     if (fullness(lastFedAt) >= FULL_ENOUGH) {

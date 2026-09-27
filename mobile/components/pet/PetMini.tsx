@@ -9,8 +9,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import type { ImageSourcePropType } from "react-native";
-import { MouthKey, PET_ASSETS, PetSpecies } from "./petAssets";
-import { ECONOMY } from "../../data/economy";
+import { getPetStage, MouthKey, PET_ASSETS, PetSpecies } from "./petAssets";
 import { usePet } from "../../store/pet";
 
 type OutfitLayers = {
@@ -83,7 +82,7 @@ export function PetMini({
   headWear,
 }: PetMiniProps) {
   const xp = usePet((s) => s.xp);
-  const stage = xp >= ECONOMY.adultLevel ? "adult" : xp >= ECONOMY.teenLevel ? "teen" : "mini";
+  const stage = getPetStage(xp);
   const assets = PET_ASSETS[species][stage];
   const { width } = useWindowDimensions();
   const w = (width * widthPercent) / 100;
@@ -138,6 +137,20 @@ export function PetMini({
               style={[styles.layer, { transformOrigin: assets.armRightOrigin }, armRightStyle]}
               resizeMode="contain"
             />
+            {outfit && (
+              <>
+                <Animated.Image
+                  source={outfit.sleeveLeft}
+                  style={[styles.layer, { transformOrigin: assets.armLeftOrigin }, armLeftStyle]}
+                  resizeMode="contain"
+                />
+                <Animated.Image
+                  source={outfit.sleeveRight}
+                  style={[styles.layer, { transformOrigin: assets.armRightOrigin }, armRightStyle]}
+                  resizeMode="contain"
+                />
+              </>
+            )}
           </>
         )}
         <Image source={assets.body} style={styles.layer} resizeMode="contain" />
@@ -155,6 +168,9 @@ export function PetMini({
             resizeMode="contain"
           />
         )}
+        {outfit && assets.armsUnderBody && (
+          <Image source={outfit.base} style={styles.layer} resizeMode="contain" />
+        )}
         {!assets.armsUnderBody && (
           <>
             <Animated.Image
@@ -169,7 +185,7 @@ export function PetMini({
             />
           </>
         )}
-        {outfit && (
+        {outfit && !assets.armsUnderBody && (
           <>
             <Animated.Image
               source={outfit.sleeveLeft}
