@@ -36,7 +36,9 @@ const PAPER_ROTATION_DEG = 4.4;
 const PAPER_FIT_SHRINK = 0.85;
 
 const TABLET_BREAKPOINT = 768;
-const TABLET_PANEL_MAX_WIDTH = 300;
+const TABLET_PANEL_MAX_WIDTH = 380;
+const TABLET_COIN_BADGE_SIZE = 40;
+const TABLET_COIN_FONT_SIZE = 22;
 
 const CARD_BORDER = 3;
 
@@ -138,18 +140,24 @@ export default function GoalScreen() {
         edges={["bottom"]}
         style={[styles.bottomPanel, isTablet && styles.bottomPanelTablet]}
       >
-        <CoinValue image={COIN_DREAM} value={goal.price} />
+        <CoinValue
+          image={COIN_DREAM}
+          value={goal.price}
+          badgeSize={isTablet ? TABLET_COIN_BADGE_SIZE : undefined}
+          fontSize={isTablet ? TABLET_COIN_FONT_SIZE : undefined}
+        />
 
-        <View style={styles.progressTrack}>
+        <View style={[styles.progressTrack, isTablet && styles.progressTrackTablet]}>
           <View style={[styles.progressFill, { width: `${progressPct}%` }]} />
         </View>
-        <Text style={styles.progressLabel}>
+        <Text style={[styles.progressLabel, isTablet && styles.progressLabelTablet]}>
           {Math.min(dream, goal.price)} / {goal.price}
         </Text>
 
         <Pressable
           style={({ pressed }) => [
             styles.buyButton,
+            isTablet && styles.buyButtonTablet,
             reached ? styles.buyButtonActive : styles.buyButtonDisabled,
             pressed && reached && styles.pressed,
           ]}
@@ -162,6 +170,7 @@ export default function GoalScreen() {
           <Text
             style={[
               styles.buyButtonText,
+              isTablet && styles.buyButtonTextTablet,
               reached ? styles.buyButtonTextActive : styles.buyButtonTextDisabled,
             ]}
           >
@@ -238,6 +247,9 @@ const styles = StyleSheet.create({
     marginHorizontal: "auto",
     borderBottomLeftRadius: radius.lg,
     borderBottomRightRadius: radius.lg,
+    paddingTop: space.lg,
+    paddingBottom: space.lg,
+    gap: space.md,
   },
   progressTrack: {
     width: "100%",
@@ -246,12 +258,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.sceneOvalLight,
     overflow: "hidden",
   },
+  progressTrackTablet: { height: 22 },
   progressFill: {
     height: "100%",
     borderRadius: radius.pill,
     backgroundColor: colors.sceneOval,
   },
   progressLabel: { ...font.small, color: colors.muted },
+  progressLabelTablet: { fontSize: 18, lineHeight: 24 },
   buyButton: {
     width: "100%",
     minHeight: HIT - 8,
@@ -259,9 +273,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  buyButtonTablet: { minHeight: HIT + 8 },
   buyButtonActive: { backgroundColor: colors.sceneOval },
   buyButtonDisabled: { backgroundColor: colors.disabled },
   buyButtonText: { fontSize: 16, fontWeight: "800" },
+  buyButtonTextTablet: { fontSize: 22 },
   buyButtonTextActive: { color: colors.surface },
   buyButtonTextDisabled: { color: colors.muted },
   pressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },

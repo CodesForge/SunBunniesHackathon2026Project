@@ -6,13 +6,19 @@ const BADGE_SIZE = 28;
 type Props = {
   image: ImageSourcePropType;
   value: number;
+  badgeSize?: number;
+  fontSize?: number;
 };
 
-export default function CoinValue({ image, value }: Props) {
+export default function CoinValue({ image, value, badgeSize, fontSize }: Props) {
   return (
     <View style={styles.wrap}>
-      <Image source={image} style={styles.badge} resizeMode="contain" />
-      <Text style={styles.value}>{value}</Text>
+      <Image
+        source={image}
+        style={[styles.badge, badgeSize != null && { width: badgeSize, height: badgeSize }]}
+        resizeMode="contain"
+      />
+      <Text style={[styles.value, fontSize != null && { fontSize }]}>{value}</Text>
     </View>
   );
 }
