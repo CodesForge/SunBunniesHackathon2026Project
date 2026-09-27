@@ -62,6 +62,7 @@ export default function WardrobeShopScreen() {
   const categoryButtonProps = isTablet
     ? { circleSize: CATEGORY_BUTTON_CIRCLE_TABLET, iconSize: CATEGORY_BUTTON_ICON_TABLET }
     : {};
+  const species = usePet((s) => s.species);
   const xp = usePet((s) => s.xp);
   const jars = usePet((s) => s.jars);
   const owned = usePet((s) => s.owned);
@@ -170,7 +171,7 @@ export default function WardrobeShopScreen() {
 
       <View style={[styles.petWrap, { bottom: height * PET_BOTTOM_FRACTION }]} pointerEvents="none">
         <PetMini
-          species="cat"
+          species={species ?? "cat"}
           widthPercent={PET_WIDTH_PERCENT}
           animated={motion}
           bodyWear={shownBodyWear}

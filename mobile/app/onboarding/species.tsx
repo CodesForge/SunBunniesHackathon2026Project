@@ -55,11 +55,7 @@ type PetOption = {
 
 const PETS: PetOption[] = [
   { key: "cat", title: "Кот", species: "cat", ready: true, icon: require("../../assets/icons/pet-icons/cat.png") },
-  { key: "dog", title: "Собака", species: "dog", ready: false, icon: require("../../assets/icons/pet-icons/dog.png") },
-  { key: "hamster", title: "Хомяк", ready: false, icon: require("../../assets/icons/pet-icons/hamster.png") },
-  { key: "fox", title: "Лиса", ready: false, icon: require("../../assets/icons/pet-icons/fox.png") },
-  { key: "mouse", title: "Мышка", ready: false, icon: require("../../assets/icons/pet-icons/mouse.png") },
-  { key: "bunny", title: "Зайка", ready: false, icon: require("../../assets/icons/pet-icons/bunny.png") },
+  { key: "dog", title: "Собака", species: "dog", ready: true, icon: require("../../assets/icons/pet-icons/dog.png") },
 ];
 
 function mod(n: number, m: number) {
@@ -101,8 +97,11 @@ export default function ChooseSpeciesScreen() {
   const coinH = (coinW * 647) / 1146;
   const coinTop = height * COIN_TOP;
 
+  const previewSpecies = pet.species ?? "cat";
+  const previewAssets = PET_ASSETS[previewSpecies].mini ?? PET_ASSETS[previewSpecies].adult ?? PET_ASSETS[previewSpecies].teen;
+
   const catW = (width * CAT_WIDTH) / 100;
-  const catH = catW * PET_ASSETS.cat.mini!.aspect;
+  const catH = catW * previewAssets!.aspect;
   const catTop = coinTop + coinH * COIN_SURFACE - catH * CAT_FEET;
 
   const arrowsTop = coinTop - coinH * 0.2;
@@ -141,7 +140,7 @@ export default function ChooseSpeciesScreen() {
       <View style={[styles.centerRow, { top: catTop }]} pointerEvents="none">
         <Animated.View key={pet.key} entering={FadeIn.duration(220)} exiting={FadeOut.duration(160)}>
           {pet.ready ? (
-            <PetMini species="cat" widthPercent={CAT_WIDTH} mouth="happy" eyesOpen />
+            <PetMini species={previewSpecies} widthPercent={CAT_WIDTH} mouth="happy" eyesOpen />
           ) : (
             <View style={[styles.stub, { width: catW, height: catH }]}>
               <Image source={pet.icon} style={{ width: catW * 0.5, height: catW * 0.5 }} resizeMode="contain" />
