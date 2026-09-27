@@ -12,8 +12,16 @@ export const ECONOMY = {
   adultLevel: 13,
   parentBonus: 200,
   chestReward: 150,
+  lessonPenalties: [0, 10, 15, 20],
+  lessonRewardFloor: 20,
   mistakePenalty: 5,
 } as const;
 
 export type Jar = "need" | "want" | "dream";
 export type Theme = "planning" | "saving" | "spending";
+
+export function rewardForMistakes(base: number, mistakes: number) {
+  const steps = ECONOMY.lessonPenalties;
+  const penalty = steps[Math.min(Math.max(mistakes, 0), steps.length - 1)];
+  return Math.max(ECONOMY.lessonRewardFloor, base - penalty);
+}
