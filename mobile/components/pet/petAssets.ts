@@ -166,6 +166,31 @@ const DOG_ADULT: PetAssetSet = {
   bodyWearHeight: 0.16,
 };
 
+const DOG_MINI: PetAssetSet = {
+  body: require("../../assets/pets/dog/mini/body.png"),
+  tail: require("../../assets/pets/dog/mini/tail.png"),
+  armLeft: require("../../assets/pets/dog/mini/arm-left.png"),
+  armRight: require("../../assets/pets/dog/mini/arm-right.png"),
+  belly: require("../../assets/pets/dog/mini/belly.png"),
+  eyesOpen: require("../../assets/pets/dog/mini/eyes-open.png"),
+  eyesClosed: require("../../assets/pets/dog/mini/eyes-closed.png"),
+  mouth: {
+    happy: require("../../assets/pets/dog/mini/mouth-happy.png"),
+    neutral: require("../../assets/pets/dog/mini/mouth-neutural.png"),
+    sad: require("../../assets/pets/dog/mini/mouth-sad.png"),
+  },
+  aspect: 2309 / 1707,
+  coreLeft: 100 / 1707,
+  coreWidth: 1523 / 1707,
+  armLeftOrigin: "47% 60%",
+  armRightOrigin: "54% 61%",
+  tailOrigin: "51% 79%",
+  bodyWearLeft: 0.32,
+  bodyWearTop: 0.70,
+  bodyWearWidth: 0.36,
+  bodyWearHeight: 0.16,
+};
+
 export const PET_ASSETS: Record<PetSpecies, Partial<Record<PetAgeStage, PetAssetSet>>> = {
   cat: {
     mini: CAT_MINI,
@@ -173,6 +198,7 @@ export const PET_ASSETS: Record<PetSpecies, Partial<Record<PetAgeStage, PetAsset
     adult: CAT_ADULT,
   },
   dog: {
+    mini: DOG_MINI,
     teen: DOG_TEEN,
     adult: DOG_ADULT,
   },
