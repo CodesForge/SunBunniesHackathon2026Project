@@ -34,8 +34,9 @@ const PAPER_CENTER_Y_FRAC = 2096.67 / BOARD_IMAGE_HEIGHT;
 const PAPER_SIDE_FRAC = 530 / BOARD_IMAGE_HEIGHT;
 const PAPER_ROTATION_DEG = 4.4;
 const PAPER_FIT_SHRINK = 0.85;
-const PANEL_TOP_FRAC = 0.53;
-const PANEL_WIDTH = 240;
+
+const TABLET_BREAKPOINT = 768;
+const TABLET_PANEL_MAX_WIDTH = 300;
 
 const CARD_BORDER = 3;
 
@@ -52,6 +53,7 @@ export default function GoalScreen() {
 
   const goal = goals.find((g) => g.id === goalId) ?? null;
   const reached = !!goal && dream >= goal.price;
+  const isTablet = width >= TABLET_BREAKPOINT;
 
   useEffect(() => {
     if (goal && reached && !goalCelebrated) {
@@ -132,7 +134,10 @@ export default function GoalScreen() {
         />
       </View>
 
-      <View style={[styles.bottomPanel, { top: height * PANEL_TOP_FRAC }]}>
+      <SafeAreaView
+        edges={["bottom"]}
+        style={[styles.bottomPanel, isTablet && styles.bottomPanelTablet]}
+      >
         <CoinValue image={COIN_DREAM} value={goal.price} />
 
         <View style={styles.progressTrack}>
@@ -163,7 +168,7 @@ export default function GoalScreen() {
             Купить
           </Text>
         </Pressable>
-      </View>
+      </SafeAreaView>
 
       <SafeAreaView style={styles.backSlot} edges={["top"]} pointerEvents="box-none">
         <BackHeader backHref="/plan" />
@@ -216,28 +221,35 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
-    maxWidth: PANEL_WIDTH,
-    marginHorizontal: "auto",
+    bottom: 0,
     backgroundColor: colors.surface,
     borderWidth: 4,
     borderColor: colors.sceneOval,
-    borderRadius: radius.lg,
-    paddingVertical: space.md,
+    borderTopLeftRadius: radius.lg,
+    borderTopRightRadius: radius.lg,
+    paddingTop: space.md,
     paddingHorizontal: space.lg,
+    paddingBottom: space.md,
     alignItems: "center",
     gap: space.sm,
+  },
+  bottomPanelTablet: {
+    maxWidth: TABLET_PANEL_MAX_WIDTH,
+    marginHorizontal: "auto",
+    borderBottomLeftRadius: radius.lg,
+    borderBottomRightRadius: radius.lg,
   },
   progressTrack: {
     width: "100%",
     height: 14,
     borderRadius: radius.pill,
-    backgroundColor: colors.jarDreamBg,
+    backgroundColor: colors.sceneOvalLight,
     overflow: "hidden",
   },
   progressFill: {
     height: "100%",
     borderRadius: radius.pill,
-    backgroundColor: colors.dream,
+    backgroundColor: colors.sceneOval,
   },
   progressLabel: { ...font.small, color: colors.muted },
   buyButton: {
@@ -247,7 +259,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  buyButtonActive: { backgroundColor: colors.dream },
+  buyButtonActive: { backgroundColor: colors.sceneOval },
   buyButtonDisabled: { backgroundColor: colors.disabled },
   buyButtonText: { fontSize: 16, fontWeight: "800" },
   buyButtonTextActive: { color: colors.surface },
