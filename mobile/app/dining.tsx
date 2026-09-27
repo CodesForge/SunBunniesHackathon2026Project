@@ -11,12 +11,15 @@ import BottomNav from "../components/ui/BottomNav";
 import Modal from "../components/ui/Modal";
 import TopHud from "../components/ui/TopHud";
 import { FOOD_ITEMS } from "../data/food";
+import { ECONOMY } from "../data/economy";
+import { resolveWornVisuals } from "../data/wardrobe";
 import { fullness } from "../lib/time";
 import { usePet } from "../store/pet";
 import { colors, space } from "../theme";
 
-const PET_WIDTH_PERCENT = 62;
+const PET_WIDTH_PERCENT = 76;
 const PET_TOP_PERCENT = 0.29;
+const PET_RIGHT_SHIFT_PERCENT = 6;
 const PLATE_WIDTH_PERCENT = 0.3;
 const FULL_ENOUGH = 80;
 
@@ -26,11 +29,17 @@ export default function DiningScreen() {
   const feed = usePet((s) => s.feed);
   const lastFedAt = usePet((s) => s.lastFedAt);
   const petName = usePet((s) => s.name);
+  const motion = usePet((s) => s.settings.motion);
+  const xp = usePet((s) => s.xp);
+  const worn = usePet((s) => s.worn);
 
   const [fullAsked, setFullAsked] = useState(false);
 
   const full = fullness(lastFedAt);
   const mouth = full >= 60 ? "happy" : full >= 25 ? "neutral" : "sad";
+
+  const isTeen = xp >= ECONOMY.teenLevel;
+  const { bodyWear, outfit, headWear } = resolveWornVisuals(worn, isTeen);
 
   const onSelect = (item: FoodPlateItem) => {
     if (fullness(lastFedAt) >= FULL_ENOUGH) {
@@ -42,6 +51,7 @@ export default function DiningScreen() {
 
   const petW = (width * PET_WIDTH_PERCENT) / 100;
   const petTop = height * PET_TOP_PERCENT;
+  const petLeft = (width - petW) / 2 + (width * PET_RIGHT_SHIFT_PERCENT) / 100;
   const plateSize = width * PLATE_WIDTH_PERCENT;
 
   // На стол попадают только реально купленные продукты (foodOwned > 0).
@@ -62,7 +72,7 @@ export default function DiningScreen() {
       />
 
       <View
-        style={[styles.petSlot, { top: petTop, left: (width - petW) / 2 }]}
+        style={[styles.petSlot, { top: petTop, left: petLeft }]}
         pointerEvents="none"
       >
         <PetMini
@@ -70,6 +80,10 @@ export default function DiningScreen() {
           widthPercent={PET_WIDTH_PERCENT}
           mouth={mouth}
           eyesOpen
+          animated={motion}
+          bodyWear={bodyWear}
+          outfit={outfit}
+          headWear={headWear}
         />
       </View>
 

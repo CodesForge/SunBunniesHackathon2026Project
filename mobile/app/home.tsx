@@ -7,6 +7,8 @@ import { PetMini } from "../components/pet/PetMini";
 import type { MouthKey } from "../components/pet/petAssets";
 import TopHud from "../components/ui/TopHud";
 import BottomNav from "../components/ui/BottomNav";
+import { ECONOMY } from "../data/economy";
+import { resolveWornVisuals } from "../data/wardrobe";
 import { colors } from "../theme";
 
 const PET_LIFT = 28;
@@ -16,9 +18,14 @@ export default function HomeScreen() {
 
   const lastFedAt = usePet((s) => s.lastFedAt);
   const motion = usePet((s) => s.settings.motion);
+  const xp = usePet((s) => s.xp);
+  const worn = usePet((s) => s.worn);
 
   const full = fullness(lastFedAt);
   const mouth: MouthKey = full >= 60 ? "happy" : full >= 25 ? "neutral" : "sad";
+
+  const isTeen = xp >= ECONOMY.teenLevel;
+  const { bodyWear, outfit, headWear } = resolveWornVisuals(worn, isTeen);
 
   return (
     <View style={styles.root}>
@@ -34,9 +41,12 @@ export default function HomeScreen() {
         <View style={styles.petSlot} pointerEvents="none">
           <PetMini
             species="cat"
-            widthPercent={65}
+            widthPercent={78}
             mouth={mouth}
             animated={motion}
+            bodyWear={bodyWear}
+            outfit={outfit}
+            headWear={headWear}
           />
         </View>
       </SafeAreaView>

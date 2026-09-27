@@ -1,13 +1,21 @@
 import { useEffect, useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Baby } from "lucide-react-native";
+import { Baby, Ribbon, Shirt } from "lucide-react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import type { ImageSourcePropType } from "react-native";
 
 import TopHud from "../../components/ui/TopHud";
 import RoundIconButton from "../../components/ui/RoundIconButton";
 import { PetMini } from "../../components/pet/PetMini";
-import { WARDROBE_ITEMS } from "../../data/wardrobe";
+import {
+  TEEN_ACCESSORY_ITEMS,
+  TEEN_CLOTHING_ITEMS,
+  WARDROBE_ITEMS,
+  resolveWornVisuals,
+  type WardrobeItem,
+  type WardrobeOutfitItem,
+} from "../../data/wardrobe";
 import { usePet } from "../../store/pet";
 import { ECONOMY } from "../../data/economy";
 import { colors, font, radius, space } from "../../theme";
@@ -20,30 +28,46 @@ const COIN_WANT = require("../../assets/icons/coin-want.png");
 // Питомец на гардеробном экране центрируется по горизонтали,
 // снизу — отступ в долях высоты экрана.
 const PET_WIDTH_PERCENT = 70;
-const PET_BOTTOM_FRACTION = 0.3;
+const PET_BOTTOM_FRACTION = 0.22;
 
 const DRAWER_HEIGHT = 220;
 const DRAWER_ANIM_DURATION = 220;
 const ARROW_SIZE = 44;
 const CATEGORY_BUTTON_HALF = 28;
 const CAROUSEL_SLIDE_DISTANCE = 56;
-const CAROUSEL_ANIM_DURATION = 220;
+const CAROUSEL_ANIM_DURATION = 800;
+
+type Category = "baby" | "accessory" | "clothing";
+type WardrobeEntry = WardrobeItem | WardrobeOutfitItem;
+
+function isOutfitItem(item: WardrobeEntry): item is WardrobeOutfitItem {
+  return "base" in item;
+}
+
+function previewImage(item: WardrobeEntry): ImageSourcePropType {
+  if (item.preview) return item.preview;
+  return isOutfitItem(item) ? item.base : item.image;
+}
 
 export default function WardrobeShopScreen() {
   const { width, height } = useWindowDimensions();
   const xp = usePet((s) => s.xp);
   const jars = usePet((s) => s.jars);
+  const owned = usePet((s) => s.owned);
+  const worn = usePet((s) => s.worn);
+  const motion = usePet((s) => s.settings.motion);
   const buy = usePet((s) => s.buy);
   const wear = usePet((s) => s.wear);
+  const unwear = usePet((s) => s.unwear);
 
-  // Тот же расчёт уровня, что и в TopHud: 1-й уровень — "малыш", только
-  // для него сейчас показываем гардероб (подгузники).
-  const level = xp >= ECONOMY.stages[2] ? 3 : xp >= ECONOMY.stages[1] ? 2 : 1;
-  const isBaby = level === 1;
+  const isTeen = xp >= ECONOMY.teenLevel;
+  const isBaby = !isTeen;
 
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [category, setCategory] = useState<Category | null>(null);
   const [index, setIndex] = useState(0);
   const drawerProgress = useSharedValue(0);
+
+  const drawerOpen = category !== null;
 
   useEffect(() => {
     drawerProgress.value = withTiming(drawerOpen ? 1 : 0, {
@@ -59,8 +83,22 @@ export default function WardrobeShopScreen() {
 
   const backgroundStyle = { position: "absolute" as const, top: 0, left: 0, width, height };
 
-  const item = WARDROBE_ITEMS[index];
-  const canAfford = !!item && jars[item.jar] >= item.price;
+  const items: WardrobeEntry[] =
+    category === "accessory" ? TEEN_ACCESSORY_ITEMS : category === "clothing" ? TEEN_CLOTHING_ITEMS : WARDROBE_ITEMS;
+
+  const item = items[index];
+  const isOwned = !!item && owned.includes(item.id);
+  const isWorn = !!item && !!item.slot && worn[item.slot] === item.id;
+  const canAfford = !!item && !isOwned && jars[item.jar] >= item.price;
+
+  const buttonMode: "buy" | "wear" | "unwear" = !isOwned ? "buy" : isWorn ? "unwear" : "wear";
+  const buttonDisabled = buttonMode === "buy" && !canAfford;
+  const buttonLabel = buttonMode === "buy" ? "Купить" : buttonMode === "wear" ? "Надеть" : "Снять";
+
+  const toggleCategory = (next: Category) => {
+    setIndex(0);
+    setCategory((c) => (c === next ? null : next));
+  };
 
   const carouselOffset = useSharedValue(0);
   const carouselOpacity = useSharedValue(1);
@@ -72,7 +110,7 @@ export default function WardrobeShopScreen() {
     // въезд следующей вещи с той стороны, откуда листаем.
     carouselOffset.value = dir * CAROUSEL_SLIDE_DISTANCE;
     carouselOpacity.value = 0;
-    setIndex((i) => (i + delta + WARDROBE_ITEMS.length) % WARDROBE_ITEMS.length);
+    setIndex((i) => (i + delta + items.length) % items.length);
     carouselOffset.value = withTiming(0, {
       duration: CAROUSEL_ANIM_DURATION,
       easing: Easing.out(Easing.cubic),
@@ -88,29 +126,75 @@ export default function WardrobeShopScreen() {
     opacity: carouselOpacity.value,
   }));
 
-  const handleBuy = () => {
-    if (!item || !canAfford) return;
-    const bought = buy(item);
-    if (bought && item.slot) wear(item.slot, item.id);
+  const handlePress = () => {
+    if (!item || !item.slot) return;
+    if (buttonMode === "buy") {
+      if (!canAfford) return;
+      buy(item);
+    } else if (buttonMode === "wear") {
+      wear(item.slot, item.id);
+    } else {
+      unwear(item.slot);
+    }
   };
+
+  const wornVisuals = resolveWornVisuals(worn, isTeen);
+
+  const previewOutfit = category === "clothing" && drawerOpen && item && isOutfitItem(item) ? item : undefined;
+  const previewHeadWear = category === "accessory" && drawerOpen ? (item as WardrobeItem | undefined)?.image : undefined;
+  const previewBodyWear = category === "baby" && drawerOpen ? (item as WardrobeItem | undefined)?.image : undefined;
+
+  const shownBodyWear = previewBodyWear ?? wornVisuals.bodyWear;
+  const shownOutfit = previewOutfit
+    ? { base: previewOutfit.base, sleeveLeft: previewOutfit.sleeveLeft, sleeveRight: previewOutfit.sleeveRight }
+    : wornVisuals.outfit;
+  const shownHeadWear = previewHeadWear ?? wornVisuals.headWear;
 
   return (
     <View style={styles.root}>
       <Image source={BACKGROUND} style={backgroundStyle} resizeMode="cover" />
 
       <View style={[styles.petWrap, { bottom: height * PET_BOTTOM_FRACTION }]} pointerEvents="none">
-        <PetMini species="cat" widthPercent={PET_WIDTH_PERCENT} animated={false} bodyWear={drawerOpen ? item?.image : undefined} />
+        <PetMini
+          species="cat"
+          widthPercent={PET_WIDTH_PERCENT}
+          animated={motion}
+          bodyWear={shownBodyWear}
+          outfit={shownOutfit}
+          headWear={shownHeadWear}
+        />
       </View>
 
       {isBaby && (
-        <View style={styles.categoryButton}>
+        <View style={styles.categoryButtonLeft}>
           <RoundIconButton
             icon={Baby}
-            onPress={() => setDrawerOpen((v) => !v)}
+            onPress={() => toggleCategory("baby")}
             accessibilityRole="button"
             accessibilityLabel="Вещи для малыша"
           />
         </View>
+      )}
+
+      {isTeen && (
+        <>
+          <View style={styles.categoryButtonLeft}>
+            <RoundIconButton
+              icon={Ribbon}
+              onPress={() => toggleCategory("accessory")}
+              accessibilityRole="button"
+              accessibilityLabel="Аксессуары"
+            />
+          </View>
+          <View style={styles.categoryButtonRight}>
+            <RoundIconButton
+              icon={Shirt}
+              onPress={() => toggleCategory("clothing")}
+              accessibilityRole="button"
+              accessibilityLabel="Одежда"
+            />
+          </View>
+        </>
       )}
 
       {item && (
@@ -135,7 +219,7 @@ export default function WardrobeShopScreen() {
                 <Text style={styles.priceText}>{item.price}</Text>
               </View>
 
-              <Image source={item.image} style={styles.itemImage} resizeMode="contain" />
+              <Image source={previewImage(item)} style={styles.itemImage} resizeMode="contain" />
             </Animated.View>
 
             <Pressable
@@ -150,13 +234,19 @@ export default function WardrobeShopScreen() {
           </View>
 
           <Pressable
-            style={[styles.buyButton, !canAfford && styles.buyButtonDisabled]}
-            onPress={handleBuy}
-            disabled={!canAfford}
+            style={[styles.buyButton, buttonDisabled && styles.buyButtonDisabled]}
+            onPress={handlePress}
+            disabled={buttonDisabled}
             accessibilityRole="button"
-            accessibilityLabel={`Купить ${item.title} за ${item.price}`}
+            accessibilityLabel={
+              buttonMode === "buy"
+                ? `Купить ${item.title} за ${item.price}`
+                : buttonMode === "wear"
+                  ? `Надеть ${item.title}`
+                  : `Снять ${item.title}`
+            }
           >
-            <Text style={styles.buyText}>Купить</Text>
+            <Text style={styles.buyText}>{buttonLabel}</Text>
           </Pressable>
         </Animated.View>
       )}
@@ -177,9 +267,15 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: "center",
   },
-  categoryButton: {
+  categoryButtonLeft: {
     position: "absolute",
     left: space.lg,
+    top: "50%",
+    marginTop: -CATEGORY_BUTTON_HALF,
+  },
+  categoryButtonRight: {
+    position: "absolute",
+    right: space.lg,
     top: "50%",
     marginTop: -CATEGORY_BUTTON_HALF,
   },
@@ -213,11 +309,11 @@ const styles = StyleSheet.create({
   priceText: { ...font.h2, color: colors.ink },
   itemImage: { width: 96, height: 96 },
   buyButton: {
-    backgroundColor: colors.accent,
-    paddingHorizontal: space.xl,
+    backgroundColor: colors.sceneOval,
+    paddingHorizontal: 40,
     paddingVertical: space.sm,
     borderRadius: radius.pill,
   },
   buyButtonDisabled: { backgroundColor: colors.statNormal },
-  buyText: { ...font.h2, color: colors.surface },
+  buyText: { fontSize: 24, fontWeight: "700", color: colors.surface },
 });
