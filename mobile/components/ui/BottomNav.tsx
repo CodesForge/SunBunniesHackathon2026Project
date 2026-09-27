@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Image,
   type ImageSourcePropType,
@@ -62,9 +62,10 @@ export default function BottomNav() {
   const router = useRouter();
   const { width } = useWindowDimensions();
   const isTablet = width >= TABLET_BREAKPOINT;
+  const [availableWidth, setAvailableWidth] = useState(width);
 
   const barHeight = isTablet ? BAR_HEIGHT_TABLET : BAR_HEIGHT;
-  const barWidth = isTablet ? Math.min(width, TABLET_BAR_MAX_WIDTH) : width;
+  const barWidth = isTablet ? Math.min(availableWidth, TABLET_BAR_MAX_WIDTH) : availableWidth;
   const pillTop = isTablet ? PILL_TOP_TABLET : PILL_TOP;
   const bumpAllowance = Math.abs(pillTop);
 
@@ -88,7 +89,10 @@ export default function BottomNav() {
   }));
 
   return (
-    <View style={[styles.bar, { height: barHeight }]}>
+    <View
+      style={[styles.bar, { height: barHeight }]}
+      onLayout={(e) => setAvailableWidth(e.nativeEvent.layout.width)}
+    >
       <View style={[styles.barInner, { width: barWidth, height: barHeight }]}>
         {TABS.map((tab, i) => (
           <TabButton
