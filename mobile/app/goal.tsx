@@ -120,7 +120,7 @@ export default function GoalScreen() {
 }
 
 const styles = StyleSheet.create({
-  pickRoot: { flex: 1, backgroundColor: colors.sceneOval },
+  pickRoot: { flex: 1, backgroundColor: colors.accent },
   pickSafe: {
     flex: 1,
     alignItems: "center",
