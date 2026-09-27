@@ -1,13 +1,5 @@
 import { useEffect, useState } from "react";
 import { Image, StyleSheet, View, useWindowDimensions } from "react-native";
-import Animated, {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withTiming,
-} from "react-native-reanimated";
 
 const BODY = require("../../assets/sleep/body.png");
 const EYES_CLOSED = require("../../assets/sleep/eyes-closed.png");
@@ -104,26 +96,13 @@ export function PetSleeping({ widthPercent = 70, animated = true, asleep = true 
   const snoring = useSnore(animated && asleep);
   const blinking = useBlink(animated && !asleep);
 
-  const breath = useSharedValue(0);
-  useEffect(() => {
-    if (!animated) return;
-    breath.value = withSequence(
-      withTiming(-1, { duration: 0 }),
-      withRepeat(withTiming(1, { duration: 1800, easing: Easing.inOut(Easing.sin) }), -1, true),
-    );
-  }, [animated]);
-
-  const breathStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: 1 + breath.value * 0.02 }],
-  }));
-
   const eyesOpen = !asleep && !blinking;
   const mouthOpen = asleep && snoring;
   const mouthRect = mouthOpen ? MOUTH_OPEN_RECT : MOUTH_CLOSED_RECT;
 
   return (
     <View style={{ width: w, height: h }}>
-      <Animated.View style={[styles.stack, breathStyle]}>
+      <View style={styles.stack}>
         <Image source={BODY} style={styles.layer} resizeMode="contain" />
         <Image
           source={eyesOpen ? EYES_OPEN : EYES_CLOSED}
@@ -147,7 +126,7 @@ export function PetSleeping({ widthPercent = 70, animated = true, asleep = true 
           }}
           resizeMode="contain"
         />
-      </Animated.View>
+      </View>
     </View>
   );
 }
