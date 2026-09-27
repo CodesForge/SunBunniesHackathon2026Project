@@ -4,7 +4,7 @@ import { Link } from "expo-router";
 import { ArrowLeft, MessageCircle, Settings, Wallet } from "lucide-react-native";
 
 import { usePet } from "../../store/pet";
-import { fullness, sleepiness } from "../../lib/time";
+import { energyNow, fullness } from "../../lib/time";
 import { colors, radius } from "../../theme";
 import CoinValue from "./CoinValue";
 import StatBar from "./StatBar";
@@ -73,13 +73,15 @@ export default function TopHud({
   const unallocated = usePet((s) => s.unallocated);
   const xp = usePet((s) => s.xp);
   const lastFedAt = usePet((s) => s.lastFedAt);
-  const lastSleptAt = usePet((s) => s.lastSleptAt);
+  const energyBase = usePet((s) => s.energyBase);
+  const energyAt = usePet((s) => s.energyAt);
+  const asleep = usePet((s) => s.asleep);
 
   const needsPlan = unallocated > 0;
 
   const level = xp;
   const hunger = fullness(lastFedAt);
-  const sleep = sleepiness(lastSleptAt);
+  const sleep = energyNow(energyBase, energyAt, asleep);
 
   return (
     <View style={styles.root} pointerEvents="box-none">
