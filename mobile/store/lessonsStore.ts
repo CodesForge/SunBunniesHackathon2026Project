@@ -54,13 +54,15 @@ export const useLessons = create<State & Actions>()(
           reward,
         };
 
+        const pet = usePet.getState();
+        pet.noteLessonDone();
+
         if (s.completedLessons.includes(id)) {
           const repeat = { ...result, reward: 0 };
           set({ lastResult: repeat });
           return repeat;
         }
 
-        const pet = usePet.getState();
         pet.grantJars({ want: reward });
         pet.addXp(1);
 

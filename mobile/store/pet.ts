@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { ECONOMY, type Jar, type Theme } from "../data/economy";
-import { HOUR, todayKey } from "../lib/time";
+import { HOUR, energyNow, todayKey } from "../lib/time";
 
 type Jars = { need: number; want: number; dream: number };
 
@@ -28,6 +28,10 @@ type State = {
   lastFedAt: number;
   lastSleptAt: number;
   periodIndex: number;
+
+  energyBase: number;
+  energyAt: number;
+  asleep: boolean;
 
   xp: number;
   doneQuests: string[];
@@ -77,6 +81,9 @@ const initial: State = {
   lastFedAt: 0,
   lastSleptAt: 0,
   periodIndex: 1,
+  energyBase: 100,
+  energyAt: Date.now(),
+  asleep: false,
   xp: 0,
   doneQuests: [],
   owned: [],
@@ -114,6 +121,8 @@ type Actions = {
   rebalance: (next: Jars) => void;
   feed: (foodId: string) => boolean;
   putToSleep: () => void;
+  wakeUp: () => void;
+  noteLessonDone: () => void;
   buy: (item: Item) => boolean;
   buyFood: (item: Item) => boolean;
   wear: (slot: "body" | "head" | "face", id: string) => void;
@@ -155,6 +164,9 @@ export const usePet = create<State & Actions>()(
           lastIncomeAt: now,
           lastFedAt: now - fedBackdate,
           lastSleptAt: now - sleepBackdate,
+          energyBase: ECONOMY.tutorialStartLevel,
+          energyAt: now,
+          asleep: false,
           dirty: true,
         });
       },
@@ -201,7 +213,36 @@ export const usePet = create<State & Actions>()(
         return true;
       },
 
-      putToSleep: () => set({ lastSleptAt: Date.now(), dirty: true }),
+      putToSleep: () =>
+        set((s) => ({
+          energyBase: s.demoMode
+            ? 100
+            : energyNow(s.energyBase, s.energyAt, s.asleep),
+          energyAt: Date.now(),
+          asleep: true,
+          lastSleptAt: Date.now(),
+          dirty: true,
+        })),
+
+      wakeUp: () =>
+        set((s) => ({
+          energyBase: energyNow(s.energyBase, s.energyAt, s.asleep),
+          energyAt: Date.now(),
+          asleep: false,
+          dirty: true,
+        })),
+
+      noteLessonDone: () =>
+        set((s) => ({
+          energyBase: Math.max(
+            0,
+            energyNow(s.energyBase, s.energyAt, s.asleep) -
+              ECONOMY.lessonTiredness,
+          ),
+          energyAt: Date.now(),
+          asleep: false,
+          dirty: true,
+        })),
 
       buy: (item) => {
         const s = get();
@@ -367,7 +408,7 @@ export const usePet = create<State & Actions>()(
       setGoal: (goalId) => set({ goalId, goalCelebrated: false, dirty: true }),
       markGoalCelebrated: () => set({ goalCelebrated: true, dirty: true }),
       toggleDemo: () => set((s) => ({ demoMode: !s.demoMode })),
-      reset: () => set({ ...initial, dayKey: todayKey() }),
+      reset: () => set({ ...initial, dayKey: todayKey(), energyAt: Date.now() }),
     }),
     {
       name: "monetka-v1",
