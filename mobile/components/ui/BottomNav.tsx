@@ -65,6 +65,8 @@ export default function BottomNav() {
 
   const barHeight = isTablet ? BAR_HEIGHT_TABLET : BAR_HEIGHT;
   const barWidth = isTablet ? Math.min(width, TABLET_BAR_MAX_WIDTH) : width;
+  const pillTop = isTablet ? PILL_TOP_TABLET : PILL_TOP;
+  const bumpAllowance = Math.abs(pillTop);
 
   const found = TABS.findIndex((t) => t.route === pathname);
   const activeIndex = found === -1 ? HOME_INDEX : found;
@@ -101,17 +103,28 @@ export default function BottomNav() {
           />
         ))}
 
-        <Animated.View
+        <View
           pointerEvents="none"
-          style={[styles.pillSlot, { width: tabWidth }, pillStyle]}
+          style={[
+            styles.pillClip,
+            { top: -bumpAllowance, width: barWidth, height: barHeight + bumpAllowance },
+          ]}
         >
-          <View
+          <Animated.View
             style={[
-              styles.pill,
-              { top: isTablet ? PILL_TOP_TABLET : PILL_TOP, width: pillSize, height: pillSize, borderRadius: pillSize / 2 },
+              styles.pillSlot,
+              { top: bumpAllowance, height: barHeight, width: tabWidth },
+              pillStyle,
             ]}
-          />
-        </Animated.View>
+          >
+            <View
+              style={[
+                styles.pill,
+                { top: pillTop, width: pillSize, height: pillSize, borderRadius: pillSize / 2 },
+              ]}
+            />
+          </Animated.View>
+        </View>
       </View>
     </View>
   );
@@ -181,10 +194,13 @@ const styles = StyleSheet.create({
   },
   tabIcon: { width: ICON_SIZE, height: ICON_SIZE },
   tabIconTablet: { width: ICON_SIZE_TABLET, height: ICON_SIZE_TABLET },
+  pillClip: {
+    position: "absolute",
+    left: 0,
+    overflow: "hidden",
+  },
   pillSlot: {
     position: "absolute",
-    top: 0,
-    height: "100%",
     alignItems: "center",
     justifyContent: "center",
   },
