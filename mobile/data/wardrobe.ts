@@ -154,9 +154,94 @@ export const TEEN_CLOTHING_ITEMS: WardrobeOutfitItem[] = [
   },
 ];
 
-export const ADULT_ACCESSORY_ITEMS: WardrobeItem[] = [];
+export const ADULT_ACCESSORY_ITEMS: WardrobeItem[] = [
+  {
+    id: "adult-star-clip",
+    kind: "wear",
+    jar: "want",
+    slot: "head",
+    title: "Заколка-звёздочка",
+    price: 15,
+    art: "adult-star-clip",
+    image: require("../assets/wardrobe/adult/accessories/star-clip.png"),
+    preview: require("../assets/wardrobe/adult/accessories/star-clip-preview.png"),
+  },
+  {
+    id: "adult-beanie",
+    kind: "wear",
+    jar: "want",
+    slot: "head",
+    title: "Шапочка",
+    price: 20,
+    art: "adult-beanie",
+    image: require("../assets/wardrobe/adult/accessories/beanie.png"),
+    preview: require("../assets/wardrobe/adult/accessories/beanie-preview.png"),
+  },
+  {
+    id: "adult-sunhat",
+    kind: "wear",
+    jar: "want",
+    slot: "head",
+    title: "Шляпка",
+    price: 20,
+    art: "adult-sunhat",
+    image: require("../assets/wardrobe/adult/accessories/sunhat.png"),
+    preview: require("../assets/wardrobe/adult/accessories/sunhat-preview.png"),
+  },
+  {
+    id: "adult-glasses",
+    kind: "wear",
+    jar: "want",
+    slot: "head",
+    title: "Очки",
+    price: 20,
+    art: "adult-glasses",
+    image: require("../assets/wardrobe/adult/accessories/glasses.png"),
+    preview: require("../assets/wardrobe/adult/accessories/glasses-preview.png"),
+  },
+];
 
-export const ADULT_CLOTHING_ITEMS: WardrobeOutfitItem[] = [];
+export const ADULT_CLOTHING_ITEMS: WardrobeOutfitItem[] = [
+  {
+    id: "adult-blueblazer",
+    kind: "wear",
+    jar: "want",
+    slot: "body",
+    title: "Синий пиджак",
+    price: 25,
+    art: "adult-blueblazer",
+    base: require("../assets/wardrobe/adult/blueblazer/base.png"),
+    sleeveLeft: require("../assets/wardrobe/adult/blueblazer/sleeve-left.png"),
+    sleeveRight: require("../assets/wardrobe/adult/blueblazer/sleeve-right.png"),
+    preview: require("../assets/wardrobe/adult/blueblazer/preview.png"),
+  },
+  {
+    id: "adult-greencoat",
+    kind: "wear",
+    jar: "want",
+    slot: "body",
+    title: "Зелёное пальто",
+    price: 25,
+    art: "adult-greencoat",
+    base: require("../assets/wardrobe/adult/greencoat/base.png"),
+    sleeveLeft: require("../assets/wardrobe/adult/greencoat/sleeve-left.png"),
+    sleeveRight: require("../assets/wardrobe/adult/greencoat/sleeve-right.png"),
+    preview: require("../assets/wardrobe/adult/greencoat/preview.png"),
+  },
+  {
+    id: "adult-pinkblazer",
+    kind: "wear",
+    jar: "want",
+    slot: "body",
+    title: "Фиолетовый пиджак",
+    price: 25,
+    art: "adult-pinkblazer",
+    base: require("../assets/wardrobe/adult/pinkblazer/base.png"),
+    sleeveLeft: require("../assets/wardrobe/adult/pinkblazer/sleeve-left.png"),
+    sleeveRight: require("../assets/wardrobe/adult/pinkblazer/sleeve-right.png"),
+    preview: require("../assets/wardrobe/adult/pinkblazer/preview.png"),
+  },
+];
 
 export type WornOutfit = { base: ImageSourcePropType; sleeveLeft: ImageSourcePropType; sleeveRight: ImageSourcePropType };
 
