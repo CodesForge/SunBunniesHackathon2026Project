@@ -13,6 +13,7 @@ const LOW = 20;
 
 const TABLET_BREAKPOINT = 768;
 const SMALL_PHONE_BREAKPOINT = 440;
+const TINY_PHONE_BREAKPOINT = 360;
 
 const ROOT_PADDING_H = 16;
 const ROOT_PADDING_H_TABLET = 28;
@@ -38,8 +39,8 @@ const TOP_RIGHT_ROW_GAP = 10;
 const PILL_BORDER_WIDTH = 5;
 
 const MONEY_PILL_HEIGHT = 36;
+const MONEY_PILL_HEIGHT_TINY = 56;
 const MONEY_PILL_HEIGHT_TABLET = 52;
-const MONEY_PILL_PADDING_H = 16;
 const MONEY_PILL_PADDING_H_TABLET = 26;
 const MONEY_PILL_WIDTH_TABLET = 340;
 
@@ -76,14 +77,9 @@ const ICON_MOON_PURPLE = require("../../assets/icons/icon-moon-purple.png");
 const ICON_FOOD_PURPLE = require("../../assets/icons/icon-food-purple.png");
 
 type TopHudProps = {
-  // Показывать ли полоски сна/сытости — на экранах вроде магазина они
-  // не нужны.
   showStats?: boolean;
-  // Показывать ли кнопку чата (сообщения) в левой колонке.
   showChat?: boolean;
   showWallet?: boolean;
-  // Если задано — вместо кружка с уровнем показываем кнопку "назад",
-  // ведущую по этому адресу (используется на подэкранах вроде магазина).
   backHref?: string;
 };
 
@@ -101,6 +97,7 @@ export default function TopHud({
   const { width } = useWindowDimensions();
   const isTablet = width >= TABLET_BREAKPOINT;
   const isSmallPhone = width < SMALL_PHONE_BREAKPOINT;
+  const isTinyPhone = width <= TINY_PHONE_BREAKPOINT;
 
   const needsPlan = unallocated > 0;
 
@@ -196,24 +193,33 @@ export default function TopHud({
 
         <View style={[styles.rightColumn, isTablet && styles.rightColumnTablet]}>
           <View style={[styles.topRightRow, isTablet && styles.topRightRowTablet]}>
-            <View style={[styles.moneyPill, isTablet && styles.moneyPillTablet]}>
+            <View
+              style={[
+                styles.moneyPill,
+                isTinyPhone && styles.moneyPillTiny,
+                isTablet && styles.moneyPillTablet,
+              ]}
+            >
               <CoinValue
                 image={COIN_NEED}
                 value={jars.need}
                 badgeSize={isTablet ? TABLET_COIN_BADGE_SIZE : undefined}
                 fontSize={coinFontSize}
+                stacked={isTinyPhone}
               />
               <CoinValue
                 image={COIN_WANT}
                 value={jars.want}
                 badgeSize={isTablet ? TABLET_COIN_BADGE_SIZE : undefined}
                 fontSize={coinFontSize}
+                stacked={isTinyPhone}
               />
               <CoinValue
                 image={COIN_DREAM}
                 value={jars.dream}
                 badgeSize={isTablet ? TABLET_COIN_BADGE_SIZE : undefined}
                 fontSize={coinFontSize}
+                stacked={isTinyPhone}
               />
             </View>
 
@@ -306,12 +312,6 @@ const styles = StyleSheet.create({
     fontSize: LEVEL_VALUE_FONT_TABLET,
     lineHeight: LEVEL_VALUE_LINE_HEIGHT_TABLET,
   },
-  levelCaption: {
-    color: colors.coinWant,
-    fontSize: 14,
-    fontWeight: "700",
-    lineHeight: 16,
-  },
 
   rightColumn: { flex: 1, marginLeft: RIGHT_COLUMN_MARGIN_LEFT },
   rightColumnTablet: { marginLeft: 0 },
@@ -328,7 +328,9 @@ const styles = StyleSheet.create({
     borderWidth: PILL_BORDER_WIDTH,
     borderColor: colors.pillBorder,
     backgroundColor: colors.surface,
-    paddingHorizontal: MONEY_PILL_PADDING_H,
+  },
+  moneyPillTiny: {
+    height: MONEY_PILL_HEIGHT_TINY,
   },
   moneyPillTablet: {
     maxWidth: MONEY_PILL_WIDTH_TABLET,

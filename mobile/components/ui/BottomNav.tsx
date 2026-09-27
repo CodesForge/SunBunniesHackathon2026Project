@@ -4,7 +4,6 @@ import {
   type ImageSourcePropType,
   Pressable,
   StyleSheet,
-  Text,
   View,
   useWindowDimensions,
 } from "react-native";
@@ -13,7 +12,6 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  withTiming,
 } from "react-native-reanimated";
 
 import { colors } from "../../theme";
@@ -23,7 +21,6 @@ type Tab = {
   icon: ImageSourcePropType;
   route: string;
   label: string;
-  badge?: number;
 };
 
 const ICON_CART = require("../../assets/icons/icon-cart.png");
@@ -33,23 +30,11 @@ const ICON_FOOD = require("../../assets/icons/icon-food.png");
 const ICON_BOOK = require("../../assets/icons/icon-book.png");
 
 const TABS: Tab[] = [
-  {
-    key: "shop",
-    icon: ICON_CART,
-    route: "/shops",
-    label: "Гардероб",
-    badge: 1,
-  },
+  { key: "shop", icon: ICON_CART, route: "/shops", label: "Гардероб" },
   { key: "moon", icon: ICON_MOON, route: "/sleep", label: "Спальня" },
   { key: "home", icon: ICON_HOME, route: "/home", label: "Комната" },
   { key: "food", icon: ICON_FOOD, route: "/dining", label: "Кухня" },
-  {
-    key: "book",
-    icon: ICON_BOOK,
-    route: "/glossary",
-    label: "Уроки",
-    badge: 7,
-  },
+  { key: "book", icon: ICON_BOOK, route: "/glossary", label: "Уроки" },
 ];
 
 const TABLET_BREAKPOINT = 768;
@@ -66,15 +51,6 @@ const ICON_SIZE_TABLET = 52;
 
 const PILL_TOP = -22;
 const PILL_TOP_TABLET = -29;
-
-const BADGE_SIZE = 18;
-const BADGE_SIZE_TABLET = 24;
-const BADGE_TOP = 10;
-const BADGE_TOP_TABLET = 14;
-const BADGE_RIGHT = 18;
-const BADGE_RIGHT_TABLET = 22;
-const BADGE_FONT = 11;
-const BADGE_FONT_TABLET = 14;
 
 const PILL_SPRING = { damping: 22, stiffness: 130, mass: 1 };
 const ICON_SPRING = { damping: 14, stiffness: 170, mass: 1 };
@@ -93,6 +69,7 @@ export default function BottomNav() {
   const found = TABS.findIndex((t) => t.route === pathname);
   const activeIndex = found === -1 ? HOME_INDEX : found;
   const tabWidth = barWidth / TABS.length;
+  const pillSize = Math.min(barHeight, tabWidth);
 
   const fromIndex = lastActiveIndex === -1 ? activeIndex : lastActiveIndex;
   const fromRef = useRef(fromIndex);
@@ -128,7 +105,12 @@ export default function BottomNav() {
           pointerEvents="none"
           style={[styles.pillSlot, { width: tabWidth }, pillStyle]}
         >
-          <View style={[styles.pill, isTablet && styles.pillTablet]} />
+          <View
+            style={[
+              styles.pill,
+              { top: isTablet ? PILL_TOP_TABLET : PILL_TOP, width: pillSize, height: pillSize, borderRadius: pillSize / 2 },
+            ]}
+          />
         </Animated.View>
       </View>
     </View>
@@ -161,10 +143,6 @@ function TabButton({
     transform: [{ scale: scale.value }, { translateY: lift.value }],
   }));
 
-  const badgeStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(active ? 1 : 0.85, { duration: 150 }),
-  }));
-
   return (
     <Pressable
       style={styles.tab}
@@ -172,11 +150,7 @@ function TabButton({
       hitSlop={8}
       accessibilityRole="tab"
       accessibilityState={{ selected: active }}
-      accessibilityLabel={
-        typeof tab.badge === "number"
-          ? `${tab.label}, новых: ${tab.badge}`
-          : tab.label
-      }
+      accessibilityLabel={tab.label}
     >
       <Animated.View style={iconStyle}>
         <Image
@@ -185,16 +159,6 @@ function TabButton({
           resizeMode="contain"
         />
       </Animated.View>
-
-      {typeof tab.badge === "number" && (
-        <Animated.View
-          style={[styles.badge, isTablet && styles.badgeTablet, badgeStyle]}
-        >
-          <Text style={[styles.badgeText, isTablet && styles.badgeTextTablet]}>
-            {tab.badge}
-          </Text>
-        </Animated.View>
-      )}
     </Pressable>
   );
 }
@@ -226,37 +190,6 @@ const styles = StyleSheet.create({
   },
   pill: {
     position: "absolute",
-    top: PILL_TOP,
-    width: BAR_HEIGHT,
-    height: BAR_HEIGHT,
-    borderRadius: BAR_HEIGHT / 2,
     backgroundColor: colors.navActive,
   },
-  pillTablet: {
-    top: PILL_TOP_TABLET,
-    width: BAR_HEIGHT_TABLET,
-    height: BAR_HEIGHT_TABLET,
-    borderRadius: BAR_HEIGHT_TABLET / 2,
-  },
-  badge: {
-    position: "absolute",
-    top: BADGE_TOP,
-    right: BADGE_RIGHT,
-    minWidth: BADGE_SIZE,
-    height: BADGE_SIZE,
-    paddingHorizontal: 4,
-    borderRadius: BADGE_SIZE / 2,
-    backgroundColor: colors.navBadge,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  badgeTablet: {
-    top: BADGE_TOP_TABLET,
-    right: BADGE_RIGHT_TABLET,
-    minWidth: BADGE_SIZE_TABLET,
-    height: BADGE_SIZE_TABLET,
-    borderRadius: BADGE_SIZE_TABLET / 2,
-  },
-  badgeText: { color: colors.surface, fontSize: BADGE_FONT, fontWeight: "700" },
-  badgeTextTablet: { fontSize: BADGE_FONT_TABLET },
 });
