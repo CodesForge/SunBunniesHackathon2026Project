@@ -22,7 +22,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { RoundButton } from "../../components/onboarding/buttons";
 import { BigOval, Clouds, Leaves, ONB, SkyBackground } from "../../components/onboarding/scene";
-import { PetMini } from "../../components/pet/PetMini";
+import { PetIdle } from "../../components/pet/PetMini";
 import { PET_ASSETS } from "../../components/pet/petAssets";
 import { PetIcon } from "../../components/pet/PetIcon";
 import { colors, font, space } from "../../theme";
@@ -141,7 +141,7 @@ export default function ChooseSpeciesScreen() {
       <View style={[styles.centerRow, { top: catTop }]} pointerEvents="none">
         <Animated.View key={pet.key} entering={FadeIn.duration(220)} exiting={FadeOut.duration(160)}>
           {pet.ready ? (
-            <PetMini species="cat" widthPercent={CAT_WIDTH} mouth="happy" eyesOpen />
+            <PetIdle species="cat" widthPercent={CAT_WIDTH} mouth="happy" eyesOpen />
           ) : (
             <View style={[styles.stub, { width: catW, height: catH }]}>
               <Image source={pet.icon} style={{ width: catW * 0.5, height: catW * 0.5 }} resizeMode="contain" />

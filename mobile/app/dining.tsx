@@ -6,7 +6,7 @@ import {
   FoodPlateCarousel,
   type FoodPlateItem,
 } from "../components/dining/FoodPlateCarousel";
-import { PetMini } from "../components/pet/PetMini";
+import { PetIdle } from "../components/pet/PetMini";
 import BottomNav from "../components/ui/BottomNav";
 import Modal from "../components/ui/Modal";
 import TopHud from "../components/ui/TopHud";
@@ -65,7 +65,7 @@ export default function DiningScreen() {
         style={[styles.petSlot, { top: petTop, left: (width - petW) / 2 }]}
         pointerEvents="none"
       >
-        <PetMini
+        <PetIdle
           species="cat"
           widthPercent={PET_WIDTH_PERCENT}
           mouth={mouth}
