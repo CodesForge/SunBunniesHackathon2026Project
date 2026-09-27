@@ -1,12 +1,13 @@
 import type { ImageSourcePropType } from "react-native";
 import { ECONOMY } from "../../data/economy";
 
-export type PetSpecies = "cat";
+export type PetSpecies = "cat" | "dog";
 export type PetAgeStage = "mini" | "teen" | "adult";
 export type MouthKey = "happy" | "neutral" | "sad";
 
 export type PetAssetSet = {
   body: ImageSourcePropType;
+  head?: ImageSourcePropType;
   tail: ImageSourcePropType;
   armLeft: ImageSourcePropType;
   armRight: ImageSourcePropType;
@@ -59,6 +60,7 @@ const CAT_MINI: PetAssetSet = {
 
 const CAT_TEEN: PetAssetSet = {
   body: require("../../assets/pets/cat/teen/body.png"),
+  head: require("../../assets/pets/cat/teen/head.png"),
   tail: require("../../assets/pets/cat/teen/tail.png"),
   armLeft: require("../../assets/pets/cat/teen/arm-left.png"),
   armRight: require("../../assets/pets/cat/teen/arm-right.png"),
@@ -76,6 +78,7 @@ const CAT_TEEN: PetAssetSet = {
   armLeftOrigin: "42% 49%",
   armRightOrigin: "38% 49%",
   tailOrigin: "53% 87%",
+  armsUnderBody: true,
   bodyWearLeft: 0.32,
   bodyWearTop: 0.70,
   bodyWearWidth: 0.36,
@@ -84,6 +87,7 @@ const CAT_TEEN: PetAssetSet = {
 
 const CAT_ADULT: PetAssetSet = {
   body: require("../../assets/pets/cat/adult/body.png"),
+  head: require("../../assets/pets/cat/adult/head.png"),
   tail: require("../../assets/pets/cat/adult/tail.png"),
   armLeft: require("../../assets/pets/cat/adult/arm-left.png"),
   armRight: require("../../assets/pets/cat/adult/arm-right.png"),
@@ -108,11 +112,69 @@ const CAT_ADULT: PetAssetSet = {
   bodyWearHeight: 0.16,
 };
 
-export const PET_ASSETS: Record<PetSpecies, Record<PetAgeStage, PetAssetSet>> = {
+const DOG_TEEN: PetAssetSet = {
+  body: require("../../assets/pets/dog/teen/body.png"),
+  head: require("../../assets/pets/dog/teen/head.png"),
+  tail: require("../../assets/pets/dog/teen/tail.png"),
+  armLeft: require("../../assets/pets/dog/teen/arm-left.png"),
+  armRight: require("../../assets/pets/dog/teen/arm-right.png"),
+  belly: require("../../assets/pets/dog/teen/belly.png"),
+  eyesOpen: require("../../assets/pets/dog/teen/eyes-open.png"),
+  eyesClosed: require("../../assets/pets/dog/teen/eyes-closed.png"),
+  mouth: {
+    happy: require("../../assets/pets/dog/teen/mouth-happy.png"),
+    neutral: require("../../assets/pets/dog/teen/mouth-neutural.png"),
+    sad: require("../../assets/pets/dog/teen/mouth-sad.png"),
+  },
+  aspect: 2309 / 1707,
+  coreLeft: 41 / 1707,
+  coreWidth: 1307 / 1707,
+  armLeftOrigin: "42% 49%",
+  armRightOrigin: "38% 49%",
+  tailOrigin: "53% 87%",
+  armsUnderBody: true,
+  bodyWearLeft: 0.32,
+  bodyWearTop: 0.70,
+  bodyWearWidth: 0.36,
+  bodyWearHeight: 0.16,
+};
+
+const DOG_ADULT: PetAssetSet = {
+  body: require("../../assets/pets/dog/adult/body.png"),
+  head: require("../../assets/pets/dog/adult/head.png"),
+  tail: require("../../assets/pets/dog/adult/tail.png"),
+  armLeft: require("../../assets/pets/dog/adult/arm-left.png"),
+  armRight: require("../../assets/pets/dog/adult/arm-right.png"),
+  belly: require("../../assets/pets/dog/adult/belly.png"),
+  eyesOpen: require("../../assets/pets/dog/adult/eyes-open.png"),
+  eyesClosed: require("../../assets/pets/dog/adult/eyes-closed.png"),
+  mouth: {
+    happy: require("../../assets/pets/dog/adult/mouth-happy.png"),
+    neutral: require("../../assets/pets/dog/adult/mouth-neutural.png"),
+    sad: require("../../assets/pets/dog/adult/mouth-sad.png"),
+  },
+  aspect: 2309 / 1707,
+  coreLeft: 27 / 1707,
+  coreWidth: 1321 / 1707,
+  armLeftOrigin: "37% 48%",
+  armRightOrigin: "43% 48%",
+  tailOrigin: "53% 87%",
+  armsUnderBody: true,
+  bodyWearLeft: 0.32,
+  bodyWearTop: 0.70,
+  bodyWearWidth: 0.36,
+  bodyWearHeight: 0.16,
+};
+
+export const PET_ASSETS: Record<PetSpecies, Partial<Record<PetAgeStage, PetAssetSet>>> = {
   cat: {
     mini: CAT_MINI,
     teen: CAT_TEEN,
     adult: CAT_ADULT,
+  },
+  dog: {
+    teen: DOG_TEEN,
+    adult: DOG_ADULT,
   },
 };
 
