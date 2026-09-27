@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { Link } from "expo-router";
 import { ArrowLeft, MessageCircle, Settings, Wallet } from "lucide-react-native";
 
@@ -12,6 +12,62 @@ import RoundIconButton from "./RoundIconButton";
 
 const LOW = 20;
 const BUBBLE_SIZE = 130;
+const BUBBLE_SIZE_TABLET = 170;
+
+const TABLET_BREAKPOINT = 768;
+
+const ROOT_PADDING_H = 16;
+const ROOT_PADDING_H_TABLET = 28;
+const ROOT_PADDING_TOP = 8;
+const ROOT_PADDING_TOP_TABLET = 14;
+
+const LEFT_COLUMN_WIDTH = 80;
+const LEFT_COLUMN_WIDTH_TABLET = 108;
+const LEFT_COLUMN_GAP = 8;
+const LEFT_COLUMN_GAP_TABLET = 14;
+
+const LEVEL_VALUE_FONT = 20;
+const LEVEL_VALUE_FONT_TABLET = 26;
+const LEVEL_VALUE_LINE_HEIGHT = 34;
+const LEVEL_VALUE_LINE_HEIGHT_TABLET = 40;
+
+const ROUND_BUTTON_CIRCLE_TABLET = 78;
+const ROUND_BUTTON_ICON_TABLET = 32;
+
+const RIGHT_COLUMN_MARGIN_LEFT = 10;
+const RIGHT_COLUMN_MARGIN_LEFT_TABLET = 18;
+const TOP_RIGHT_ROW_GAP = 10;
+const TOP_RIGHT_ROW_GAP_TABLET = 16;
+
+const MONEY_PILL_HEIGHT = 36;
+const MONEY_PILL_HEIGHT_TABLET = 52;
+const MONEY_PILL_PADDING_H = 16;
+const MONEY_PILL_PADDING_H_TABLET = 26;
+const MONEY_PILL_GAP_TABLET = 22;
+
+const TABLET_COIN_BADGE_SIZE = 38;
+const TABLET_COIN_FONT_SIZE = 18;
+
+const SCALES_FRAME_HEIGHT = 46;
+const SCALES_FRAME_HEIGHT_TABLET = 64;
+const SCALES_FRAME_MARGIN_TOP = 8;
+const SCALES_FRAME_MARGIN_TOP_TABLET = 12;
+const SCALES_FRAME_PADDING_H = 16;
+const SCALES_FRAME_PADDING_H_TABLET = 26;
+const SCALES_FRAME_GAP = 10;
+const SCALES_FRAME_GAP_TABLET = 24;
+const SCALE_WIDTH_TABLET = 220;
+
+const TABLET_STAT_BAR_HEIGHT = 24;
+const TABLET_STAT_ICON_SIZE = 32;
+
+const LOW_MARK_FONT = 16;
+const LOW_MARK_FONT_TABLET = 20;
+
+const ALERT_SIZE = 20;
+const ALERT_SIZE_TABLET = 26;
+const ALERT_FONT = 13;
+const ALERT_FONT_TABLET = 16;
 
 const COIN_NEED = require("../../assets/icons/coin-need.png");
 const COIN_WANT = require("../../assets/icons/coin-want.png");
@@ -74,6 +130,8 @@ export default function TopHud({
   const xp = usePet((s) => s.xp);
   const lastFedAt = usePet((s) => s.lastFedAt);
   const lastSleptAt = usePet((s) => s.lastSleptAt);
+  const { width } = useWindowDimensions();
+  const isTablet = width >= TABLET_BREAKPOINT;
 
   const needsPlan = unallocated > 0;
 
@@ -81,27 +139,38 @@ export default function TopHud({
   const hunger = fullness(lastFedAt);
   const sleep = sleepiness(lastSleptAt);
 
+  const roundButtonProps = isTablet
+    ? { circleSize: ROUND_BUTTON_CIRCLE_TABLET, iconSize: ROUND_BUTTON_ICON_TABLET }
+    : {};
+
   return (
-    <View style={styles.root} pointerEvents="box-none">
+    <View style={[styles.root, isTablet && styles.rootTablet]}>
       <View style={styles.row}>
-        <View style={styles.leftColumn}>
+        <View style={[styles.leftColumn, isTablet && styles.leftColumnTablet]}>
           {backHref ? (
             <Link href={backHref as any} asChild>
               <RoundIconButton
                 icon={ArrowLeft}
                 accessibilityRole="button"
                 accessibilityLabel="Назад"
+                {...roundButtonProps}
               />
             </Link>
           ) : (
             <Link href={"/pet-level" as any} asChild>
               <Pressable
-                style={styles.levelCircle}
+                style={[styles.levelCircle, isTablet && styles.levelCircleTablet]}
                 accessibilityRole="button"
                 accessibilityLabel={`Уровень ${level}`}
               >
-                <Image source={CIRCLE_LARGE} style={styles.levelCircleBg} resizeMode="contain" />
-                <Text style={styles.levelValue}>{level} Ур.</Text>
+                <Image
+                  source={CIRCLE_LARGE}
+                  style={[styles.levelCircleBg, isTablet && styles.levelCircleBgTablet]}
+                  resizeMode="contain"
+                />
+                <Text style={[styles.levelValue, isTablet && styles.levelValueTablet]}>
+                  {level} Ур.
+                </Text>
               </Pressable>
             </Link>
           )}
@@ -115,11 +184,12 @@ export default function TopHud({
                   accessibilityLabel={
                     needsPlan ? "Бюджет, деньги ещё не разложены" : "Бюджет"
                   }
+                  {...roundButtonProps}
                 />
               </Link>
               {needsPlan && (
-                <View style={styles.alert} pointerEvents="none">
-                  <Text style={styles.alertText}>!</Text>
+                <View style={[styles.alert, isTablet && styles.alertTablet]} pointerEvents="none">
+                  <Text style={[styles.alertText, isTablet && styles.alertTextTablet]}>!</Text>
                 </View>
               )}
             </View>
@@ -130,17 +200,33 @@ export default function TopHud({
               icon={MessageCircle}
               accessibilityRole="button"
               accessibilityLabel="Сообщения"
+              {...roundButtonProps}
             />
           )}
         </View>
 
-        <View style={styles.rightColumn}>
-          <View style={styles.topRightRow}>
-            <View style={styles.moneyPill}>
+        <View style={[styles.rightColumn, isTablet && styles.rightColumnTablet]}>
+          <View style={[styles.topRightRow, isTablet && styles.topRightRowTablet]}>
+            <View style={[styles.moneyPill, isTablet && styles.moneyPillTablet]}>
               <PillBackground />
-              <CoinValue image={COIN_NEED} value={jars.need} />
-              <CoinValue image={COIN_WANT} value={jars.want} />
-              <CoinValue image={COIN_DREAM} value={jars.dream} />
+              <CoinValue
+                image={COIN_NEED}
+                value={jars.need}
+                badgeSize={isTablet ? TABLET_COIN_BADGE_SIZE : undefined}
+                fontSize={isTablet ? TABLET_COIN_FONT_SIZE : undefined}
+              />
+              <CoinValue
+                image={COIN_WANT}
+                value={jars.want}
+                badgeSize={isTablet ? TABLET_COIN_BADGE_SIZE : undefined}
+                fontSize={isTablet ? TABLET_COIN_FONT_SIZE : undefined}
+              />
+              <CoinValue
+                image={COIN_DREAM}
+                value={jars.dream}
+                badgeSize={isTablet ? TABLET_COIN_BADGE_SIZE : undefined}
+                fontSize={isTablet ? TABLET_COIN_FONT_SIZE : undefined}
+              />
             </View>
 
             <Link href={"/settings" as any} asChild>
@@ -148,30 +234,45 @@ export default function TopHud({
                 icon={Settings}
                 accessibilityRole="button"
                 accessibilityLabel="Настройки"
+                {...roundButtonProps}
               />
             </Link>
           </View>
 
           {showStats && (
-            <View style={styles.scalesFrame}>
+            <View style={[styles.scalesFrame, isTablet && styles.scalesFrameTablet]}>
               <PillBackground />
 
               <View
-                style={styles.scale}
+                style={[styles.scale, isTablet && styles.scaleTablet]}
                 accessibilityRole="progressbar"
                 accessibilityLabel={`Сон: ${Math.round(sleep)} из 100${sleep <= LOW ? ", мало" : ""}`}
               >
-                <StatBar value={sleep} icon={ICON_MOON_PURPLE} />
-                {sleep <= LOW && <Text style={styles.lowMark}>!</Text>}
+                <StatBar
+                  value={sleep}
+                  icon={ICON_MOON_PURPLE}
+                  barHeight={isTablet ? TABLET_STAT_BAR_HEIGHT : undefined}
+                  iconSize={isTablet ? TABLET_STAT_ICON_SIZE : undefined}
+                />
+                {sleep <= LOW && (
+                  <Text style={[styles.lowMark, isTablet && styles.lowMarkTablet]}>!</Text>
+                )}
               </View>
 
               <View
-                style={styles.scale}
+                style={[styles.scale, isTablet && styles.scaleTablet]}
                 accessibilityRole="progressbar"
                 accessibilityLabel={`Сытость: ${Math.round(hunger)} из 100${hunger <= LOW ? ", мало" : ""}`}
               >
-                <StatBar value={hunger} icon={ICON_FOOD_PURPLE} />
-                {hunger <= LOW && <Text style={styles.lowMark}>!</Text>}
+                <StatBar
+                  value={hunger}
+                  icon={ICON_FOOD_PURPLE}
+                  barHeight={isTablet ? TABLET_STAT_BAR_HEIGHT : undefined}
+                  iconSize={isTablet ? TABLET_STAT_ICON_SIZE : undefined}
+                />
+                {hunger <= LOW && (
+                  <Text style={[styles.lowMark, isTablet && styles.lowMarkTablet]}>!</Text>
+                )}
               </View>
             </View>
           )}
@@ -179,7 +280,7 @@ export default function TopHud({
           {showChatBubble && (
             <View style={styles.bubbleRow} pointerEvents="none">
               <MessageCircle
-                size={BUBBLE_SIZE}
+                size={isTablet ? BUBBLE_SIZE_TABLET : BUBBLE_SIZE}
                 color={colors.iconBorder}
                 fill={colors.surface}
                 strokeWidth={0.5}
@@ -193,26 +294,40 @@ export default function TopHud({
 }
 
 const styles = StyleSheet.create({
-  root: { paddingHorizontal: 16, paddingTop: 8 },
+  root: { paddingHorizontal: ROOT_PADDING_H, paddingTop: ROOT_PADDING_TOP },
+  rootTablet: { paddingHorizontal: ROOT_PADDING_H_TABLET, paddingTop: ROOT_PADDING_TOP_TABLET },
   row: { flexDirection: "row" },
 
-  leftColumn: { width: 80, alignItems: "center", gap: 8 },
+  leftColumn: { width: LEFT_COLUMN_WIDTH, alignItems: "center", gap: LEFT_COLUMN_GAP },
+  leftColumnTablet: { width: LEFT_COLUMN_WIDTH_TABLET, gap: LEFT_COLUMN_GAP_TABLET },
   levelCircle: {
-    width: 80,
-    height: 80,
+    width: LEFT_COLUMN_WIDTH,
+    height: LEFT_COLUMN_WIDTH,
     alignItems: "center",
     justifyContent: "center",
   },
+  levelCircleTablet: {
+    width: LEFT_COLUMN_WIDTH_TABLET,
+    height: LEFT_COLUMN_WIDTH_TABLET,
+  },
   levelCircleBg: {
     position: "absolute",
-    width: 80,
-    height: 80,
+    width: LEFT_COLUMN_WIDTH,
+    height: LEFT_COLUMN_WIDTH,
+  },
+  levelCircleBgTablet: {
+    width: LEFT_COLUMN_WIDTH_TABLET,
+    height: LEFT_COLUMN_WIDTH_TABLET,
   },
   levelValue: {
     color: colors.coinWant,
-    fontSize: 20,
+    fontSize: LEVEL_VALUE_FONT,
     fontWeight: "800",
-    lineHeight: 34,
+    lineHeight: LEVEL_VALUE_LINE_HEIGHT,
+  },
+  levelValueTablet: {
+    fontSize: LEVEL_VALUE_FONT_TABLET,
+    lineHeight: LEVEL_VALUE_LINE_HEIGHT_TABLET,
   },
   levelCaption: {
     color: colors.coinWant,
@@ -221,31 +336,48 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
 
-  rightColumn: { flex: 1, marginLeft: 10 },
-  topRightRow: { flexDirection: "row", alignItems: "center", gap: 10 },
+  rightColumn: { flex: 1, marginLeft: RIGHT_COLUMN_MARGIN_LEFT },
+  rightColumnTablet: { marginLeft: RIGHT_COLUMN_MARGIN_LEFT_TABLET },
+  topRightRow: { flexDirection: "row", alignItems: "center", gap: TOP_RIGHT_ROW_GAP },
+  topRightRowTablet: { justifyContent: "center", gap: TOP_RIGHT_ROW_GAP_TABLET },
   moneyPill: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    height: 36,
+    height: MONEY_PILL_HEIGHT,
     borderRadius: radius.pill,
     overflow: "hidden",
-    paddingHorizontal: 16,
+    paddingHorizontal: MONEY_PILL_PADDING_H,
+  },
+  moneyPillTablet: {
+    flex: 0,
+    height: MONEY_PILL_HEIGHT_TABLET,
+    paddingHorizontal: MONEY_PILL_PADDING_H_TABLET,
+    gap: MONEY_PILL_GAP_TABLET,
   },
 
   scalesFrame: {
     flexDirection: "row",
     alignItems: "center",
-    height: 46,
-    marginTop: 8,
+    height: SCALES_FRAME_HEIGHT,
+    marginTop: SCALES_FRAME_MARGIN_TOP,
     borderRadius: radius.pill,
     overflow: "hidden",
-    paddingHorizontal: 16,
-    gap: 10,
+    paddingHorizontal: SCALES_FRAME_PADDING_H,
+    gap: SCALES_FRAME_GAP,
+  },
+  scalesFrameTablet: {
+    alignSelf: "center",
+    height: SCALES_FRAME_HEIGHT_TABLET,
+    marginTop: SCALES_FRAME_MARGIN_TOP_TABLET,
+    paddingHorizontal: SCALES_FRAME_PADDING_H_TABLET,
+    gap: SCALES_FRAME_GAP_TABLET,
   },
   scale: { flex: 1, flexDirection: "row", alignItems: "center", gap: 4 },
-  lowMark: { fontSize: 16, fontWeight: "800", color: colors.statLow },
+  scaleTablet: { flex: undefined, width: SCALE_WIDTH_TABLET },
+  lowMark: { fontSize: LOW_MARK_FONT, fontWeight: "800", color: colors.statLow },
+  lowMarkTablet: { fontSize: LOW_MARK_FONT_TABLET },
 
   bubbleRow: { alignItems: "flex-end", marginTop: 4 },
 
@@ -253,12 +385,18 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 0,
     right: 0,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: ALERT_SIZE,
+    height: ALERT_SIZE,
+    borderRadius: ALERT_SIZE / 2,
     backgroundColor: colors.navBadge,
     alignItems: "center",
     justifyContent: "center",
   },
-  alertText: { color: colors.surface, fontSize: 13, fontWeight: "800" },
+  alertTablet: {
+    width: ALERT_SIZE_TABLET,
+    height: ALERT_SIZE_TABLET,
+    borderRadius: ALERT_SIZE_TABLET / 2,
+  },
+  alertText: { color: colors.surface, fontSize: ALERT_FONT, fontWeight: "800" },
+  alertTextTablet: { fontSize: ALERT_FONT_TABLET },
 });

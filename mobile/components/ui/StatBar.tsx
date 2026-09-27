@@ -13,16 +13,22 @@ const NORMAL_COLOR = colors.statNormal;
 type Props = {
   value: number;
   icon: ImageSourcePropType;
+  barHeight?: number;
+  iconSize?: number;
 };
 
-export default function StatBar({ value, icon }: Props) {
+export default function StatBar({ value, icon, barHeight, iconSize }: Props) {
   const pct = Math.max(0, Math.min(100, value));
   const fillColor = pct <= LOW_THRESHOLD ? LOW_COLOR : NORMAL_COLOR;
 
   return (
     <View style={styles.wrap}>
-      <Image source={icon} style={styles.icon} resizeMode="contain" />
-      <View style={styles.track}>
+      <Image
+        source={icon}
+        style={[styles.icon, iconSize != null && { width: iconSize, height: iconSize }]}
+        resizeMode="contain"
+      />
+      <View style={[styles.track, barHeight != null && { height: barHeight }]}>
         <View
           style={[styles.fill, { width: `${pct}%`, backgroundColor: fillColor }]}
         />

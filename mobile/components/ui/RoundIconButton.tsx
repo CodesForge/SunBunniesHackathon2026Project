@@ -4,25 +4,45 @@ import { colors, HIT } from "../../theme";
 
 const CIRCLE_SIZE = 58;
 const ICON_SIZE = 24;
-const TAP_AREA_SIZE = Math.max(HIT, CIRCLE_SIZE);
-const TAP_PADDING = (TAP_AREA_SIZE - CIRCLE_SIZE) / 2;
 
 const CIRCLE_BG = require("../../assets/icons/circle-small.png");
 
 type Props = PressableProps & {
   icon: LucideIcon;
+  circleSize?: number;
+  iconSize?: number;
 };
 
 export default function RoundIconButton({
   icon: Icon,
+  circleSize,
+  iconSize,
   ...pressableProps
 }: Props) {
+  const resolvedCircleSize = circleSize ?? CIRCLE_SIZE;
+  const resolvedIconSize = iconSize ?? ICON_SIZE;
+  const tapAreaSize = Math.max(HIT, resolvedCircleSize);
+  const tapPadding = (tapAreaSize - resolvedCircleSize) / 2;
+
   return (
-    <Pressable style={styles.tapArea} {...pressableProps}>
-      <View style={styles.circle}>
-        <Image source={CIRCLE_BG} style={styles.circleBg} resizeMode="contain" />
+    <Pressable
+      style={[
+        styles.tapArea,
+        { width: tapAreaSize, height: tapAreaSize, padding: tapPadding },
+      ]}
+      {...pressableProps}
+    >
+      <View style={[styles.circle, { width: resolvedCircleSize, height: resolvedCircleSize }]}>
+        <Image
+          source={CIRCLE_BG}
+          style={[
+            styles.circleBg,
+            { width: resolvedCircleSize, height: resolvedCircleSize },
+          ]}
+          resizeMode="contain"
+        />
         <View style={styles.iconWrap}>
-          <Icon size={ICON_SIZE} color={colors.iconBorder} strokeWidth={3} />
+          <Icon size={resolvedIconSize} color={colors.iconBorder} strokeWidth={3} />
         </View>
       </View>
     </Pressable>
@@ -31,22 +51,15 @@ export default function RoundIconButton({
 
 const styles = StyleSheet.create({
   tapArea: {
-    width: TAP_AREA_SIZE,
-    height: TAP_AREA_SIZE,
-    padding: TAP_PADDING,
     alignItems: "center",
     justifyContent: "center",
   },
   circle: {
-    width: CIRCLE_SIZE,
-    height: CIRCLE_SIZE,
     alignItems: "center",
     justifyContent: "center",
   },
   circleBg: {
     position: "absolute",
-    width: CIRCLE_SIZE,
-    height: CIRCLE_SIZE,
     zIndex: 0,
   },
   iconWrap: {
