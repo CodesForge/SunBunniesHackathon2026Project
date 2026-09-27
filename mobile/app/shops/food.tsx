@@ -87,11 +87,13 @@ export default function FoodShopScreen() {
   const cartRef = useRef<View>(null);
   const itemRefs = useRef<Record<string, View | null>>({});
 
-  useFocusEffect(() => {
-    return () => {
-      setSessionQty({});
-    };
-  });
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setSessionQty({});
+      };
+    }, [])
+  );
 
   const itemSize = width * ITEM_SIZE_PERCENT;
   const cartWidth = width * CART_WIDTH_PERCENT;
