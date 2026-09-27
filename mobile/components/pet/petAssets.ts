@@ -217,7 +217,8 @@ export type SleepAssetSet = {
   mouthOpen: ImageSourcePropType;
   mouthClosed: ImageSourcePropType;
   aspect: number;
-  eyesRect: { left: number; top: number; width: number; height: number };
+  eyesOpenRect: { left: number; top: number; width: number; height: number };
+  eyesClosedRect: { left: number; top: number; width: number; height: number };
   mouthClosedRect: { left: number; top: number; width: number; height: number };
   mouthOpenRect: { left: number; top: number; width: number; height: number };
 };
@@ -229,7 +230,8 @@ const CAT_SLEEP: SleepAssetSet = {
   mouthOpen: require("../../assets/sleep/mouth-open.png"),
   mouthClosed: require("../../assets/sleep/mouth-closed.png"),
   aspect: 1025 / 1772,
-  eyesRect: { left: 0.3832, top: 0.4712, width: 0.2297, height: 0.0829 },
+  eyesOpenRect: { left: 0.3832, top: 0.4712, width: 0.2297, height: 0.0829 },
+  eyesClosedRect: { left: 0.3832, top: 0.4712, width: 0.2297, height: 0.0829 },
   mouthClosedRect: { left: 0.4024, top: 0.4976, width: 0.1868, height: 0.1698 },
   mouthOpenRect: { left: 0.4024, top: 0.4976, width: 0.1868, height: 0.2351 },
 };
@@ -241,7 +243,8 @@ const DOG_SLEEP: SleepAssetSet = {
   mouthOpen: require("../../assets/sleep/dog/mouth-open.png"),
   mouthClosed: require("../../assets/sleep/dog/mouth-closed.png"),
   aspect: 1161 / 1772,
-  eyesRect: { left: 0.3877, top: 0.4936, width: 0.2229, height: 0.0603 },
+  eyesOpenRect: { left: 0.3900, top: 0.4936, width: 0.2206, height: 0.0594 },
+  eyesClosedRect: { left: 0.3877, top: 0.5194, width: 0.2218, height: 0.0345 },
   mouthClosedRect: { left: 0.4261, top: 0.5116, width: 0.1445, height: 0.1275 },
   mouthOpenRect: { left: 0.4244, top: 0.5150, width: 0.1507, height: 0.1981 },
 };

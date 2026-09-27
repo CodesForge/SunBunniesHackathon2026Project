@@ -90,6 +90,7 @@ export function PetSleeping({ species = "cat", widthPercent = 70, animated = tru
 
   const eyesOpen = !asleep && !blinking;
   const mouthOpen = asleep && snoring;
+  const eyesRect = eyesOpen ? assets.eyesOpenRect : assets.eyesClosedRect;
   const mouthRect = mouthOpen ? assets.mouthOpenRect : assets.mouthClosedRect;
 
   return (
@@ -100,10 +101,10 @@ export function PetSleeping({ species = "cat", widthPercent = 70, animated = tru
           source={eyesOpen ? assets.eyesOpen : assets.eyesClosed}
           style={{
             position: "absolute",
-            left: w * assets.eyesRect.left,
-            top: h * assets.eyesRect.top,
-            width: w * assets.eyesRect.width,
-            height: h * assets.eyesRect.height,
+            left: w * eyesRect.left,
+            top: h * eyesRect.top,
+            width: w * eyesRect.width,
+            height: h * eyesRect.height,
           }}
           resizeMode="contain"
         />
