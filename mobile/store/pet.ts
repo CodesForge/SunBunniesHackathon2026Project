@@ -112,6 +112,7 @@ type Actions = {
   buy: (item: Item) => boolean;
   buyFood: (item: Item) => boolean;
   wear: (slot: "body" | "head" | "face", id: string) => void;
+  unwear: (slot: "body" | "head" | "face") => void;
   putToDream: (amount: number) => boolean;
   withdrawFromDream: (amount: number) => boolean;
   completeQuest: (
@@ -199,10 +200,11 @@ export const usePet = create<State & Actions>()(
 
       buy: (item) => {
         const s = get();
+        if (s.owned.includes(item.id)) return false;
         if (s.jars[item.jar] < item.price) return false;
         set({
           jars: { ...s.jars, [item.jar]: s.jars[item.jar] - item.price },
-          owned: s.owned.includes(item.id) ? s.owned : [...s.owned, item.id],
+          owned: [...s.owned, item.id],
           dirty: true,
         });
         return true;
@@ -227,6 +229,13 @@ export const usePet = create<State & Actions>()(
 
       wear: (slot, id) =>
         set((s) => ({ worn: { ...s.worn, [slot]: id }, dirty: true })),
+
+      unwear: (slot) =>
+        set((s) => {
+          const worn = { ...s.worn };
+          delete worn[slot];
+          return { worn, dirty: true };
+        }),
 
       putToDream: (amount) => {
         const s = get();

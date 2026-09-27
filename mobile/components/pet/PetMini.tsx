@@ -10,8 +10,16 @@ import Animated, {
 } from "react-native-reanimated";
 import type { ImageSourcePropType } from "react-native";
 import { MouthKey, PET_ASSETS, PetSpecies } from "./petAssets";
+import { ECONOMY } from "../../data/economy";
+import { usePet } from "../../store/pet";
 
-type PetIdleProps = {
+type OutfitLayers = {
+  base: ImageSourcePropType;
+  sleeveLeft: ImageSourcePropType;
+  sleeveRight: ImageSourcePropType;
+};
+
+type PetMiniProps = {
   species: PetSpecies;
   widthPercent?: number;
   mouth?: MouthKey;
@@ -19,6 +27,8 @@ type PetIdleProps = {
   animated?: boolean;
   // Надетая на тело вещь из гардероба (подгузник и т.п.), если есть.
   bodyWear?: ImageSourcePropType;
+  outfit?: OutfitLayers;
+  headWear?: ImageSourcePropType;
 };
 
 function useBlink(enabled: boolean) {
@@ -62,8 +72,19 @@ function sway(duration: number) {
   );
 }
 
-export function PetIdle({ species, widthPercent = 58, mouth = "happy", eyesOpen = true, animated = true, bodyWear }: PetIdleProps) {
-  const assets = PET_ASSETS[species];
+export function PetMini({
+  species,
+  widthPercent = 58,
+  mouth = "happy",
+  eyesOpen = true,
+  animated = true,
+  bodyWear,
+  outfit,
+  headWear,
+}: PetMiniProps) {
+  const xp = usePet((s) => s.xp);
+  const stage = xp >= ECONOMY.teenLevel ? "teen" : "mini";
+  const assets = PET_ASSETS[species][stage];
   const { width } = useWindowDimensions();
   const w = (width * widthPercent) / 100;
   const h = w * assets.aspect;
@@ -130,8 +151,24 @@ export function PetIdle({ species, widthPercent = 58, mouth = "happy", eyesOpen 
           style={[styles.layer, { transformOrigin: assets.armRightOrigin }, armRightStyle]}
           resizeMode="contain"
         />
+        {outfit && (
+          <>
+            <Animated.Image
+              source={outfit.sleeveLeft}
+              style={[styles.layer, { transformOrigin: assets.armLeftOrigin }, armLeftStyle]}
+              resizeMode="contain"
+            />
+            <Animated.Image
+              source={outfit.sleeveRight}
+              style={[styles.layer, { transformOrigin: assets.armRightOrigin }, armRightStyle]}
+              resizeMode="contain"
+            />
+            <Image source={outfit.base} style={styles.layer} resizeMode="contain" />
+          </>
+        )}
         <Image source={showOpenEyes ? assets.eyesOpen : assets.eyesClosed} style={styles.layer} resizeMode="contain" />
         <Image source={assets.mouth[mouth]} style={styles.layer} resizeMode="contain" />
+        {headWear && <Image source={headWear} style={styles.layer} resizeMode="contain" />}
       </View>
     </View>
   );
@@ -146,4 +183,3 @@ const styles = StyleSheet.create({
     height: "100%",
   },
 });
-

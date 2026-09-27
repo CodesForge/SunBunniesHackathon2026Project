@@ -1,6 +1,7 @@
 import type { ImageSourcePropType } from "react-native";
 
 export type PetSpecies = "cat";
+export type PetAgeStage = "mini" | "teen";
 export type MouthKey = "happy" | "neutral" | "sad";
 
 export type PetAssetSet = {
@@ -29,7 +30,7 @@ export type PetAssetSet = {
   bodyWearHeight: number;
 };
 
-const CAT: PetAssetSet = {
+const CAT_MINI: PetAssetSet = {
   body: require("../../assets/pets/cat/mini/body.png"),
   tail: require("../../assets/pets/cat/mini/tail.png"),
   armLeft: require("../../assets/pets/cat/mini/arm-left.png"),
@@ -54,6 +55,34 @@ const CAT: PetAssetSet = {
   bodyWearHeight: 0.16,
 };
 
-export const PET_ASSETS: Record<PetSpecies, PetAssetSet> = {
-  cat: CAT,
+const CAT_TEEN: PetAssetSet = {
+  body: require("../../assets/pets/cat/teen/body.png"),
+  tail: require("../../assets/pets/cat/teen/tail.png"),
+  armLeft: require("../../assets/pets/cat/teen/arm-left.png"),
+  armRight: require("../../assets/pets/cat/teen/arm-right.png"),
+  belly: require("../../assets/pets/cat/teen/belly.png"),
+  eyesOpen: require("../../assets/pets/cat/teen/eyes-open.png"),
+  eyesClosed: require("../../assets/pets/cat/teen/eyes-closed.png"),
+  mouth: {
+    happy: require("../../assets/pets/cat/teen/mouth-happy.png"),
+    neutral: require("../../assets/pets/cat/teen/mouth-neutural.png"),
+    sad: require("../../assets/pets/cat/teen/mouth-sad.png"),
+  },
+  aspect: 2309 / 1707,
+  coreLeft: 152 / 1707,
+  coreWidth: 1065 / 1707,
+  armLeftOrigin: "42% 49%",
+  armRightOrigin: "38% 49%",
+  tailOrigin: "53% 87%",
+  bodyWearLeft: 0.32,
+  bodyWearTop: 0.70,
+  bodyWearWidth: 0.36,
+  bodyWearHeight: 0.16,
+};
+
+export const PET_ASSETS: Record<PetSpecies, Record<PetAgeStage, PetAssetSet>> = {
+  cat: {
+    mini: CAT_MINI,
+    teen: CAT_TEEN,
+  },
 };
