@@ -9,6 +9,8 @@ import TopHud from "../../components/ui/TopHud";
 import RoundIconButton from "../../components/ui/RoundIconButton";
 import { PetMini } from "../../components/pet/PetMini";
 import {
+  ADULT_ACCESSORY_ITEMS,
+  ADULT_CLOTHING_ITEMS,
   TEEN_ACCESSORY_ITEMS,
   TEEN_CLOTHING_ITEMS,
   WARDROBE_ITEMS,
@@ -17,7 +19,7 @@ import {
   type WardrobeOutfitItem,
 } from "../../data/wardrobe";
 import { usePet } from "../../store/pet";
-import { ECONOMY } from "../../data/economy";
+import { getPetStage } from "../../components/pet/petAssets";
 import { colors, font, radius, space } from "../../theme";
 
 const BACKGROUND = require("../../assets/wardrobe/background.png");
@@ -60,8 +62,9 @@ export default function WardrobeShopScreen() {
   const wear = usePet((s) => s.wear);
   const unwear = usePet((s) => s.unwear);
 
-  const isTeen = xp >= ECONOMY.teenLevel;
-  const isBaby = !isTeen;
+  const stage = getPetStage(xp);
+  const isBaby = stage === "mini";
+  const isGrownUp = stage !== "mini";
 
   const [category, setCategory] = useState<Category | null>(null);
   const [index, setIndex] = useState(0);
@@ -83,8 +86,10 @@ export default function WardrobeShopScreen() {
 
   const backgroundStyle = { position: "absolute" as const, top: 0, left: 0, width, height };
 
+  const clothingItems = stage === "adult" ? ADULT_CLOTHING_ITEMS : TEEN_CLOTHING_ITEMS;
+  const accessoryItems = stage === "adult" ? ADULT_ACCESSORY_ITEMS : TEEN_ACCESSORY_ITEMS;
   const items: WardrobeEntry[] =
-    category === "accessory" ? TEEN_ACCESSORY_ITEMS : category === "clothing" ? TEEN_CLOTHING_ITEMS : WARDROBE_ITEMS;
+    category === "accessory" ? accessoryItems : category === "clothing" ? clothingItems : WARDROBE_ITEMS;
 
   const item = items[index];
   const isOwned = !!item && owned.includes(item.id);
@@ -138,7 +143,7 @@ export default function WardrobeShopScreen() {
     }
   };
 
-  const wornVisuals = resolveWornVisuals(worn, isTeen);
+  const wornVisuals = resolveWornVisuals(worn, stage);
 
   const previewOutfit = category === "clothing" && drawerOpen && item && isOutfitItem(item) ? item : undefined;
   const previewHeadWear = category === "accessory" && drawerOpen ? (item as WardrobeItem | undefined)?.image : undefined;
@@ -176,7 +181,7 @@ export default function WardrobeShopScreen() {
         </View>
       )}
 
-      {isTeen && (
+      {isGrownUp && (
         <>
           <View style={styles.categoryButtonLeft}>
             <RoundIconButton

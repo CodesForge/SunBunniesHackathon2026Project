@@ -4,10 +4,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { usePet } from "../store/pet";
 import { fullness } from "../lib/time";
 import { PetMini } from "../components/pet/PetMini";
-import type { MouthKey } from "../components/pet/petAssets";
+import { getPetStage, type MouthKey } from "../components/pet/petAssets";
 import TopHud from "../components/ui/TopHud";
 import BottomNav from "../components/ui/BottomNav";
-import { ECONOMY } from "../data/economy";
 import { resolveWornVisuals } from "../data/wardrobe";
 import { colors } from "../theme";
 
@@ -24,8 +23,8 @@ export default function HomeScreen() {
   const full = fullness(lastFedAt);
   const mouth: MouthKey = full >= 60 ? "happy" : full >= 25 ? "neutral" : "sad";
 
-  const isTeen = xp >= ECONOMY.teenLevel;
-  const { bodyWear, outfit, headWear } = resolveWornVisuals(worn, isTeen);
+  const stage = getPetStage(xp);
+  const { bodyWear, outfit, headWear } = resolveWornVisuals(worn, stage);
 
   return (
     <View style={styles.root}>

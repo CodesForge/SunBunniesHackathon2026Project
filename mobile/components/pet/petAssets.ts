@@ -1,4 +1,5 @@
 import type { ImageSourcePropType } from "react-native";
+import { ECONOMY } from "../../data/economy";
 
 export type PetSpecies = "cat";
 export type PetAgeStage = "mini" | "teen" | "adult";
@@ -114,3 +115,9 @@ export const PET_ASSETS: Record<PetSpecies, Record<PetAgeStage, PetAssetSet>> = 
     adult: CAT_ADULT,
   },
 };
+
+export function getPetStage(xp: number): PetAgeStage {
+  if (xp >= ECONOMY.adultLevel) return "adult";
+  if (xp >= ECONOMY.teenLevel) return "teen";
+  return "mini";
+}
