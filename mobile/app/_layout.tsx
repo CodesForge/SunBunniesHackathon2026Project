@@ -10,7 +10,7 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <Stack screenOptions={{ headerShown: false }}>
+        <Stack screenOptions={{ headerShown: false }} initialRouteName="index">
           <Stack.Screen name="settings" options={{ animation: "slide_from_right" }} />
           <Stack.Screen name="parent" options={{ animation: "slide_from_right" }} />
           <Stack.Screen name="lesson/[id]" options={{ animation: "slide_from_right" }} />
