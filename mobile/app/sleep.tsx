@@ -129,9 +129,9 @@ const styles = StyleSheet.create({
   hintSlot: { alignItems: "center", paddingHorizontal: space.lg, paddingTop: space.sm },
   hint: {
     backgroundColor: colors.surface,
-    borderRadius: radius.pill,
+    borderRadius: radius.md,
     paddingHorizontal: space.lg,
     paddingVertical: space.sm,
   },
-  hintText: { ...font.small, fontWeight: "700", color: colors.ink, textAlign: "center" },
+  hintText: { ...font.small, fontWeight: "700", color: colors.coinWant, textAlign: "center" },
 });
