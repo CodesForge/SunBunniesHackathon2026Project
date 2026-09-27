@@ -160,6 +160,7 @@ export function PetMini({
         )}
         <Image source={assets.body} style={styles.layer} resizeMode="contain" />
         <Animated.Image source={assets.belly} style={[styles.layer, bellyStyle]} resizeMode="contain" />
+        {assets.diaper && <Image source={assets.diaper} style={styles.layer} resizeMode="contain" />}
         {bodyWear && (
           <Image
             source={bodyWear}

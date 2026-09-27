@@ -12,6 +12,7 @@ export type PetAssetSet = {
   armLeft: ImageSourcePropType;
   armRight: ImageSourcePropType;
   belly: ImageSourcePropType;
+  diaper?: ImageSourcePropType;
   eyesOpen: ImageSourcePropType;
   eyesClosed: ImageSourcePropType;
   mouth: Record<MouthKey, ImageSourcePropType>;
@@ -172,6 +173,7 @@ const DOG_MINI: PetAssetSet = {
   armLeft: require("../../assets/pets/dog/mini/arm-left.png"),
   armRight: require("../../assets/pets/dog/mini/arm-right.png"),
   belly: require("../../assets/pets/dog/mini/belly.png"),
+  diaper: require("../../assets/pets/dog/mini/diaper.png"),
   eyesOpen: require("../../assets/pets/dog/mini/eyes-open.png"),
   eyesClosed: require("../../assets/pets/dog/mini/eyes-closed.png"),
   mouth: {
