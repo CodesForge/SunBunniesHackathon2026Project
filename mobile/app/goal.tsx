@@ -1,243 +1,159 @@
-import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+  type ImageSourcePropType,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { Bike, Check, ChevronLeft, ChevronRight, CircleDot, Footprints } from "lucide-react-native";
 
+import BackHeader from "../components/ui/BackHeader";
 import CoinValue from "../components/ui/CoinValue";
 import { usePet } from "../store/pet";
 import goals from "../data/goals.json";
-import { colors, font, radius, space, HIT } from "../theme";
+import { colors, font, radius, space } from "../theme";
 
 const COIN_DREAM = require("../assets/icons/coin-dream.png");
+const BOARD_BACKGROUND = require("../assets/goals/board-background.png");
 
-const GOAL_ICONS: Record<string, typeof Bike> = {
-  ball: CircleDot,
-  skate: Footprints,
-  bike: Bike,
+const GOAL_IMAGES: Record<string, ImageSourcePropType> = {
+  ball: require("../assets/goals/ball.png"),
+  guitar: require("../assets/goals/guitar.png"),
+  skate: require("../assets/goals/skate.png"),
+  scooter: require("../assets/goals/scooter.png"),
 };
 
+const BOARD_IMAGE_WIDTH = 2270;
+const BOARD_IMAGE_HEIGHT = 4715;
+const PAPER_CENTER_X_FRAC = 1147.76 / BOARD_IMAGE_WIDTH;
+const PAPER_CENTER_Y_FRAC = 2096.67 / BOARD_IMAGE_HEIGHT;
+const PAPER_SIDE_FRAC = 530 / BOARD_IMAGE_HEIGHT;
+const PAPER_ROTATION_DEG = 4.4;
+const PAPER_FIT_SHRINK = 0.85;
+const PRICE_TOP_FRAC = 0.53;
+
+const CARD_BORDER = 3;
+
 export default function GoalScreen() {
-  const router = useRouter();
+  const { width, height } = useWindowDimensions();
   const goalId = usePet((s) => s.goalId);
-  const dream = usePet((s) => s.jars.dream);
   const setGoal = usePet((s) => s.setGoal);
 
-  const [index, setIndex] = useState(() => {
-    const i = goals.findIndex((g) => g.id === goalId);
-    return i >= 0 ? i : 0;
-  });
+  const goal = goals.find((g) => g.id === goalId) ?? null;
 
-  const goal = goals[index];
-  const isSelected = goal.id === goalId;
-  const Icon = GOAL_ICONS[goal.art] ?? CircleDot;
-  const pct = Math.max(0, Math.min(100, Math.round((dream / goal.price) * 100)));
+  if (!goal) {
+    return (
+      <View style={styles.pickRoot}>
+        <SafeAreaView style={styles.pickSafe} edges={["top", "bottom"]}>
+          <Text style={styles.pickTitle}>Выбери мечту!</Text>
 
-  const move = (delta: number) =>
-    setIndex((i) => (i + delta + goals.length) % goals.length);
-
-  return (
-    <View style={styles.root}>
-      <View style={styles.header}>
-        <SafeAreaView edges={["top"]}>
-          <View style={styles.headerRow}>
-            <Pressable
-              style={styles.back}
-              onPress={() => router.back()}
-              accessibilityRole="button"
-              accessibilityLabel="Назад"
-            >
-              <ChevronLeft size={28} color={colors.navActive} strokeWidth={3.5} />
-            </Pressable>
-
-            <View style={styles.headerText}>
-              <Text style={styles.headerTitle}>Доска желаний</Text>
-              <Text style={styles.headerSubtitle}>Выбери мечту, к которой копишь!</Text>
-            </View>
+          <View style={styles.grid}>
+            {goals.map((g) => (
+              <Pressable
+                key={g.id}
+                style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+                onPress={() => setGoal(g.id)}
+                accessibilityRole="button"
+                accessibilityLabel={`Выбрать «${g.title}»`}
+              >
+                <Image source={GOAL_IMAGES[g.art]} style={styles.cardImage} resizeMode="contain" />
+              </Pressable>
+            ))}
           </View>
         </SafeAreaView>
       </View>
+    );
+  }
 
-      <View style={styles.body}>
-        <View style={styles.carouselRow}>
-          <Pressable
-            onPress={() => move(-1)}
-            hitSlop={12}
-            style={styles.arrowHit}
-            accessibilityRole="button"
-            accessibilityLabel="Предыдущая мечта"
-          >
-            <ChevronLeft size={32} color={colors.navActive} strokeWidth={3} />
-          </Pressable>
+  const boardScale = Math.max(width / BOARD_IMAGE_WIDTH, height / BOARD_IMAGE_HEIGHT);
+  const boardWidth = BOARD_IMAGE_WIDTH * boardScale;
+  const boardHeight = BOARD_IMAGE_HEIGHT * boardScale;
+  const boardOffsetX = (width - boardWidth) / 2;
+  const boardOffsetY = (height - boardHeight) / 2;
 
-          <View style={styles.card}>
-            <View style={styles.iconCircle}>
-              <Icon size={56} color={colors.coinDream} strokeWidth={2} />
-              {isSelected && (
-                <View style={styles.selectedBadge}>
-                  <Check size={16} color={colors.surface} strokeWidth={3.5} />
-                </View>
-              )}
-            </View>
+  const paperCenterX = boardOffsetX + PAPER_CENTER_X_FRAC * boardWidth;
+  const paperCenterY = boardOffsetY + PAPER_CENTER_Y_FRAC * boardHeight;
+  const paperSide = PAPER_SIDE_FRAC * boardHeight * PAPER_FIT_SHRINK;
 
-            <Text style={styles.title}>{goal.title}</Text>
-            <CoinValue image={COIN_DREAM} value={goal.price} />
+  return (
+    <View style={styles.boardRoot}>
+      <Image
+        source={BOARD_BACKGROUND}
+        style={{
+          position: "absolute",
+          left: boardOffsetX,
+          top: boardOffsetY,
+          width: boardWidth,
+          height: boardHeight,
+        }}
+        resizeMode="cover"
+      />
 
-            <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: `${pct}%` }]} />
-            </View>
-            <Text style={styles.progressText}>
-              {isSelected
-                ? `Накоплено ${Math.min(dream, goal.price)} из ${goal.price}`
-                : "Пока не выбрана"}
-            </Text>
-          </View>
-
-          <Pressable
-            onPress={() => move(1)}
-            hitSlop={12}
-            style={styles.arrowHit}
-            accessibilityRole="button"
-            accessibilityLabel="Следующая мечта"
-          >
-            <ChevronRight size={32} color={colors.navActive} strokeWidth={3} />
-          </Pressable>
-        </View>
-
-        <Pressable
-          style={({ pressed }) => [
-            styles.selectButton,
-            isSelected && styles.selectButtonOff,
-            pressed && !isSelected && styles.pressed,
-          ]}
-          onPress={() => setGoal(goal.id)}
-          disabled={isSelected}
-          accessibilityRole="button"
-          accessibilityLabel={isSelected ? `«${goal.title}» уже выбрана` : `Выбрать «${goal.title}»`}
-        >
-          <Text style={styles.selectButtonText}>
-            {isSelected ? "Мечта выбрана" : "Выбрать эту мечту"}
-          </Text>
-        </Pressable>
+      <View
+        style={{
+          position: "absolute",
+          left: paperCenterX - paperSide / 2,
+          top: paperCenterY - paperSide / 2,
+          width: paperSide,
+          height: paperSide,
+          transform: [{ rotate: `${PAPER_ROTATION_DEG}deg` }],
+        }}
+      >
+        <Image
+          source={GOAL_IMAGES[goal.art]}
+          style={{ width: "100%", height: "100%" }}
+          resizeMode="contain"
+        />
       </View>
+
+      <View style={[styles.priceRow, { top: height * PRICE_TOP_FRAC }]}>
+        <CoinValue image={COIN_DREAM} value={goal.price} />
+      </View>
+
+      <SafeAreaView style={styles.backSlot} edges={["top"]} pointerEvents="box-none">
+        <BackHeader backHref="/plan" />
+      </SafeAreaView>
     </View>
   );
 }
 
-const BORDER = 4;
-
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.bg },
-
-  header: {
-    backgroundColor: colors.accent,
-    borderBottomLeftRadius: radius.lg,
-    borderBottomRightRadius: radius.lg,
-    paddingBottom: space.md,
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: space.lg,
-    paddingTop: space.sm,
-    gap: space.md,
-  },
-  back: {
-    width: HIT,
-    height: HIT,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surface,
-    borderWidth: BORDER,
-    borderColor: colors.surface,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerText: { flex: 1 },
-  headerTitle: { ...font.h1, color: colors.surface },
-  headerSubtitle: {
-    ...font.small,
-    fontWeight: "700",
-    color: colors.surface,
-    marginTop: 2,
-  },
-
-  body: {
+  pickRoot: { flex: 1, backgroundColor: colors.sceneOval },
+  pickSafe: {
     flex: 1,
-    padding: space.lg,
+    alignItems: "center",
     justifyContent: "center",
     gap: space.xl,
   },
-
-  carouselRow: {
+  pickTitle: { ...font.h1, color: colors.surface },
+  grid: {
     flexDirection: "row",
-    alignItems: "center",
+    flexWrap: "wrap",
     justifyContent: "center",
-    gap: space.md,
-  },
-  arrowHit: { padding: space.sm },
-
-  card: {
-    flex: 1,
-    maxWidth: 260,
-    borderWidth: BORDER,
-    borderColor: colors.iconBorder,
-    borderRadius: radius.lg,
-    backgroundColor: colors.jarDreamBg,
-    paddingVertical: space.xl,
+    gap: space.lg,
     paddingHorizontal: space.lg,
-    alignItems: "center",
-    gap: space.md,
   },
-  iconCircle: {
-    width: 96,
-    height: 96,
-    borderRadius: radius.pill,
-    borderWidth: BORDER,
-    borderColor: colors.coinDream,
+  card: {
+    width: 130,
+    height: 130,
+    borderRadius: radius.lg,
+    borderWidth: CARD_BORDER,
+    borderColor: colors.sceneOval,
     backgroundColor: colors.surface,
     alignItems: "center",
     justifyContent: "center",
   },
-  selectedBadge: {
+  cardPressed: { opacity: 0.85, transform: [{ scale: 0.97 }] },
+  cardImage: { width: "70%", height: "70%" },
+
+  boardRoot: { flex: 1, backgroundColor: colors.sceneOval, overflow: "hidden" },
+  priceRow: {
     position: "absolute",
-    right: -4,
-    top: -4,
-    width: 28,
-    height: 28,
-    borderRadius: radius.pill,
-    backgroundColor: colors.good,
-    borderWidth: 2,
-    borderColor: colors.surface,
+    left: 0,
+    right: 0,
     alignItems: "center",
-    justifyContent: "center",
   },
-  title: { ...font.h2, color: colors.ink, textAlign: "center" },
-
-  progressTrack: {
-    width: "100%",
-    height: 16,
-    borderRadius: radius.pill,
-    borderWidth: 2,
-    borderColor: colors.iconBorder,
-    backgroundColor: colors.surface,
-    overflow: "hidden",
-  },
-  progressFill: {
-    height: "100%",
-    borderRadius: radius.pill,
-    backgroundColor: colors.coinDreamBg,
-  },
-  progressText: { ...font.small, fontWeight: "700", color: colors.muted },
-
-  selectButton: {
-    minHeight: HIT + 6,
-    borderRadius: radius.pill,
-    backgroundColor: colors.navActive,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  selectButtonOff: { backgroundColor: colors.good },
-  selectButtonText: { fontSize: 20, fontWeight: "800", color: colors.surface },
-
-  pressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
+  backSlot: { position: "absolute", top: 0, left: 0 },
 });
