@@ -37,6 +37,7 @@ type State = {
   worn: { body?: string; head?: string; face?: string };
 
   goalId: string | null;
+  goalCelebrated: boolean;
 
   dayKey: string;
   secondsToday: number;
@@ -82,6 +83,7 @@ const initial: State = {
   foodOwned: {},
   worn: {},
   goalId: null,
+  goalCelebrated: false,
   dayKey: todayKey(),
   secondsToday: 0,
   history: [],
@@ -106,6 +108,8 @@ const initial: State = {
 type Actions = {
   hatch: (species: "dog" | "cat", name: string, goalId: string) => void;
   setGoal: (goalId: string) => void;
+  buyGoal: (price: number) => boolean;
+  markGoalCelebrated: () => void;
   setPlan: (p: Jars) => void;
   rebalance: (next: Jars) => void;
   feed: (foodId: string) => boolean;
@@ -270,6 +274,18 @@ export const usePet = create<State & Actions>()(
         return true;
       },
 
+      buyGoal: (price) => {
+        const s = get();
+        if (s.jars.dream < price) return false;
+        set({
+          jars: { ...s.jars, dream: s.jars.dream - price },
+          goalId: null,
+          goalCelebrated: false,
+          dirty: true,
+        });
+        return true;
+      },
+
       completeQuest: (id, theme, reward, right) =>
         set((s) => {
           const st = s.themeStats[theme];
@@ -348,7 +364,8 @@ export const usePet = create<State & Actions>()(
 
       setSetting: (k, v) =>
         set((s) => ({ settings: { ...s.settings, [k]: v } })),
-      setGoal: (goalId) => set({ goalId, dirty: true }),
+      setGoal: (goalId) => set({ goalId, goalCelebrated: false, dirty: true }),
+      markGoalCelebrated: () => set({ goalCelebrated: true, dirty: true }),
       toggleDemo: () => set((s) => ({ demoMode: !s.demoMode })),
       reset: () => set({ ...initial, dayKey: todayKey() }),
     }),
