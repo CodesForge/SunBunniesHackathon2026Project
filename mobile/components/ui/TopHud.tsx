@@ -11,8 +11,6 @@ import StatBar from "./StatBar";
 import RoundIconButton from "./RoundIconButton";
 
 const LOW = 20;
-const BUBBLE_SIZE = 130;
-const BUBBLE_SIZE_TABLET = 170;
 
 const TABLET_BREAKPOINT = 768;
 
@@ -35,15 +33,13 @@ const ROUND_BUTTON_CIRCLE_TABLET = 78;
 const ROUND_BUTTON_ICON_TABLET = 32;
 
 const RIGHT_COLUMN_MARGIN_LEFT = 10;
-const RIGHT_COLUMN_MARGIN_LEFT_TABLET = 18;
 const TOP_RIGHT_ROW_GAP = 10;
-const TOP_RIGHT_ROW_GAP_TABLET = 16;
 
 const MONEY_PILL_HEIGHT = 36;
 const MONEY_PILL_HEIGHT_TABLET = 52;
 const MONEY_PILL_PADDING_H = 16;
 const MONEY_PILL_PADDING_H_TABLET = 26;
-const MONEY_PILL_GAP_TABLET = 22;
+const MONEY_PILL_WIDTH_TABLET = 340;
 
 const TABLET_COIN_BADGE_SIZE = 38;
 const TABLET_COIN_FONT_SIZE = 18;
@@ -56,7 +52,7 @@ const SCALES_FRAME_PADDING_H = 16;
 const SCALES_FRAME_PADDING_H_TABLET = 26;
 const SCALES_FRAME_GAP = 10;
 const SCALES_FRAME_GAP_TABLET = 24;
-const SCALE_WIDTH_TABLET = 220;
+const SCALES_FRAME_WIDTH_TABLET = 460;
 
 const TABLET_STAT_BAR_HEIGHT = 24;
 const TABLET_STAT_ICON_SIZE = 32;
@@ -106,7 +102,6 @@ function PillBackground() {
 }
 
 type TopHudProps = {
-  showChatBubble?: boolean;
   // Показывать ли полоски сна/сытости — на экранах вроде магазина они
   // не нужны.
   showStats?: boolean;
@@ -119,7 +114,6 @@ type TopHudProps = {
 };
 
 export default function TopHud({
-  showChatBubble = true,
   showStats = true,
   showChat = true,
   showWallet = true,
@@ -143,10 +137,26 @@ export default function TopHud({
     ? { circleSize: ROUND_BUTTON_CIRCLE_TABLET, iconSize: ROUND_BUTTON_ICON_TABLET }
     : {};
 
+  const settingsButton = (
+    <Link href={"/settings" as any} asChild>
+      <RoundIconButton
+        icon={Settings}
+        accessibilityRole="button"
+        accessibilityLabel="Настройки"
+        {...roundButtonProps}
+      />
+    </Link>
+  );
+
   return (
     <View style={[styles.root, isTablet && styles.rootTablet]}>
       <View style={styles.row}>
-        <View style={[styles.leftColumn, isTablet && styles.leftColumnTablet]}>
+        <View
+          style={[
+            styles.leftColumn,
+            isTablet && styles.leftColumnTablet,
+          ]}
+        >
           {backHref ? (
             <Link href={backHref as any} asChild>
               <RoundIconButton
@@ -201,6 +211,8 @@ export default function TopHud({
               {...roundButtonProps}
             />
           )}
+
+          {isTablet && settingsButton}
         </View>
 
         <View style={[styles.rightColumn, isTablet && styles.rightColumnTablet]}>
@@ -227,14 +239,7 @@ export default function TopHud({
               />
             </View>
 
-            <Link href={"/settings" as any} asChild>
-              <RoundIconButton
-                icon={Settings}
-                accessibilityRole="button"
-                accessibilityLabel="Настройки"
-                {...roundButtonProps}
-              />
-            </Link>
+            {!isTablet && settingsButton}
           </View>
 
           {showStats && (
@@ -242,7 +247,7 @@ export default function TopHud({
               <PillBackground />
 
               <View
-                style={[styles.scale, isTablet && styles.scaleTablet]}
+                style={styles.scale}
                 accessibilityRole="progressbar"
                 accessibilityLabel={`Сон: ${Math.round(sleep)} из 100${sleep <= LOW ? ", мало" : ""}`}
               >
@@ -258,7 +263,7 @@ export default function TopHud({
               </View>
 
               <View
-                style={[styles.scale, isTablet && styles.scaleTablet]}
+                style={styles.scale}
                 accessibilityRole="progressbar"
                 accessibilityLabel={`Сытость: ${Math.round(hunger)} из 100${hunger <= LOW ? ", мало" : ""}`}
               >
@@ -274,17 +279,6 @@ export default function TopHud({
               </View>
             </View>
           )}
-
-          {showChatBubble && (
-            <View style={styles.bubbleRow} pointerEvents="none">
-              <MessageCircle
-                size={isTablet ? BUBBLE_SIZE_TABLET : BUBBLE_SIZE}
-                color={colors.iconBorder}
-                fill={colors.surface}
-                strokeWidth={0.5}
-              />
-            </View>
-          )}
         </View>
       </View>
     </View>
@@ -294,10 +288,17 @@ export default function TopHud({
 const styles = StyleSheet.create({
   root: { paddingHorizontal: ROOT_PADDING_H, paddingTop: ROOT_PADDING_TOP },
   rootTablet: { paddingHorizontal: ROOT_PADDING_H_TABLET, paddingTop: ROOT_PADDING_TOP_TABLET },
-  row: { flexDirection: "row" },
+  row: { flexDirection: "row", position: "relative" },
 
   leftColumn: { width: LEFT_COLUMN_WIDTH, alignItems: "center", gap: LEFT_COLUMN_GAP },
-  leftColumnTablet: { width: LEFT_COLUMN_WIDTH_TABLET, gap: LEFT_COLUMN_GAP_TABLET },
+  leftColumnTablet: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: LEFT_COLUMN_WIDTH_TABLET,
+    gap: LEFT_COLUMN_GAP_TABLET,
+    zIndex: 1,
+  },
   levelCircle: {
     width: LEFT_COLUMN_WIDTH,
     height: LEFT_COLUMN_WIDTH,
@@ -335,9 +336,9 @@ const styles = StyleSheet.create({
   },
 
   rightColumn: { flex: 1, marginLeft: RIGHT_COLUMN_MARGIN_LEFT },
-  rightColumnTablet: { marginLeft: RIGHT_COLUMN_MARGIN_LEFT_TABLET },
+  rightColumnTablet: { marginLeft: 0 },
   topRightRow: { flexDirection: "row", alignItems: "center", gap: TOP_RIGHT_ROW_GAP },
-  topRightRowTablet: { justifyContent: "center", gap: TOP_RIGHT_ROW_GAP_TABLET },
+  topRightRowTablet: { justifyContent: "center" },
   moneyPill: {
     flex: 1,
     flexDirection: "row",
@@ -350,9 +351,9 @@ const styles = StyleSheet.create({
   },
   moneyPillTablet: {
     flex: 0,
+    width: MONEY_PILL_WIDTH_TABLET,
     height: MONEY_PILL_HEIGHT_TABLET,
     paddingHorizontal: MONEY_PILL_PADDING_H_TABLET,
-    gap: MONEY_PILL_GAP_TABLET,
   },
 
   scalesFrame: {
@@ -367,17 +368,15 @@ const styles = StyleSheet.create({
   },
   scalesFrameTablet: {
     alignSelf: "center",
+    width: SCALES_FRAME_WIDTH_TABLET,
     height: SCALES_FRAME_HEIGHT_TABLET,
     marginTop: SCALES_FRAME_MARGIN_TOP_TABLET,
     paddingHorizontal: SCALES_FRAME_PADDING_H_TABLET,
     gap: SCALES_FRAME_GAP_TABLET,
   },
   scale: { flex: 1, flexDirection: "row", alignItems: "center", gap: 4 },
-  scaleTablet: { flex: undefined, width: SCALE_WIDTH_TABLET },
   lowMark: { fontSize: LOW_MARK_FONT, fontWeight: "800", color: colors.statLow },
   lowMarkTablet: { fontSize: LOW_MARK_FONT_TABLET },
-
-  bubbleRow: { alignItems: "flex-end", marginTop: 4 },
 
   alert: {
     position: "absolute",

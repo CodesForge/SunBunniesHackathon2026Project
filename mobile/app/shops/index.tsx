@@ -36,7 +36,7 @@ export default function ShopsScreen() {
       <ShopLink href="/shops/wardrobe" label="Магазин одежды" image={WARDROBE_ICON} side="right" top={top} />
 
       <SafeAreaView style={styles.content} edges={["top"]} pointerEvents="box-none">
-        <TopHud showChatBubble={false} />
+        <TopHud />
       </SafeAreaView>
 
       <SafeAreaView style={styles.navSlot} edges={["bottom"]}>

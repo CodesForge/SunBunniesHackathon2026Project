@@ -257,7 +257,7 @@ export default function WardrobeShopScreen() {
       )}
 
       <SafeAreaView style={styles.hudSlot} edges={["top"]} pointerEvents="box-none">
-        <TopHud backHref="/shops" showStats={false} showChatBubble={false} showChat={false} />
+        <TopHud backHref="/shops" showStats={false} showChat={false} />
       </SafeAreaView>
     </View>
   );

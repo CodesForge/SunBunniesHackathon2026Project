@@ -123,7 +123,7 @@ export default function GlossaryScreen() {
   return (
     <View style={styles.root}>
       <SafeAreaView style={styles.content} edges={["top"]}>
-        <TopHud showChatBubble={false} showStats={false} showChat={false} showWallet={false} />
+        <TopHud showStats={false} showChat={false} showWallet={false} />
 
         <View style={styles.dailyBanner}>
           <Text style={styles.dailyTitle}>Урок дня</Text>
