@@ -83,7 +83,7 @@ export function PetMini({
   headWear,
 }: PetMiniProps) {
   const xp = usePet((s) => s.xp);
-  const stage = xp >= ECONOMY.teenLevel ? "teen" : "mini";
+  const stage = xp >= ECONOMY.adultLevel ? "adult" : xp >= ECONOMY.teenLevel ? "teen" : "mini";
   const assets = PET_ASSETS[species][stage];
   const { width } = useWindowDimensions();
   const w = (width * widthPercent) / 100;
@@ -126,6 +126,20 @@ export function PetMini({
           style={[styles.layer, { transformOrigin: assets.tailOrigin }, tailStyle]}
           resizeMode="contain"
         />
+        {assets.armsUnderBody && (
+          <>
+            <Animated.Image
+              source={assets.armLeft}
+              style={[styles.layer, { transformOrigin: assets.armLeftOrigin }, armLeftStyle]}
+              resizeMode="contain"
+            />
+            <Animated.Image
+              source={assets.armRight}
+              style={[styles.layer, { transformOrigin: assets.armRightOrigin }, armRightStyle]}
+              resizeMode="contain"
+            />
+          </>
+        )}
         <Image source={assets.body} style={styles.layer} resizeMode="contain" />
         <Animated.Image source={assets.belly} style={[styles.layer, bellyStyle]} resizeMode="contain" />
         {bodyWear && (
@@ -141,16 +155,20 @@ export function PetMini({
             resizeMode="contain"
           />
         )}
-        <Animated.Image
-          source={assets.armLeft}
-          style={[styles.layer, { transformOrigin: assets.armLeftOrigin }, armLeftStyle]}
-          resizeMode="contain"
-        />
-        <Animated.Image
-          source={assets.armRight}
-          style={[styles.layer, { transformOrigin: assets.armRightOrigin }, armRightStyle]}
-          resizeMode="contain"
-        />
+        {!assets.armsUnderBody && (
+          <>
+            <Animated.Image
+              source={assets.armLeft}
+              style={[styles.layer, { transformOrigin: assets.armLeftOrigin }, armLeftStyle]}
+              resizeMode="contain"
+            />
+            <Animated.Image
+              source={assets.armRight}
+              style={[styles.layer, { transformOrigin: assets.armRightOrigin }, armRightStyle]}
+              resizeMode="contain"
+            />
+          </>
+        )}
         {outfit && (
           <>
             <Animated.Image

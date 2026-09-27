@@ -9,6 +9,7 @@ export const ECONOMY = {
   questReward: 100,
   xpPerQuest: 1,
   teenLevel: 6,
+  adultLevel: 13,
   parentBonus: 200,
   chestReward: 150,
   mistakePenalty: 5,

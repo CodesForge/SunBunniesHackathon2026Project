@@ -1,7 +1,7 @@
 import type { ImageSourcePropType } from "react-native";
 
 export type PetSpecies = "cat";
-export type PetAgeStage = "mini" | "teen";
+export type PetAgeStage = "mini" | "teen" | "adult";
 export type MouthKey = "happy" | "neutral" | "sad";
 
 export type PetAssetSet = {
@@ -19,6 +19,7 @@ export type PetAssetSet = {
   armLeftOrigin: string;
   armRightOrigin: string;
   tailOrigin: string;
+  armsUnderBody?: boolean;
   // Область под надетую на тело вещь из гардероба (подгузник и т.п.) —
   // рисуется поверх пузика, но под ручками. Доли от ширины/высоты общего
   // холста питомца (того же "w"/"h", что и у остальных слоёв), картинка
@@ -80,9 +81,36 @@ const CAT_TEEN: PetAssetSet = {
   bodyWearHeight: 0.16,
 };
 
+const CAT_ADULT: PetAssetSet = {
+  body: require("../../assets/pets/cat/adult/body.png"),
+  tail: require("../../assets/pets/cat/adult/tail.png"),
+  armLeft: require("../../assets/pets/cat/adult/arm-left.png"),
+  armRight: require("../../assets/pets/cat/adult/arm-right.png"),
+  belly: require("../../assets/pets/cat/adult/belly.png"),
+  eyesOpen: require("../../assets/pets/cat/adult/eyes-open.png"),
+  eyesClosed: require("../../assets/pets/cat/adult/eyes-closed.png"),
+  mouth: {
+    happy: require("../../assets/pets/cat/adult/mouth-happy.png"),
+    neutral: require("../../assets/pets/cat/adult/mouth-neutural.png"),
+    sad: require("../../assets/pets/cat/adult/mouth-sad.png"),
+  },
+  aspect: 2309 / 1707,
+  coreLeft: 153 / 1707,
+  coreWidth: 1067 / 1707,
+  armLeftOrigin: "37% 48%",
+  armRightOrigin: "43% 48%",
+  tailOrigin: "53% 87%",
+  armsUnderBody: true,
+  bodyWearLeft: 0.32,
+  bodyWearTop: 0.70,
+  bodyWearWidth: 0.36,
+  bodyWearHeight: 0.16,
+};
+
 export const PET_ASSETS: Record<PetSpecies, Record<PetAgeStage, PetAssetSet>> = {
   cat: {
     mini: CAT_MINI,
     teen: CAT_TEEN,
+    adult: CAT_ADULT,
   },
 };
