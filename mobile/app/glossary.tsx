@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { ChevronRight } from "lucide-react-native";
@@ -11,6 +11,7 @@ import LessonCoin from "../components/lessons/LessonCoin";
 import PetGrewModal from "../components/lessons/PetGrewModal";
 import PetMarker from "../components/lessons/PetMarker";
 import BottomNav from "../components/ui/BottomNav";
+import Modal from "../components/ui/Modal";
 import TopHud from "../components/ui/TopHud";
 import {
   LESSON_SECTIONS,
@@ -19,8 +20,13 @@ import {
   waveForLesson,
   type LessonSection,
 } from "../data/lessons";
+import { ECONOMY } from "../data/economy";
+import { energyNow, minutesToFull } from "../lib/time";
 import { isLessonUnlocked, useLessons } from "../store/lessonsStore";
+import { usePet } from "../store/pet";
 import { colors, radius, space } from "../theme";
+
+const ENERGY_TICK_MS = 15000;
 
 const COL_CYCLE = [1, 0, 1, 2];
 const ALIGN_FOR_COL = ["flex-start", "center", "flex-end"] as const;
@@ -89,6 +95,23 @@ export default function GlossaryScreen() {
   const dismissPetGrowth = useLessons((s) => s.dismissPetGrowth);
 
   const [rewardWave, setRewardWave] = useState<number | null>(null);
+  const [tiredAsked, setTiredAsked] = useState(false);
+  const [, setTick] = useState(0);
+
+  const petName = usePet((s) => s.name);
+  const energyBase = usePet((s) => s.energyBase);
+  const energyAt = usePet((s) => s.energyAt);
+  const asleep = usePet((s) => s.asleep);
+
+  useEffect(() => {
+    if (!asleep) return;
+    const id = setInterval(() => setTick((n) => n + 1), ENERGY_TICK_MS);
+    return () => clearInterval(id);
+  }, [asleep]);
+
+  const energy = energyNow(energyBase, energyAt, asleep);
+  const minutesLeft = minutesToFull(energyBase, energyAt, asleep);
+  const tooTired = energy < ECONOMY.lessonEnergyMin;
 
   const lessonState = (number: number): "locked" | "current" | "done" => {
     const id = `l${number}`;
@@ -105,6 +128,10 @@ export default function GlossaryScreen() {
 
   const openLesson = (number: number) => {
     if (lessonState(number) === "locked") return;
+    if (asleep || tooTired) {
+      setTiredAsked(true);
+      return;
+    }
     router.push(`/lesson/l${number}` as any);
   };
 
@@ -185,6 +212,29 @@ export default function GlossaryScreen() {
       <SafeAreaView style={styles.navSlot} edges={["bottom"]}>
         <BottomNav />
       </SafeAreaView>
+
+      <Modal
+        visible={tiredAsked}
+        title={
+          asleep
+            ? `${petName || "Питомец"} спит`
+            : `${petName || "Питомец"} совсем сонный`
+        }
+        text={
+          asleep
+            ? minutesLeft > 0
+              ? `Пусть отдохнёт ещё ${minutesLeft} мин. — и снова возьмётесь за уроки вместе.`
+              : "Он уже выспался, можно будить и продолжать."
+            : "Он старался вместе с тобой и устал. Уложи его спать — и вернётесь к урокам отдохнувшими."
+        }
+        confirmLabel={asleep ? "Посмотреть" : "Уложить спать"}
+        cancelLabel="Позже"
+        onConfirm={() => {
+          setTiredAsked(false);
+          router.push("/sleep" as any);
+        }}
+        onCancel={() => setTiredAsked(false)}
+      />
 
       <ChestRewardModal visible={rewardWave !== null} onClose={() => setRewardWave(null)} />
       <PetGrewModal

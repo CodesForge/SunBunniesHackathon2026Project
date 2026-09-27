@@ -20,7 +20,9 @@ export default function SettingsScreen() {
           <View style={styles.backSlot}>
             <RoundIconButton
               icon={ArrowLeft}
-              onPress={() => router.back()}
+              onPress={() =>
+                router.canGoBack() ? router.back() : router.replace("/home" as any)
+              }
               accessibilityRole="button"
               accessibilityLabel="Назад"
             />
@@ -59,11 +61,14 @@ export default function SettingsScreen() {
   );
 }
 
+const BACK_SIZE = 58;
+
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.surface },
   content: { flex: 1 },
 
   header: {
+    minHeight: BACK_SIZE + space.sm * 2,
     alignItems: "center",
     justifyContent: "center",
     paddingTop: space.sm,

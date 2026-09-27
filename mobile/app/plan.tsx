@@ -28,16 +28,16 @@ const BORDER = 4;
 
 const JAR_INFO = {
   need: {
-    title: "╨Э╨░╨┤╨╛",
-    text: `╨Ю╤В╤Б╤О╨┤╨░ ╨┐╨╛╨║╤Г╨┐╨░╤О╤В ╨╡╨┤╤Г. ╨Я╨╕╤В╨╛╨╝╨╡╤Ж ╨║╤Г╤И╨░╨╡╤В ${MEALS_PER_DAY} ╤А╨░╨╖╨░ ╨▓ ╨┤╨╡╨╜╤М, ╨╛╨┤╨╜╨░ ╨┐╨╛╤А╤Ж╨╕╤П ╤Б╤В╨╛╨╕╤В ╨╛╨║╨╛╨╗╨╛ ${ECONOMY.mealCost} ╨╝╨╛╨╜╨╡╤В. ╨Э╨░ ╨▓╤Б╨╡ ${PERIOD_DAYS} ╨┤╨╜╨╡╨╣ ╨╜╤Г╨╢╨╜╨╛ ╨┐╤А╨╕╨╝╨╡╤А╨╜╨╛ ${ECONOMY.minNeed}.`,
+    title: "Надо",
+    text: `Отсюда покупают еду. Питомец кушает ${MEALS_PER_DAY} раза в день, одна порция стоит около ${ECONOMY.mealCost} монет. На все ${PERIOD_DAYS} дней нужно примерно ${ECONOMY.minNeed}.`,
   },
   want: {
-    title: "╨е╨╛╤З╤Г",
-    text: "╨Ю╤В╤Б╤О╨┤╨░ ╨┐╨╛╨║╤Г╨┐╨░╤О╤В ╨▓╨║╤Г╤Б╨╜╤П╤И╨║╨╕ ╨╕ ╨╜╨░╤А╤П╨┤╤Л. ╨б╤О╨┤╨░ ╨╢╨╡ ╨┐╤А╨╕╤Е╨╛╨┤╤П╤В ╨╝╨╛╨╜╨╡╤В╨║╨╕ ╨╖╨░ ╨┐╤А╨╛╨╣╨┤╨╡╨╜╨╜╤Л╨╡ ╨╖╨░╨┤╨░╨╜╨╕╤П. ╨Ь╨╛╨╢╨╜╨╛ ╨╜╨╕╤З╨╡╨│╨╛ ╨╜╨╡ ╨┐╨╛╨║╤Г╨┐╨░╤В╤М ╨╕ ╨╛╤Б╤В╨░╨▓╨╕╤В╤М ╨╜╨░ ╨┐╨╛╤В╨╛╨╝ тАФ ╤Н╤В╨╛ ╨╜╨╡ ╨╛╤И╨╕╨▒╨║╨░.",
+    title: "Хочу",
+    text: "Отсюда покупают вкусняшки и наряды. Сюда же приходят монетки за пройденные задания. Можно ничего не покупать и оставить на потом — это не ошибка.",
   },
   dream: {
-    title: "╨Ь╨╡╤З╤В╨░",
-    text: "╨Ч╨┤╨╡╤Б╤М ╨║╨╛╨┐╤П╤В╤Б╤П ╨┤╨╡╨╜╤М╨│╨╕ ╨╜╨░ ╨▒╨╛╨╗╤М╤И╤Г╤О ╤Ж╨╡╨╗╤М. ╨С╨░╨╜╨║╨░ ╨╜╨░╨┐╨╛╨╗╨╜╤П╨╡╤В╤Б╤П ╨┐╨╛ ╨╝╨╡╤А╨╡ ╤В╨╛╨│╨╛, ╨║╨░╨║ ╤В╤Л ╨┐╤А╨╕╨▒╨╗╨╕╨╢╨░╨╡╤И╤М╤Б╤П ╨║ ╨╜╨╡╨╣.",
+    title: "Мечта",
+    text: "Здесь копятся деньги на большую цель. Банка наполняется по мере того, как ты приближаешься к ней.",
   },
 } as const;
 
@@ -86,17 +86,17 @@ export default function PlanScreen() {
   const hint =
     left > 0
       ? planning
-        ? `╨Ю╤Б╤В╨░╨╗╨╛╤Б╤М ╤А╨░╨╖╨╗╨╛╨╢╨╕╤В╤М ${left} ╨╝╨╛╨╜╨╡╤В`
-        : `╨Т ╤А╤Г╨║╨░╤Е ${left} ╨╝╨╛╨╜╨╡╤В тАФ ╤А╨░╨╖╨╗╨╛╨╢╨╕ ╨╕╤Е ╨┐╨╛ ╨▒╨░╨╜╨║╨░╨╝`
+        ? `Осталось разложить ${left} монет`
+        : `В руках ${left} монет — разложи их по банкам`
       : !changed
         ? daysLeft > 0
-          ? `╨Ь╨╛╨╜╨╡╤В╤Л ╤А╨░╨╖╨╗╨╛╨╢╨╡╨╜╤Л. ╨Э╨╛╨▓╤Л╨╡ ╨┐╤А╨╕╨┤╤Г╤В ╤З╨╡╤А╨╡╨╖ ${daysLeft} ${dayWord(daysLeft)}. ╨Я╨╡╤А╨╡╨╗╨╛╨╢╨╕╤В╤М ╨╝╨╛╨╢╨╜╨╛ ╨▓ ╨╗╤О╨▒╨╛╨╣ ╨╝╨╛╨╝╨╡╨╜╤В.`
-          : "╨Ь╨╛╨╜╨╡╤В╤Л ╤А╨░╨╖╨╗╨╛╨╢╨╡╨╜╤Л. ╨Э╨╛╨▓╤Л╨╡ ╨┐╤А╨╕╨┤╤Г╤В ╤Б╨╛╨▓╤Б╨╡╨╝ ╤Б╨║╨╛╤А╨╛."
+          ? `Монеты разложены. Новые придут через ${daysLeft} ${dayWord(daysLeft)}. Переложить можно в любой момент.`
+          : "Монеты разложены. Новые придут совсем скоро."
         : enoughFood
           ? planning
-            ? "╨Т╤Б╤С ╤А╨░╨╖╨╗╨╛╨╢╨╡╨╜╨╛! ╨Ь╨╛╨╢╨╜╨╛ ╨┐╨╛╨┤╤В╨▓╨╡╤А╨╢╨┤╨░╤В╤М."
-            : "╨У╨╛╤В╨╛╨▓╨╛, ╨╝╨╛╨╢╨╜╨╛ ╨┐╨╡╤А╨╡╨║╨╗╨░╨┤╤Л╨▓╨░╤В╤М."
-          : `╨Э╨░ ╨╡╨┤╤Г ╨╛╤В╨╗╨╛╨╢╨╡╨╜╨╛ ${draft.need}. ╨н╤В╨╛╨│╨╛ ╤Е╨▓╨░╤В╨╕╤В ╨╜╨░ ${days} ${dayWord(days)} ╨╕╨╖ ${PERIOD_DAYS}.`;
+            ? "Всё разложено! Можно подтверждать."
+            : "Готово, можно перекладывать."
+          : `На еду отложено ${draft.need}. Этого хватит на ${days} ${dayWord(days)} из ${PERIOD_DAYS}.`;
 
   const confirm = () => {
     if (planning) setPlan({ ...draft });
@@ -108,14 +108,14 @@ export default function PlanScreen() {
   const confirmText = () => {
     if (takenFromDream > 0) {
       const restLine = goal
-        ? ` ╨Ф╨╛ ╤Ж╨╡╨╗╨╕ ┬л${goal.title}┬╗ ╨╛╤Б╤В╨░╨╜╨╡╤В╤Б╤П ${Math.max(0, goal.price - draft.dream)} ╨╝╨╛╨╜╨╡╤В.`
+        ? ` До цели «${goal.title}» останется ${Math.max(0, goal.price - draft.dream)} монет.`
         : "";
-      return `╨в╤Л ╨╖╨░╨▒╨╕╤А╨░╨╡╤И╤М ╨╕╨╖ ╨Ь╨╡╤З╤В╤Л ${takenFromDream} ╨╝╨╛╨╜╨╡╤В.${restLine} ╨ж╨╡╨╗╤М ╤Б╤В╨░╨╜╨╡╤В ╨┤╨░╨╗╤М╤И╨╡, ╨╜╨╛ ╨║╨╛╨┐╨╕╤В╤М ╨╝╨╛╨╢╨╜╨╛ ╤Б╨╜╨╛╨▓╨░.`;
+      return `Ты забираешь из Мечты ${takenFromDream} монет.${restLine} Цель станет дальше, но копить можно снова.`;
     }
     if (!enoughFood) {
-      return `╨Э╨░ ╨╡╨┤╤Г ╨╛╤В╨╗╨╛╨╢╨╡╨╜╨╛ ${draft.need} тАФ ╤Е╨▓╨░╤В╨╕╤В ╨╜╨░ ${days} ${dayWord(days)} ╨╕╨╖ ${PERIOD_DAYS}. ╨Ь╨╛╨╢╨╜╨╛ ╨╛╤Б╤В╨░╨▓╨╕╤В╤М ╤В╨░╨║, ╨░ ╨╝╨╛╨╢╨╜╨╛ ╨┐╨╡╤А╨╡╨╗╨╛╨╢╨╕╤В╤М.`;
+      return `На еду отложено ${draft.need} — хватит на ${days} ${dayWord(days)} из ${PERIOD_DAYS}. Можно оставить так, а можно переложить.`;
     }
-    return `╨Э╨░╨┤╨╛ ${draft.need}, ╨е╨╛╤З╤Г ${draft.want}, ╨Ь╨╡╤З╤В╨░ ${draft.dream}.`;
+    return `Надо ${draft.need}, Хочу ${draft.want}, Мечта ${draft.dream}.`;
   };
 
   return (
@@ -127,15 +127,15 @@ export default function PlanScreen() {
               style={styles.back}
               onPress={() => router.back()}
               accessibilityRole="button"
-              accessibilityLabel="╨Э╨░╨╖╨░╨┤"
+              accessibilityLabel="Назад"
             >
               <ChevronLeft size={28} color={colors.navActive} strokeWidth={3.5} />
             </Pressable>
 
             <View style={styles.headerText}>
-              <Text style={styles.headerTitle}>╨Я╨╗╨░╨╜ ╨▒╤О╨┤╨╢╨╡╤В╨░</Text>
+              <Text style={styles.headerTitle}>План бюджета</Text>
               <Text style={styles.headerSubtitle}>
-                ╨а╨░╤Б╨┐╤А╨╡╨┤╨╡╨╗╤П╨╣ ╨┤╨╡╨╜╤М╨│╨╕ ╨╜╨░ ╤Б╨▓╨╛╨╕ ╤Ж╨╡╨╗╨╕!
+                Распределяй деньги на свои цели!
               </Text>
             </View>
           </View>
@@ -165,7 +165,7 @@ export default function PlanScreen() {
 
           <View style={styles.budgetText}>
             <Text style={styles.budgetLabel}>
-              {left > 0 ? "╨Т ╤А╤Г╨║╨░╤Е" : "╨Т╤Б╨╡╨│╨╛ ╨╝╨╛╨╜╨╡╤В"}
+              {left > 0 ? "В руках" : "Всего монет"}
             </Text>
             <Text style={styles.budgetValue}>{left > 0 ? left : budget}</Text>
           </View>
@@ -174,9 +174,9 @@ export default function PlanScreen() {
             style={({ pressed }) => [styles.wishes, pressed && styles.pressed]}
             onPress={() => router.push("/goal" as any)}
             accessibilityRole="button"
-            accessibilityLabel="╨Ф╨╛╤Б╨║╨░ ╨╢╨╡╨╗╨░╨╜╨╕╨╣"
+            accessibilityLabel="Доска желаний"
           >
-            <Text style={styles.wishesText}>╨Ф╨╛╤Б╨║╨░{"\n"}╨Ц╨╡╨╗╨░╨╜╨╕╨╣</Text>
+            <Text style={styles.wishesText}>Доска{"\n"}Желаний</Text>
             <ChevronRight size={22} color={colors.navActive} strokeWidth={3.5} />
           </Pressable>
         </View>
@@ -185,7 +185,7 @@ export default function PlanScreen() {
 
         <View style={styles.jars}>
           <JarCard
-            title="╨Э╨░╨┤╨╛"
+            title="Надо"
             color={colors.coinNeed}
             background={colors.jarNeedBg}
             value={draft.need}
@@ -197,7 +197,7 @@ export default function PlanScreen() {
             onInfo={() => setInfo("need")}
           />
           <JarCard
-            title="╨е╨╛╤З╤Г"
+            title="Хочу"
             color={colors.coinWant}
             background={colors.jarWantBg}
             value={draft.want}
@@ -209,7 +209,7 @@ export default function PlanScreen() {
             onInfo={() => setInfo("want")}
           />
           <JarCard
-            title="╨Ь╨╡╤З╤В╨░"
+            title="Мечта"
             color={colors.coinDream}
             background={colors.jarDreamBg}
             value={draft.dream}
@@ -243,11 +243,11 @@ export default function PlanScreen() {
           disabled={!ready}
           accessibilityRole="button"
           accessibilityLabel={
-            planning ? "╨Я╨╛╨┤╤В╨▓╨╡╤А╨┤╨╕╤В╤М ╤А╨░╤Б╨┐╤А╨╡╨┤╨╡╨╗╨╡╨╜╨╕╨╡" : "╨Я╨╡╤А╨╡╨╗╨╛╨╢╨╕╤В╤М ╨╝╨╛╨╜╨╡╤В╤Л"
+            planning ? "Подтвердить распределение" : "Переложить монеты"
           }
         >
           <Text style={styles.confirmText}>
-            {planning ? "╨Я╨╛╨┤╤В╨▓╨╡╤А╨┤╨╕╤В╤М" : "╨Я╨╡╤А╨╡╨╗╨╛╨╢╨╕╤В╤М"}
+            {planning ? "Подтвердить" : "Переложить"}
           </Text>
         </Pressable>
       </SafeAreaView>
@@ -261,10 +261,10 @@ export default function PlanScreen() {
 
       <Modal
         visible={confirming}
-        title={takenFromDream > 0 ? "╨в╨╛╤З╨╜╨╛ ╨╖╨░╨▒╤А╨░╤В╤М ╨╕╨╖ ╨Ь╨╡╤З╤В╤Л?" : "╨а╨░╨╖╨╗╨╛╨╢╨╕╤В╤М ╤В╨░╨║?"}
+        title={takenFromDream > 0 ? "Точно забрать из Мечты?" : "Разложить так?"}
         text={confirmText()}
-        confirmLabel={takenFromDream > 0 ? "╨Ф╨░, ╨╖╨░╨▒╤А╨░╤В╤М" : "╨Ф╨░, ╤А╨░╨╖╨╗╨╛╨╢╨╕╤В╤М"}
-        cancelLabel="╨Х╤Й╤С ╨┐╨╛╨┤╤Г╨╝╨░╤О"
+        confirmLabel={takenFromDream > 0 ? "Да, забрать" : "Да, разложить"}
+        cancelLabel="Ещё подумаю"
         onConfirm={confirm}
         onCancel={() => setConfirming(false)}
       />
@@ -275,10 +275,10 @@ export default function PlanScreen() {
 function dayWord(n: number) {
   const last = n % 10;
   const two = n % 100;
-  if (two >= 11 && two <= 14) return "╨┤╨╜╨╡╨╣";
-  if (last === 1) return "╨┤╨╡╨╜╤М";
-  if (last >= 2 && last <= 4) return "╨┤╨╜╤П";
-  return "╨┤╨╜╨╡╨╣";
+  if (two >= 11 && two <= 14) return "дней";
+  if (last === 1) return "день";
+  if (last >= 2 && last <= 4) return "дня";
+  return "дней";
 }
 
 const styles = StyleSheet.create({
