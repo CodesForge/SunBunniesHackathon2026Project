@@ -2,15 +2,23 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import { ECONOMY } from "../data/economy";
+import { ECONOMY, rewardForMistakes } from "../data/economy";
 import { LESSON_SECTIONS, getLesson, sectionForLesson, waveForLesson } from "../data/lessons";
 import { usePet } from "./pet";
+
+export type LessonResult = {
+  lessonId: string;
+  base: number;
+  mistakes: number;
+  reward: number;
+};
 
 type State = {
   completedLessons: string[];
   chestsOpened: number[];
   pendingChest: number | null;
   pendingPetGrowth: boolean;
+  lastResult: LessonResult | null;
 };
 
 const initial: State = {
@@ -18,10 +26,11 @@ const initial: State = {
   chestsOpened: [],
   pendingChest: null,
   pendingPetGrowth: false,
+  lastResult: null,
 };
 
 type Actions = {
-  completeLesson: (id: string) => void;
+  completeLesson: (id: string, mistakes?: number) => LessonResult | null;
   openChest: (waveIndex: number) => void;
   dismissPetGrowth: () => void;
   reset: () => void;
@@ -32,14 +41,27 @@ export const useLessons = create<State & Actions>()(
     (set, get) => ({
       ...initial,
 
-      completeLesson: (id) => {
+      completeLesson: (id, mistakes = 0) => {
         const s = get();
-        if (s.completedLessons.includes(id)) return;
         const lesson = getLesson(id);
-        if (!lesson) return;
+        if (!lesson) return null;
+
+        const reward = rewardForMistakes(lesson.reward, mistakes);
+        const result: LessonResult = {
+          lessonId: id,
+          base: lesson.reward,
+          mistakes,
+          reward,
+        };
+
+        if (s.completedLessons.includes(id)) {
+          const repeat = { ...result, reward: 0 };
+          set({ lastResult: repeat });
+          return repeat;
+        }
 
         const pet = usePet.getState();
-        pet.grantJars({ want: lesson.reward });
+        pet.grantJars({ want: reward });
         pet.addXp(1);
 
         const completedLessons = [...s.completedLessons, id];
@@ -62,7 +84,10 @@ export const useLessons = create<State & Actions>()(
               ? waveIndex
               : s.pendingChest,
           pendingPetGrowth: true,
+          lastResult: result,
         });
+
+        return result;
       },
 
       openChest: (waveIndex) => {
