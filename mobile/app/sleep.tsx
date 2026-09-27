@@ -1,13 +1,14 @@
-import { useState } from "react";
-import { Image, StyleSheet, View, useWindowDimensions } from "react-native";
+import { useEffect, useState } from "react";
+import { Image, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { PetSleeping } from "../components/pet/PetSleeping";
 import BottomNav from "../components/ui/BottomNav";
 import RoundImageButton from "../components/ui/RoundImageButton";
 import TopHud from "../components/ui/TopHud";
+import { energyNow, minutesToFull } from "../lib/time";
 import { usePet } from "../store/pet";
-import { colors, space } from "../theme";
+import { colors, font, radius, space } from "../theme";
 
 const BACKGROUND = require("../assets/sleep/background.png");
 const BLANKET_OVERLAY = require("../assets/sleep/blanket-overlay.png");
@@ -19,18 +20,37 @@ const PET_TOP_PERCENT = 0.353;
 
 const ROUND_BUTTON_SIZE = 88;
 const NIGHT_TINT_COLOR = "rgba(24, 34, 92, 0.38)";
+const TIRED_ENOUGH = 45;
+const TICK_MS = 15000;
 
 export default function SleepScreen() {
   const { width, height } = useWindowDimensions();
   const motion = usePet((s) => s.settings.motion);
+  const petName = usePet((s) => s.name);
+  const energyBase = usePet((s) => s.energyBase);
+  const energyAt = usePet((s) => s.energyAt);
+  const asleep = usePet((s) => s.asleep);
+  const putToSleep = usePet((s) => s.putToSleep);
+  const wakeUp = usePet((s) => s.wakeUp);
 
-  const [asleep, setAsleep] = useState(false);
+  const [, setTick] = useState(0);
+
+  useEffect(() => {
+    if (!asleep) return;
+    const id = setInterval(() => setTick((n) => n + 1), TICK_MS);
+    return () => clearInterval(id);
+  }, [asleep]);
+
+  const energy = Math.round(energyNow(energyBase, energyAt, asleep));
+  const minutesLeft = minutesToFull(energyBase, energyAt, asleep);
+  const tired = energy < TIRED_ENOUGH;
 
   const petTop = height * PET_TOP_PERCENT;
   const petWidth = (width * PET_WIDTH_PERCENT) / 100;
 
   const handleToggle = () => {
-    setAsleep((prev) => !prev);
+    if (asleep) wakeUp();
+    else putToSleep();
   };
 
   return (
@@ -70,6 +90,20 @@ export default function SleepScreen() {
 
       <SafeAreaView style={styles.content} edges={["top"]} pointerEvents="box-none">
         <TopHud />
+
+        <View style={styles.hintSlot} pointerEvents="none">
+          <View style={styles.hint}>
+            <Text style={styles.hintText}>
+              {asleep && minutesLeft > 0
+                ? `${petName || "Питомец"} спит. Сил ${energy} из 100, полностью отдохнёт через ${minutesLeft} мин.`
+                : asleep
+                  ? `${petName || "Питомец"} выспался и полон сил`
+                  : tired
+                    ? `${petName || "Питомец"} клюёт носом — пора укладывать`
+                    : `${petName || "Питомец"} бодрый, сил ${energy} из 100`}
+            </Text>
+          </View>
+        </View>
       </SafeAreaView>
 
       <SafeAreaView style={styles.navSlot} edges={["bottom"]}>
@@ -92,4 +126,12 @@ const styles = StyleSheet.create({
     marginTop: -ROUND_BUTTON_SIZE / 2,
   },
   navSlot: { backgroundColor: colors.navActive },
+  hintSlot: { alignItems: "center", paddingHorizontal: space.lg, paddingTop: space.sm },
+  hint: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.pill,
+    paddingHorizontal: space.lg,
+    paddingVertical: space.sm,
+  },
+  hintText: { ...font.small, fontWeight: "700", color: colors.ink, textAlign: "center" },
 });
