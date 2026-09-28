@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import ChestNode from "../components/lessons/ChestNode";
 import ChestRewardModal from "../components/lessons/ChestRewardModal";
-import { LESSON_BG, LESSON_TITLE, SECTION_PALETTE } from "../components/lessons/lessonColors";
+import { SECTION_PALETTE } from "../components/lessons/lessonColors";
 import LessonCoin from "../components/lessons/LessonCoin";
 import PetGrewModal from "../components/lessons/PetGrewModal";
 import PetMarker from "../components/lessons/PetMarker";
@@ -24,7 +24,7 @@ import { ECONOMY } from "../data/economy";
 import { energyNow, minutesToFull } from "../lib/time";
 import { isLessonUnlocked, useLessons } from "../store/lessonsStore";
 import { usePet } from "../store/pet";
-import { colors, radius, space } from "../theme";
+import { colors, font, radius, space } from "../theme";
 
 const ENERGY_TICK_MS = 15000;
 
@@ -152,27 +152,29 @@ export default function GlossaryScreen() {
       <SafeAreaView style={styles.content} edges={["top"]}>
         <TopHud showStats={false} showChat={false} showWallet={false} />
 
-        <View style={styles.dailyBanner}>
-          <Text style={styles.dailyTitle}>Урок дня</Text>
-          <Pressable
-            style={styles.dailyButton}
-            onPress={() => {}}
-            accessibilityRole="button"
-            accessibilityLabel="Урок дня"
-          >
-            <ChevronRight size={20} color={colors.sceneOval} strokeWidth={3} />
-          </Pressable>
-        </View>
+        <Pressable
+          style={[styles.banner, { backgroundColor: colors.coinWant }]}
+          onPress={() => {}}
+          accessibilityRole="button"
+          accessibilityLabel="Урок дня"
+        >
+          <View style={[styles.bannerInner, { backgroundColor: colors.pillBorder }]}>
+            <Text style={styles.bannerTitle}>Урок дня</Text>
+            <View style={styles.bannerDivider} />
+            <ChevronRight size={24} color={colors.surface} strokeWidth={3} />
+          </View>
+        </Pressable>
 
         <Pressable
-          style={[styles.dailyBanner, styles.termsBanner]}
+          style={[styles.banner, styles.termsBanner, { backgroundColor: colors.coinDream }]}
           onPress={() => router.push("/terms" as any)}
           accessibilityRole="button"
           accessibilityLabel="Словарь"
         >
-          <Text style={styles.dailyTitle}>Словарь</Text>
-          <View style={styles.dailyButton}>
-            <BookOpen size={20} color={colors.sceneOval} strokeWidth={3} />
+          <View style={[styles.bannerInner, { backgroundColor: colors.coinDreamBg }]}>
+            <Text style={styles.bannerTitle}>Словарь</Text>
+            <View style={styles.bannerDivider} />
+            <BookOpen size={24} color={colors.surface} strokeWidth={3} />
           </View>
         </Pressable>
 
@@ -258,31 +260,31 @@ export default function GlossaryScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.surface, padding: 10},
+  root: { flex: 1, backgroundColor: colors.bg },
   content: { flex: 1 },
   navSlot: { backgroundColor: colors.navActive },
 
-  dailyBanner: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "80%",
+  banner: {
+    width: "90%",
     maxWidth: CONTENT_MAX_WIDTH,
     alignSelf: "center",
-    backgroundColor: LESSON_BG,
     borderRadius: radius.lg,
-    borderWidth: 5,
-    borderColor: colors.sceneOval,
-    marginVertical: 20,
-    paddingVertical: 5,
-    paddingHorizontal: 5,
+    marginVertical: 10,
   },
-  dailyTitle: { fontSize: 20, fontWeight: "600", color: LESSON_TITLE, marginLeft: 5 },
-  dailyButton: {
-    width: 40,
-    height: 40,
+  bannerInner: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    borderRadius: radius.lg,
+    paddingVertical: space.md,
+    paddingHorizontal: space.lg,
+    marginBottom: 6,
+  },
+  bannerTitle: { ...font.body, flex: 1, color: colors.surface, fontWeight: "800" },
+  bannerDivider: {
+    width: 2,
+    height: 28,
+    backgroundColor: "rgba(255, 255, 255, 0.4)",
+    marginHorizontal: space.md,
   },
   termsBanner: { marginTop: 0 },
 
@@ -291,7 +293,7 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: CONTENT_MAX_WIDTH,
     alignSelf: "center",
-    paddingHorizontal: 5,
+    paddingHorizontal: space.lg,
   },
 
   bandOuter: {

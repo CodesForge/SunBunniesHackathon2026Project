@@ -15,8 +15,8 @@ export const SECTION_PALETTE: Record<
   LessonSection,
   { header: string; body: string; title: string }
 > = {
-  1: { header: "#CAFFBF", body: "#ECFFE8", title: "#23C82E" },
-  2: { header: "#D5D9FF", body: "#E8EAFF", title: "#653EF0" },
-  3: { header: "#FFE1B0", body: "#FFF6E8", title: "#C97A00" },
-  4: { header: "#FFD2CB", body: "#FFF0ED", title: "#E14F39" },
+  1: { header: "#23C82E", body: "#ECFFE8", title: colors.surface },
+  2: { header: colors.pillBorder, body: "#E8EAFF", title: colors.surface },
+  3: { header: colors.coinDreamBg, body: "#FFF6E8", title: colors.surface },
+  4: { header: "#E14F39", body: "#FFF0ED", title: colors.surface },
 };
