@@ -25,16 +25,25 @@ const MAX_COINS = 12;
 const BORDER = 4;
 const COIN_LEFT_MIN = 14;
 const COIN_LEFT_MAX = 72;
-const COIN_BOTTOM_PAD = 8;
+const COIN_BOTTOM_MIN = 6;
+const COIN_BOTTOM_MAX = 34;
+const GOLDEN_RATIO_CONJUGATE = 0.6180339887;
 
 function seededRandom(seed: number) {
   const x = Math.sin(seed * 9973) * 43758.5453;
   return x - Math.floor(x);
 }
-const COIN_SLOTS = Array.from({ length: MAX_COINS }, (_, i) => ({
-  leftPercent: COIN_LEFT_MIN + seededRandom(i * 2 + 1) * (COIN_LEFT_MAX - COIN_LEFT_MIN),
-  bottom: COIN_BOTTOM_PAD + seededRandom(i * 2 + 2) * (JAR_HEIGHT - 2 * COIN_BOTTOM_PAD - COIN_SIZE),
-}));
+const COIN_SLOTS = Array.from({ length: MAX_COINS }, (_, i) => {
+  const leftFrac = (i * GOLDEN_RATIO_CONJUGATE) % 1;
+  const leftJitter = (seededRandom(i * 2 + 1) - 0.5) * 6;
+  return {
+    leftPercent: Math.min(
+      COIN_LEFT_MAX,
+      Math.max(COIN_LEFT_MIN, COIN_LEFT_MIN + leftFrac * (COIN_LEFT_MAX - COIN_LEFT_MIN) + leftJitter),
+    ),
+    bottom: COIN_BOTTOM_MIN + seededRandom(i * 2 + 2) * (COIN_BOTTOM_MAX - COIN_BOTTOM_MIN),
+  };
+});
 
 export default function JarCard({
   title,
