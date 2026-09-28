@@ -22,6 +22,18 @@ const NECK_HEIGHT = 8;
 const COIN_SIZE = 14;
 const MAX_COINS = 12;
 const BORDER = 4;
+const COIN_LEFT_MIN = 8;
+const COIN_LEFT_MAX = 82;
+const COIN_BOTTOM_PAD = 6;
+
+function seededRandom(seed: number) {
+  const x = Math.sin(seed * 9973) * 43758.5453;
+  return x - Math.floor(x);
+}
+const COIN_SLOTS = Array.from({ length: MAX_COINS }, (_, i) => ({
+  leftPercent: COIN_LEFT_MIN + seededRandom(i * 2 + 1) * (COIN_LEFT_MAX - COIN_LEFT_MIN),
+  bottom: COIN_BOTTOM_PAD + seededRandom(i * 2 + 2) * (JAR_HEIGHT - 2 * COIN_BOTTOM_PAD - COIN_SIZE),
+}));
 
 export default function JarCard({
   title,
@@ -57,11 +69,15 @@ export default function JarCard({
         <View style={[styles.lid, { backgroundColor: color }]} />
         <View style={[styles.neck, { borderColor: color }]} />
         <View style={[styles.jar, { borderColor: color }]}>
-          <View style={styles.coins}>
-            {Array.from({ length: coins }, (_, i) => (
-              <View key={i} style={styles.coin} />
-            ))}
-          </View>
+          {Array.from({ length: coins }, (_, i) => (
+            <View
+              key={i}
+              style={[
+                styles.coin,
+                { left: `${COIN_SLOTS[i].leftPercent}%`, bottom: COIN_SLOTS[i].bottom },
+              ]}
+            />
+          ))}
         </View>
       </View>
 
@@ -141,15 +157,8 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     justifyContent: "flex-end",
   },
-  coins: {
-    flexDirection: "row",
-    flexWrap: "wrap-reverse",
-    justifyContent: "center",
-    alignItems: "flex-end",
-    gap: 3,
-    padding: 5,
-  },
   coin: {
+    position: "absolute",
     width: COIN_SIZE,
     height: COIN_SIZE,
     borderRadius: COIN_SIZE / 2,
