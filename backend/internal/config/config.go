@@ -15,6 +15,7 @@ type Config struct {
 	KafkaProducerConfig
 	KafkaConsumerConfig
 	PostgresConfig
+	gRPCConfig
 }
 
 type AppConfig struct {
@@ -49,6 +50,11 @@ type KafkaConsumerConfig struct {
 	MaxWait        time.Duration `env:"KAFKA_CONSUMER_MAX_WAIT" envDefault:"250ms"`     // макс. время ожидания наполнения MinBytes
 	CommitInterval time.Duration `env:"KAFKA_CONSUMER_COMMIT_INTERVAL" envDefault:"1s"` // периодичность автокоммита оффсетов
 	StartOffset    string        `env:"KAFKA_CONSUMER_START_OFFSET" envDefault:"first"` // "first" (earliest) или "last" (latest)
+}
+
+type gRPCConfig struct {
+	TargetAddr string        `env:"GRPC_TARGET_ADDR" envDefault:"localhost:50051"`
+	Timeout    time.Duration `env:"GRPC_TIMEOUT" envDefault:"5s"`
 }
 
 func (p PostgresConfig) DSN() string {
