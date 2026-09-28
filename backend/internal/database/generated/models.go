@@ -9,6 +9,17 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type Balance struct {
+	ID                    uuid.UUID          `json:"id"`
+	UserID                uuid.UUID          `json:"user_id"`
+	MandatoryExpenses     int64              `json:"mandatory_expenses"`
+	DiscretionaryExpenses int64              `json:"discretionary_expenses"`
+	DreamSavings          int64              `json:"dream_savings"`
+	TotalSpent            int64              `json:"total_spent"`
+	CreatedAt             pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt             pgtype.Timestamptz `json:"updated_at"`
+}
+
 type Event struct {
 	GlobalOffset  int64              `json:"global_offset"`
 	AggregateID   string             `json:"aggregate_id"`
@@ -17,6 +28,26 @@ type Event struct {
 	EventType     string             `json:"event_type"`
 	Payload       []byte             `json:"payload"`
 	CreatedAt     pgtype.Timestamptz `json:"created_at"`
+}
+
+type Lesson struct {
+	ID                    uuid.UUID          `json:"id"`
+	UserID                uuid.UUID          `json:"user_id"`
+	CompletedLessonsCount int32              `json:"completed_lessons_count"`
+	CreatedAt             pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt             pgtype.Timestamptz `json:"updated_at"`
+}
+
+type Pet struct {
+	ID                uuid.UUID          `json:"id"`
+	UserID            uuid.UUID          `json:"user_id"`
+	Name              string             `json:"name"`
+	HungerPoints      int16              `json:"hunger_points"`
+	SleepPoints       int16              `json:"sleep_points"`
+	MandatoryExpenses int64              `json:"mandatory_expenses"`
+	OptionalExpenses  int64              `json:"optional_expenses"`
+	CreatedAt         pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt         pgtype.Timestamptz `json:"updated_at"`
 }
 
 type User struct {
