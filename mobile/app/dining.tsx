@@ -11,7 +11,7 @@ import BottomNav from "../components/ui/BottomNav";
 import Modal from "../components/ui/Modal";
 import TopHud from "../components/ui/TopHud";
 import { FOOD_ITEMS } from "../data/food";
-import { getPetStage } from "../components/pet/petAssets";
+import { getPetStage, PET_ASSETS } from "../components/pet/petAssets";
 import { resolveWornVisuals } from "../data/wardrobe";
 import { fullness } from "../lib/time";
 import { usePet } from "../store/pet";
@@ -19,7 +19,6 @@ import { colors, space } from "../theme";
 
 const PET_WIDTH_PERCENT = 76;
 const PET_TOP_PERCENT = 0.29;
-const PET_RIGHT_SHIFT_PERCENT = 15;
 const PLATE_WIDTH_PERCENT = 0.3;
 const FULL_ENOUGH = 80;
 
@@ -51,8 +50,9 @@ export default function DiningScreen() {
   };
 
   const petW = (width * PET_WIDTH_PERCENT) / 100;
+  const petCoreW = petW * (PET_ASSETS[species ?? "cat"][stage]?.coreWidth ?? 1);
   const petTop = height * PET_TOP_PERCENT;
-  const petLeft = (width - petW) / 2 + (width * PET_RIGHT_SHIFT_PERCENT) / 100;
+  const petLeft = (width - petCoreW) / 2;
   const plateSize = width * PLATE_WIDTH_PERCENT;
 
   // На стол попадают только реально купленные продукты (foodOwned > 0).
