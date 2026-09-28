@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
-import { ChevronRight } from "lucide-react-native";
+import { BookOpen, ChevronRight } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import ChestNode from "../components/lessons/ChestNode";
@@ -164,6 +164,18 @@ export default function GlossaryScreen() {
           </Pressable>
         </View>
 
+        <Pressable
+          style={[styles.dailyBanner, styles.termsBanner]}
+          onPress={() => router.push("/terms" as any)}
+          accessibilityRole="button"
+          accessibilityLabel="Словарь"
+        >
+          <Text style={styles.dailyTitle}>Словарь</Text>
+          <View style={styles.dailyButton}>
+            <BookOpen size={20} color={colors.sceneOval} strokeWidth={3} />
+          </View>
+        </Pressable>
+
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           <View style={styles.pathOuter}>
             {BLOCKS.map((block) => {
@@ -272,6 +284,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  termsBanner: { marginTop: 0 },
 
   scrollContent: { paddingTop: 5, paddingBottom: 60 },
   pathOuter: {
