@@ -151,7 +151,7 @@ export default function PlanScreen() {
           <View style={styles.starCircle}>
             <Image source={CIRCLE_LARGE} style={styles.starCircleBg} resizeMode="contain" />
             <Star
-              size={36}
+              size={24}
               color={colors.coinDreamBg}
               fill={colors.coinDreamBg}
               strokeWidth={2}
@@ -306,15 +306,15 @@ const styles = StyleSheet.create({
 
   budgetRow: { flexDirection: "row", alignItems: "center", gap: space.md },
   starCircle: {
-    width: 88,
-    height: 88,
+    width: 64,
+    height: 64,
     alignItems: "center",
     justifyContent: "center",
   },
   starCircleBg: {
     position: "absolute",
-    width: 88,
-    height: 88,
+    width: 64,
+    height: 64,
   },
   budgetText: { flex: 1 },
   budgetLabel: { ...font.small, fontWeight: "700", color: colors.muted },
