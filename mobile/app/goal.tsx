@@ -21,7 +21,6 @@ const COIN_DREAM = require("../assets/icons/coin-dream.png");
 const BOARD_BACKGROUND = require("../assets/goals/board-background.png");
 
 const GOAL_IMAGES: Record<string, ImageSourcePropType> = {
-  ball: require("../assets/goals/ball.png"),
   guitar: require("../assets/goals/guitar.png"),
   skate: require("../assets/goals/skate.png"),
   scooter: require("../assets/goals/scooter.png"),
