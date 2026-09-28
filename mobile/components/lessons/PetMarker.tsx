@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 import { Animated, Easing } from "react-native";
 import { Star } from "lucide-react-native";
 
+import { useMotion } from "../../lib/useMotion";
+
 const SIZE = 32;
 const FLOAT_DISTANCE = 6;
 const FLOAT_DURATION = 900;
@@ -9,8 +11,15 @@ const FLOAT_DURATION = 900;
 export default function PetMarker() {
   const opacity = useRef(new Animated.Value(0)).current;
   const float = useRef(new Animated.Value(0)).current;
+  const motion = useMotion();
 
   useEffect(() => {
+    if (!motion) {
+      opacity.setValue(1);
+      float.setValue(0);
+      return;
+    }
+
     Animated.timing(opacity, { toValue: 1, duration: 280, useNativeDriver: true }).start();
 
     const loop = Animated.loop(
@@ -32,7 +41,7 @@ export default function PetMarker() {
     loop.start();
 
     return () => loop.stop();
-  }, [opacity, float]);
+  }, [motion, opacity, float]);
 
   const translateY = float.interpolate({
     inputRange: [0, 1],

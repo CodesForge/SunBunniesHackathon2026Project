@@ -41,7 +41,7 @@ export const font = {
   h1: { fontSize: 28, fontWeight: "800" as const, lineHeight: 34 },
   h2: { fontSize: 20, fontWeight: "800" as const, lineHeight: 26 },
   body: { fontSize: 16, lineHeight: 24 },
-  small: { fontSize: 13, lineHeight: 18 },
+  small: { fontSize: 16, lineHeight: 22 },
 };
 
 export const HIT = 48;

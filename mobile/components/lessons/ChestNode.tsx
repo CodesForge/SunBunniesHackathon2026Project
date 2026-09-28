@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Animated, Image, Pressable, StyleSheet, Text, View } from "react-native";
 
+import { useMotion } from "../../lib/useMotion";
 import { colors, font } from "../../theme";
 
 const CHEST_CLOSED_IMAGE = require("../../assets/lessons/chest-closed.png");
@@ -20,9 +21,13 @@ type Props = {
 
 export default function ChestNode({ state, onPress, size = CHEST_SIZE }: Props) {
   const bounce = useRef(new Animated.Value(0)).current;
+  const motion = useMotion();
 
   useEffect(() => {
-    if (state !== "ready") return;
+    if (state !== "ready" || !motion) {
+      bounce.setValue(0);
+      return;
+    }
     const loop = Animated.loop(
       Animated.sequence([
         Animated.timing(bounce, { toValue: 1, duration: 420, useNativeDriver: true }),
@@ -31,7 +36,7 @@ export default function ChestNode({ state, onPress, size = CHEST_SIZE }: Props) 
     );
     loop.start();
     return () => loop.stop();
-  }, [state, bounce]);
+  }, [state, motion, bounce]);
 
   const scale = bounce.interpolate({ inputRange: [0, 1], outputRange: [1, 1.12] });
   const image = state === "opened" ? CHEST_OPEN_IMAGE : CHEST_CLOSED_IMAGE;
