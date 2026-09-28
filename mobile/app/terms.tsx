@@ -9,10 +9,6 @@ import { colors, font, radius, space } from "../theme";
 
 const CONTENT_MAX_WIDTH = 480;
 
-/**
- * Словарь терминов. Определения собраны из текстов уроков, поэтому
- * говорят с ребёнком теми же словами. Открывается с карты уроков.
- */
 export default function TermsScreen() {
   return (
     <View style={styles.root}>

@@ -10,6 +10,10 @@ export const ECONOMY = {
   xpPerQuest: 1,
   teenLevel: 6,
   adultLevel: 13,
+  // Сколько недель, прожитых по плану, нужно вдобавок к очкам роста.
+  // Уроками их заменить нельзя — иначе питомец взрослеет мимо бюджета.
+  teenPeriods: 1,
+  adultPeriods: 2,
   parentBonus: 200,
   chestReward: 150,
   lessonTiredness: 30,

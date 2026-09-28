@@ -9,7 +9,7 @@ import { colors, font, radius, HIT } from "../../theme";
 
 type Props = {
   data: QuestionsStepData;
-  onDone: (mistakes: number) => void;
+  onDone: (mistakes: number, wrongQuestionIds?: string[]) => void;
   onStep?: () => void;
 };
 
@@ -30,6 +30,7 @@ export default function QuestionsTask({ data, onDone, onStep }: Props) {
   const [index, setIndex] = useState(0);
   const [answeredIndex, setAnsweredIndex] = useState<number | null>(null);
   const mistakes = useRef(0);
+  const wrongIds = useRef<string[]>([]);
   const history = usePet((s) => s.history);
   const grantJars = usePet((s) => s.grantJars);
 
@@ -56,7 +57,10 @@ export default function QuestionsTask({ data, onDone, onStep }: Props) {
       grantJars({ want: delta });
       return;
     }
-    if (!isCorrect(optionIndex)) mistakes.current += 1;
+    if (!isCorrect(optionIndex)) {
+      mistakes.current += 1;
+      wrongIds.current.push(question.id);
+    }
   };
 
   const next = () => {
@@ -65,7 +69,7 @@ export default function QuestionsTask({ data, onDone, onStep }: Props) {
       setIndex(index + 1);
       onStep?.();
     } else {
-      onDone(mistakes.current);
+      onDone(mistakes.current, wrongIds.current);
     }
   };
 

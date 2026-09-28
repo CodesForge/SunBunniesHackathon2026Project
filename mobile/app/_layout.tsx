@@ -10,8 +10,6 @@ export default function RootLayout() {
   usePeriodIncome();
   const motion = useMotion();
 
-  // Когда анимации выключены, reanimated сразу ставит конечное значение
-  // вместо проигрывания, а экраны перестают выезжать.
   const screenAnimation = motion ? "slide_from_right" : "none";
 
   return (

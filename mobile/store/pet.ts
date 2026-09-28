@@ -28,6 +28,8 @@ type State = {
   lastFedAt: number;
   lastSleptAt: number;
   periodIndex: number;
+  /** Сколько периодов прожито в соответствии с планом. */
+  keptPeriods: number;
 
   energyBase: number;
   energyAt: number;
@@ -91,6 +93,7 @@ const initial: State = {
   lastFedAt: 0,
   lastSleptAt: 0,
   periodIndex: 1,
+  keptPeriods: 0,
   energyBase: 100,
   energyAt: Date.now(),
   asleep: false,
@@ -379,6 +382,7 @@ export const usePet = create<State & Actions>()(
               },
             ].slice(-8),
             xp: kept ? s.xp + 1 : s.xp,
+            keptPeriods: kept ? s.keptPeriods + 1 : s.keptPeriods,
             periodIndex: s.periodIndex + 1,
             plan: { ...EMPTY },
             unallocated: s.unallocated + ECONOMY.weeklyIncome,
