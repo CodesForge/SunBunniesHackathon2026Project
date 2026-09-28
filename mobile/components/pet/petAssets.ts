@@ -12,6 +12,7 @@ export type PetAssetSet = {
   armLeft: ImageSourcePropType;
   armRight: ImageSourcePropType;
   belly: ImageSourcePropType;
+  diaper?: ImageSourcePropType;
   eyesOpen: ImageSourcePropType;
   eyesClosed: ImageSourcePropType;
   mouth: Record<MouthKey, ImageSourcePropType>;
@@ -166,6 +167,32 @@ const DOG_ADULT: PetAssetSet = {
   bodyWearHeight: 0.16,
 };
 
+const DOG_MINI: PetAssetSet = {
+  body: require("../../assets/pets/dog/mini/body.png"),
+  tail: require("../../assets/pets/dog/mini/tail.png"),
+  armLeft: require("../../assets/pets/dog/mini/arm-left.png"),
+  armRight: require("../../assets/pets/dog/mini/arm-right.png"),
+  belly: require("../../assets/pets/dog/mini/belly.png"),
+  diaper: require("../../assets/pets/dog/mini/diaper.png"),
+  eyesOpen: require("../../assets/pets/dog/mini/eyes-open.png"),
+  eyesClosed: require("../../assets/pets/dog/mini/eyes-closed.png"),
+  mouth: {
+    happy: require("../../assets/pets/dog/mini/mouth-happy.png"),
+    neutral: require("../../assets/pets/dog/mini/mouth-neutural.png"),
+    sad: require("../../assets/pets/dog/mini/mouth-sad.png"),
+  },
+  aspect: 2309 / 1707,
+  coreLeft: 100 / 1707,
+  coreWidth: 1523 / 1707,
+  armLeftOrigin: "47% 60%",
+  armRightOrigin: "54% 61%",
+  tailOrigin: "51% 79%",
+  bodyWearLeft: 0.32,
+  bodyWearTop: 0.70,
+  bodyWearWidth: 0.36,
+  bodyWearHeight: 0.16,
+};
+
 export const PET_ASSETS: Record<PetSpecies, Partial<Record<PetAgeStage, PetAssetSet>>> = {
   cat: {
     mini: CAT_MINI,
@@ -173,6 +200,7 @@ export const PET_ASSETS: Record<PetSpecies, Partial<Record<PetAgeStage, PetAsset
     adult: CAT_ADULT,
   },
   dog: {
+    mini: DOG_MINI,
     teen: DOG_TEEN,
     adult: DOG_ADULT,
   },
@@ -183,3 +211,47 @@ export function getPetStage(xp: number): PetAgeStage {
   if (xp >= ECONOMY.teenLevel) return "teen";
   return "mini";
 }
+
+export type SleepAssetSet = {
+  body: ImageSourcePropType;
+  eyesOpen: ImageSourcePropType;
+  eyesClosed: ImageSourcePropType;
+  mouthOpen: ImageSourcePropType;
+  mouthClosed: ImageSourcePropType;
+  aspect: number;
+  eyesOpenRect: { left: number; top: number; width: number; height: number };
+  eyesClosedRect: { left: number; top: number; width: number; height: number };
+  mouthClosedRect: { left: number; top: number; width: number; height: number };
+  mouthOpenRect: { left: number; top: number; width: number; height: number };
+};
+
+const CAT_SLEEP: SleepAssetSet = {
+  body: require("../../assets/sleep/body.png"),
+  eyesOpen: require("../../assets/sleep/eyes-open.png"),
+  eyesClosed: require("../../assets/sleep/eyes-closed.png"),
+  mouthOpen: require("../../assets/sleep/mouth-open.png"),
+  mouthClosed: require("../../assets/sleep/mouth-closed.png"),
+  aspect: 1025 / 1772,
+  eyesOpenRect: { left: 0.3832, top: 0.4712, width: 0.2297, height: 0.0829 },
+  eyesClosedRect: { left: 0.3832, top: 0.4712, width: 0.2297, height: 0.0829 },
+  mouthClosedRect: { left: 0.4024, top: 0.4976, width: 0.1868, height: 0.1698 },
+  mouthOpenRect: { left: 0.4024, top: 0.4976, width: 0.1868, height: 0.2351 },
+};
+
+const DOG_SLEEP: SleepAssetSet = {
+  body: require("../../assets/sleep/dog/body.png"),
+  eyesOpen: require("../../assets/sleep/dog/eyes-open.png"),
+  eyesClosed: require("../../assets/sleep/dog/eyes-closed.png"),
+  mouthOpen: require("../../assets/sleep/dog/mouth-open.png"),
+  mouthClosed: require("../../assets/sleep/dog/mouth-closed.png"),
+  aspect: 1161 / 1772,
+  eyesOpenRect: { left: 0.3900, top: 0.4936, width: 0.2206, height: 0.0594 },
+  eyesClosedRect: { left: 0.3877, top: 0.5194, width: 0.2218, height: 0.0345 },
+  mouthClosedRect: { left: 0.4261, top: 0.5116, width: 0.1445, height: 0.1275 },
+  mouthOpenRect: { left: 0.4244, top: 0.5150, width: 0.1507, height: 0.1981 },
+};
+
+export const SLEEP_ASSETS: Record<PetSpecies, SleepAssetSet> = {
+  cat: CAT_SLEEP,
+  dog: DOG_SLEEP,
+};

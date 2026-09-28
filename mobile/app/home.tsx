@@ -15,6 +15,7 @@ const PET_LIFT = 28;
 export default function HomeScreen() {
   const { width, height } = useWindowDimensions();
 
+  const species = usePet((s) => s.species);
   const lastFedAt = usePet((s) => s.lastFedAt);
   const energyBase = usePet((s) => s.energyBase);
   const energyAt = usePet((s) => s.energyAt);
@@ -45,7 +46,7 @@ export default function HomeScreen() {
 
         <View style={styles.petSlot} pointerEvents="none">
           <PetMini
-            species="cat"
+            species={species ?? "cat"}
             widthPercent={78}
             mouth={mouth}
             animated={motion}

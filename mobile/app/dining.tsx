@@ -25,6 +25,7 @@ const FULL_ENOUGH = 80;
 
 export default function DiningScreen() {
   const { width, height } = useWindowDimensions();
+  const species = usePet((s) => s.species);
   const foodOwned = usePet((s) => s.foodOwned);
   const feed = usePet((s) => s.feed);
   const lastFedAt = usePet((s) => s.lastFedAt);
@@ -76,7 +77,7 @@ export default function DiningScreen() {
         pointerEvents="none"
       >
         <PetMini
-          species="cat"
+          species={species ?? "cat"}
           widthPercent={PET_WIDTH_PERCENT}
           mouth={mouth}
           eyesOpen

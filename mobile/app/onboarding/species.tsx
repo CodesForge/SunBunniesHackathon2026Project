@@ -1,13 +1,6 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import Animated, {
-  Easing,
-  FadeIn,
-  FadeOut,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import {
   Image,
   type ImageSourcePropType,
@@ -24,7 +17,6 @@ import { RoundButton } from "../../components/onboarding/buttons";
 import { BigOval, Clouds, Leaves, ONB, SkyBackground } from "../../components/onboarding/scene";
 import { PetMini } from "../../components/pet/PetMini";
 import { PET_ASSETS } from "../../components/pet/petAssets";
-import { PetIcon } from "../../components/pet/PetIcon";
 import { colors, font, space } from "../../theme";
 import { usePet } from "../../store/pet";
 
@@ -37,9 +29,6 @@ const COIN_SURFACE = 0.45;
 const CAT_WIDTH = 58;
 const CAT_FEET = 0.891;
 
-const CAROUSEL_OFFSETS = [-2, -1, 0, 1, 2];
-const CAROUSEL_SIZES = [34, 46, 60, 46, 34];
-const CAROUSEL_STEP = 54;
 const ARROW_SIZE = 44;
 
 const ARROW_LEFT = require("../../assets/icons/white-arrow-left.png");
@@ -55,11 +44,7 @@ type PetOption = {
 
 const PETS: PetOption[] = [
   { key: "cat", title: "Кот", species: "cat", ready: true, icon: require("../../assets/icons/pet-icons/cat.png") },
-  { key: "dog", title: "Собака", species: "dog", ready: false, icon: require("../../assets/icons/pet-icons/dog.png") },
-  { key: "hamster", title: "Хомяк", ready: false, icon: require("../../assets/icons/pet-icons/hamster.png") },
-  { key: "fox", title: "Лиса", ready: false, icon: require("../../assets/icons/pet-icons/fox.png") },
-  { key: "mouse", title: "Мышка", ready: false, icon: require("../../assets/icons/pet-icons/mouse.png") },
-  { key: "bunny", title: "Зайка", ready: false, icon: require("../../assets/icons/pet-icons/bunny.png") },
+  { key: "dog", title: "Собака", species: "dog", ready: true, icon: require("../../assets/icons/pet-icons/dog.png") },
 ];
 
 function mod(n: number, m: number) {
@@ -79,17 +64,9 @@ export default function ChooseSpeciesScreen() {
   const nameOk = trimmedName.length >= MIN && trimmedName.length <= MAX;
   const canGo = pet.ready && !!pet.species && nameOk;
 
-  const rowShift = useSharedValue(0);
-
   const move = (delta: number) => {
-    rowShift.value = delta * CAROUSEL_STEP;
-    rowShift.value = withTiming(0, { duration: 260, easing: Easing.out(Easing.cubic) });
     setIndex((i) => i + delta);
   };
-
-  const rowStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: rowShift.value }],
-  }));
 
   const finish = () => {
     if (!canGo || !pet.species) return;
@@ -101,8 +78,11 @@ export default function ChooseSpeciesScreen() {
   const coinH = (coinW * 647) / 1146;
   const coinTop = height * COIN_TOP;
 
+  const previewSpecies = pet.species ?? "cat";
+  const previewAssets = PET_ASSETS[previewSpecies].mini ?? PET_ASSETS[previewSpecies].adult ?? PET_ASSETS[previewSpecies].teen;
+
   const catW = (width * CAT_WIDTH) / 100;
-  const catH = catW * PET_ASSETS.cat.mini!.aspect;
+  const catH = catW * previewAssets!.aspect;
   const catTop = coinTop + coinH * COIN_SURFACE - catH * CAT_FEET;
 
   const arrowsTop = coinTop - coinH * 0.2;
@@ -113,22 +93,6 @@ export default function ChooseSpeciesScreen() {
       <Clouds />
       <BigOval top={ONB.ovalHigh} />
       <Leaves source={require("../../assets/items/first-enter/coins-and-leaves-choose.png")} mode="in" />
-
-      <SafeAreaView style={styles.safe} edges={["top"]} pointerEvents="box-none">
-        <Animated.View style={[styles.carousel, rowStyle]}>
-          {CAROUSEL_OFFSETS.map((offset) => {
-            const i = mod(index + offset, PETS.length);
-            const slot = PETS[i];
-            const size = CAROUSEL_SIZES[offset + 2];
-            const isCenter = offset === 0;
-            return (
-              <Pressable key={`${slot.key}-${offset}`} onPress={() => move(offset)} hitSlop={4}>
-                <PetIcon icon={slot.icon} size={size} active={isCenter} />
-              </Pressable>
-            );
-          })}
-        </Animated.View>
-      </SafeAreaView>
 
       <View style={[styles.centerRow, { top: coinTop }]} pointerEvents="none">
         <Image
@@ -141,7 +105,7 @@ export default function ChooseSpeciesScreen() {
       <View style={[styles.centerRow, { top: catTop }]} pointerEvents="none">
         <Animated.View key={pet.key} entering={FadeIn.duration(220)} exiting={FadeOut.duration(160)}>
           {pet.ready ? (
-            <PetMini species="cat" widthPercent={CAT_WIDTH} mouth="happy" eyesOpen />
+            <PetMini species={previewSpecies} widthPercent={CAT_WIDTH} mouth="happy" eyesOpen />
           ) : (
             <View style={[styles.stub, { width: catW, height: catH }]}>
               <Image source={pet.icon} style={{ width: catW * 0.5, height: catW * 0.5 }} resizeMode="contain" />
@@ -254,12 +218,5 @@ const styles = StyleSheet.create({
     opacity: 0.9,
   },
   nextSlot: { marginTop: space.md },
-  carousel: {
-    marginTop: space.lg,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: space.sm,
-  },
 });
 
