@@ -6,11 +6,19 @@ package db
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 type Querier interface {
+	CreateBalance(ctx context.Context, arg CreateBalanceParams) (Balance, error)
 	CreateEvent(ctx context.Context, arg CreateEventParams) error
+	CreateLesson(ctx context.Context, arg CreateLessonParams) (Lesson, error)
+	CreatePet(ctx context.Context, arg CreatePetParams) (Pet, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	GetBalanceByUserID(ctx context.Context, userID uuid.UUID) (Balance, error)
+	GetLessonByUserID(ctx context.Context, userID uuid.UUID) (Lesson, error)
+	GetPetByUserID(ctx context.Context, userID uuid.UUID) (Pet, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
 }
 
