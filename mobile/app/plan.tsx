@@ -223,8 +223,8 @@ export default function PlanScreen() {
       <SafeAreaView edges={["bottom"]} style={styles.footer}>
         <View style={styles.bubbleRow}>
           <Image
-            source={require("../assets/plan/boy-wave.png")}
-            style={styles.boyWave}
+            source={require("../assets/plan/boy-peek.png")}
+            style={styles.boyPeek}
             resizeMode="contain"
           />
           <SpeechBubble text={hint} />
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
     gap: space.lg,
   },
   bubbleRow: { flexDirection: "row", alignItems: "flex-end", gap: space.sm },
-  boyWave: { width: 118, height: 98 },
+  boyPeek: { width: 150, height: 86 },
 
   confirm: {
     minHeight: HIT + 6,
