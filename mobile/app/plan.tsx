@@ -347,7 +347,12 @@ const styles = StyleSheet.create({
 
   divider: { height: 3, backgroundColor: colors.line, borderRadius: 2 },
 
-  jars: { flexDirection: "row", gap: space.sm, alignItems: "stretch" },
+  jars: {
+    flexDirection: "row",
+    gap: space.sm,
+    alignItems: "stretch",
+    justifyContent: "center",
+  },
 
   footer: {
     paddingHorizontal: space.lg,

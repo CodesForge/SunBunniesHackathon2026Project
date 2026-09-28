@@ -105,6 +105,7 @@ export default function JarCard({
 const styles = StyleSheet.create({
   card: {
     flex: 1,
+    maxWidth: 160,
     borderWidth: BORDER,
     borderRadius: radius.lg,
     paddingVertical: space.md,
