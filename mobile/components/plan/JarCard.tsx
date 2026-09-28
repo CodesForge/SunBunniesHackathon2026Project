@@ -35,16 +35,16 @@ function seededRandom(seed: number) {
   return x - Math.floor(x);
 }
 
-const CELL_WIDTH = (COIN_LEFT_MAX - COIN_LEFT_MIN) / COIN_GRID_COLS;
-const CELL_HEIGHT = (COIN_BOTTOM_MAX - COIN_BOTTOM_MIN) / COIN_GRID_ROWS;
+const COL_STEP = (COIN_LEFT_MAX - COIN_LEFT_MIN) / (COIN_GRID_COLS - 1);
+const ROW_STEP = (COIN_BOTTOM_MAX - COIN_BOTTOM_MIN) / (COIN_GRID_ROWS - 1);
 const COIN_SLOTS = Array.from({ length: MAX_COINS }, (_, i) => {
   const col = i % COIN_GRID_COLS;
   const row = Math.floor(i / COIN_GRID_COLS);
-  const leftJitter = (seededRandom(i * 2 + 1) - 0.5) * CELL_WIDTH * 0.7;
-  const bottomJitter = (seededRandom(i * 2 + 2) - 0.5) * CELL_HEIGHT * 0.7;
+  const leftJitter = (seededRandom(i * 2 + 1) - 0.5) * COL_STEP * 0.25;
+  const bottomJitter = (seededRandom(i * 2 + 2) - 0.5) * ROW_STEP * 0.25;
   return {
-    leftPercent: COIN_LEFT_MIN + (col + 0.5) * CELL_WIDTH + leftJitter,
-    bottom: COIN_BOTTOM_MIN + (row + 0.5) * CELL_HEIGHT + bottomJitter,
+    leftPercent: COIN_LEFT_MIN + col * COL_STEP + leftJitter,
+    bottom: COIN_BOTTOM_MIN + row * ROW_STEP + bottomJitter,
   };
 });
 
