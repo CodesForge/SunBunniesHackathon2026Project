@@ -150,12 +150,14 @@ export default function PlanScreen() {
         <View style={styles.budgetRow}>
           <View style={styles.starCircle}>
             <Image source={CIRCLE_LARGE} style={styles.starCircleBg} resizeMode="contain" />
-            <Star
-              size={24}
-              color={colors.coinDreamBg}
-              fill={colors.coinDreamBg}
-              strokeWidth={2}
-            />
+            <View style={styles.starIconWrap}>
+              <Star
+                size={24}
+                color={colors.coinDreamBg}
+                fill={colors.coinDreamBg}
+                strokeWidth={2}
+              />
+            </View>
           </View>
 
           <View style={styles.budgetText}>
@@ -172,7 +174,7 @@ export default function PlanScreen() {
             accessibilityLabel="Доска желаний"
           >
             <Text style={styles.wishesText}>Доска{"\n"}Желаний</Text>
-            <ChevronRight size={22} color={colors.navActive} strokeWidth={3.5} />
+            <ChevronRight size={22} color={colors.iconBorder} strokeWidth={3.5} />
           </Pressable>
         </View>
 
@@ -315,6 +317,11 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 64,
     height: 64,
+    zIndex: 0,
+  },
+  starIconWrap: {
+    zIndex: 1,
+    elevation: 1,
   },
   budgetText: { flex: 1 },
   budgetLabel: { ...font.small, fontWeight: "700", color: colors.muted },
@@ -333,7 +340,7 @@ const styles = StyleSheet.create({
   wishesText: {
     fontSize: 14,
     fontWeight: "800",
-    color: colors.navActive,
+    color: colors.iconBorder,
     textAlign: "center",
   },
 
