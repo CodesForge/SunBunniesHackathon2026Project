@@ -3,6 +3,7 @@ import { Animated, Modal as RNModal, Pressable, StyleSheet, Text, View } from "r
 import { PackageOpen, X } from "lucide-react-native";
 
 import { ECONOMY } from "../../data/economy";
+import { useMotion } from "../../lib/useMotion";
 import { colors, font, radius, space } from "../../theme";
 
 type Props = {
@@ -15,9 +16,19 @@ export default function ChestRewardModal({ visible, onClose }: Props) {
   const coin1 = useRef(new Animated.Value(0)).current;
   const coin2 = useRef(new Animated.Value(0)).current;
   const coin3 = useRef(new Animated.Value(0)).current;
+  const motion = useMotion();
 
   useEffect(() => {
     if (!visible) return;
+
+    if (!motion) {
+      chestScale.setValue(1);
+      coin1.setValue(1);
+      coin2.setValue(1);
+      coin3.setValue(1);
+      return;
+    }
+
     chestScale.setValue(0);
     coin1.setValue(0);
     coin2.setValue(0);
@@ -31,7 +42,7 @@ export default function ChestRewardModal({ visible, onClose }: Props) {
         Animated.timing(coin3, { toValue: 1, duration: 420, useNativeDriver: true }),
       ]),
     ]).start();
-  }, [visible, chestScale, coin1, coin2, coin3]);
+  }, [visible, motion, chestScale, coin1, coin2, coin3]);
 
   const coinStyle = (v: Animated.Value) => ({
     opacity: v,
@@ -42,7 +53,7 @@ export default function ChestRewardModal({ visible, onClose }: Props) {
   });
 
   return (
-    <RNModal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <RNModal visible={visible} transparent animationType={motion ? "fade" : "none"} onRequestClose={onClose}>
       <View style={styles.backdrop}>
         <View style={styles.card}>
           <Pressable style={styles.closeBtn} onPress={onClose} accessibilityRole="button" accessibilityLabel="Закрыть">
