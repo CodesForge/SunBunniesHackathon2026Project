@@ -34,7 +34,7 @@ func (e UserCreatedEvent) EventName() string {
 
 func (e UserCreatedEvent) Payload() any {
 	return UserCreatedPayloadDTO{
-		UserID:   e.ID.UUID(),
+		UserID:   e.userID.UUID(),
 		Username: e.username.String(),
 	}
 }
