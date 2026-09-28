@@ -17,13 +17,16 @@ import { colors } from "../../theme";
 
 const MIN = 3;
 const MAX = 25;
+const USERNAME_PATTERN = /^[a-zA-Zа-яА-ЯёЁ]+$/;
 
 export default function ChooseNameScreen() {
   const router = useRouter();
   const [value, setValue] = useState("");
 
   const trimmed = value.trim();
-  const valid = trimmed.length >= MIN && trimmed.length <= MAX;
+  const validLength = trimmed.length >= MIN && trimmed.length <= MAX;
+  const validChars = USERNAME_PATTERN.test(trimmed);
+  const valid = validLength && validChars;
 
   const next = () => {
     if (!valid) return;
@@ -60,7 +63,11 @@ export default function ChooseNameScreen() {
               onSubmitEditing={next}
             />
 
-            {!valid && (
+            {!validChars && trimmed.length > 0 && (
+              <Text style={styles.hint}>Только буквы</Text>
+            )}
+
+            {validChars && !validLength && (
               <Text style={styles.hint}>
                 От {MIN} до {MAX} символов
               </Text>
