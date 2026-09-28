@@ -70,7 +70,7 @@ export default function GoalScreen() {
           <BackHeader backHref="/plan" />
         </SafeAreaView>
 
-        <SafeAreaView style={styles.pickSafe} edges={["top", "bottom"]}>
+        <SafeAreaView style={styles.pickSafe} edges={["top", "bottom"]} pointerEvents="box-none">
           <View style={styles.titleBlock}>
             <Text style={styles.pickTitle}>Выбери мечту!</Text>
             <Text style={styles.pickWarning}>
