@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package sunbunnies.quiz.v1;
+
+option go_package = "github.com/CodesForge/SunBunniesHackathon2026Project/pkg/quiz/v1;quiz_v1";
+
+service QuizService {
+  rpc GenerateQuestion(GenerateQuestionRequest) returns (GenerateQuestionResponse);
+}
+
+message GenerateQuestionRequest {
+  string message = 1;
+}
+
+message GenerateQuestionResponse {
+  string answer = 2;
+}
