@@ -20,11 +20,11 @@ type JarCardProps = {
 const JAR_HEIGHT = 96;
 const LID_HEIGHT = 14;
 const NECK_HEIGHT = 8;
-const COIN_SIZE = 20;
+const COIN_SIZE = 28;
 const MAX_COINS = 12;
 const BORDER = 4;
-const COIN_LEFT_MIN = 10;
-const COIN_LEFT_MAX = 78;
+const COIN_LEFT_MIN = 14;
+const COIN_LEFT_MAX = 72;
 const COIN_BOTTOM_PAD = 8;
 
 function seededRandom(seed: number) {
