@@ -206,8 +206,8 @@ const styles = StyleSheet.create({
     gap: space.xl,
   },
   titleBlock: { alignItems: "center", gap: space.xs, paddingHorizontal: space.xl },
-  pickTitle: { ...font.h1, color: colors.surface, textAlign: "center" },
-  pickWarning: { ...font.small, color: colors.warn, textAlign: "center" },
+  pickTitle: { ...font.h1, color: colors.navActive, textAlign: "center" },
+  pickWarning: { ...font.small, color: colors.muted, textAlign: "center" },
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
