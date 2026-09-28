@@ -34,7 +34,7 @@ export default function SettingsScreen() {
           <View style={styles.card}>
             <View style={styles.rowText}>
               <Text style={styles.rowTitle}>Отключить анимации</Text>
-              <Text style={styles.rowSubtitle}>Питомец будет двигаться в статичном режиме</Text>
+              <Text style={styles.rowSubtitle}>Питомец, сундуки и переходы между экранами станут статичными</Text>
             </View>
             <PurpleSwitch
               value={!motion}
