@@ -74,6 +74,36 @@ export const WARDROBE_ITEMS: WardrobeItem[] = [
     art: "diaper-green",
     image: require("../assets/wardrobe/diaper-green.png"),
   },
+  {
+    id: "diaper-mint",
+    kind: "wear",
+    jar: "want",
+    slot: "body",
+    title: "Подгузник мятный",
+    price: 10,
+    art: "diaper-mint",
+    image: require("../assets/wardrobe/diaper-mint.png"),
+  },
+  {
+    id: "diaper-yellow",
+    kind: "wear",
+    jar: "want",
+    slot: "body",
+    title: "Подгузник жёлтый",
+    price: 10,
+    art: "diaper-yellow",
+    image: require("../assets/wardrobe/diaper-yellow.png"),
+  },
+  {
+    id: "diaper-gray",
+    kind: "wear",
+    jar: "want",
+    slot: "body",
+    title: "Подгузник серый",
+    price: 10,
+    art: "diaper-gray",
+    image: require("../assets/wardrobe/diaper-gray.png"),
+  },
 ];
 
 export const TEEN_ACCESSORY_ITEMS: WardrobeItem[] = [
