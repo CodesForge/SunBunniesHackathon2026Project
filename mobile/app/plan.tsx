@@ -23,6 +23,9 @@ import { colors, font, radius, space, HIT } from "../theme";
 
 const STEP = 100;
 const CIRCLE_LARGE = require("../assets/icons/circle-large.png");
+const COIN_NEED = require("../assets/icons/coin-need.png");
+const COIN_WANT = require("../assets/icons/coin-want.png");
+const COIN_DREAM = require("../assets/icons/coin-dream.png");
 const MEALS_PER_DAY = 2;
 const PERIOD_DAYS = ECONOMY.minNeed / (ECONOMY.mealCost * MEALS_PER_DAY);
 const MAX_COINS = 12;
@@ -187,6 +190,7 @@ export default function PlanScreen() {
             background={colors.jarNeedBg}
             value={draft.need}
             coinStep={STEP}
+            coinIcon={COIN_NEED}
             canAdd={left >= STEP}
             canRemove={draft.need >= STEP}
             onAdd={() => change("need", STEP)}
@@ -199,6 +203,7 @@ export default function PlanScreen() {
             background={colors.jarWantBg}
             value={draft.want}
             coinStep={STEP}
+            coinIcon={COIN_WANT}
             canAdd={left >= STEP}
             canRemove={draft.want >= STEP}
             onAdd={() => change("want", STEP)}
@@ -211,6 +216,7 @@ export default function PlanScreen() {
             background={colors.jarDreamBg}
             value={draft.dream}
             coinStep={dreamStep}
+            coinIcon={COIN_DREAM}
             canAdd={left >= STEP}
             canRemove={draft.dream >= STEP}
             onAdd={() => change("dream", STEP)}

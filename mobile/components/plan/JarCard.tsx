@@ -1,5 +1,5 @@
 import { Info, Minus, Plus } from "lucide-react-native";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View, type ImageSourcePropType } from "react-native";
 
 import { colors, radius, space, HIT } from "../../theme";
 
@@ -9,6 +9,7 @@ type JarCardProps = {
   background: string;
   value: number;
   coinStep: number;
+  coinIcon: ImageSourcePropType;
   canAdd: boolean;
   canRemove: boolean;
   onAdd: () => void;
@@ -41,6 +42,7 @@ export default function JarCard({
   background,
   value,
   coinStep,
+  coinIcon,
   canAdd,
   canRemove,
   onAdd,
@@ -70,8 +72,10 @@ export default function JarCard({
         <View style={[styles.neck, { borderColor: color }]} />
         <View style={[styles.jar, { borderColor: color }]}>
           {Array.from({ length: coins }, (_, i) => (
-            <View
+            <Image
               key={i}
+              source={coinIcon}
+              resizeMode="contain"
               style={[
                 styles.coin,
                 { left: `${COIN_SLOTS[i].leftPercent}%`, bottom: COIN_SLOTS[i].bottom },
@@ -161,10 +165,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: COIN_SIZE,
     height: COIN_SIZE,
-    borderRadius: COIN_SIZE / 2,
-    backgroundColor: colors.coinDreamBg,
-    borderWidth: 2,
-    borderColor: colors.coinDream,
   },
 
   value: { fontSize: 24, fontWeight: "800" },
