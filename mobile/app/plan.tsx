@@ -218,9 +218,7 @@ export default function PlanScreen() {
             onInfo={() => setInfo("dream")}
           />
         </View>
-      </ScrollView>
 
-      <SafeAreaView edges={["bottom"]} style={styles.footer}>
         <View style={styles.bubbleRow}>
           <Image
             source={require("../assets/plan/boy-peek.png")}
@@ -229,7 +227,9 @@ export default function PlanScreen() {
           />
           <SpeechBubble text={hint} />
         </View>
+      </ScrollView>
 
+      <SafeAreaView edges={["bottom"]} style={styles.footer}>
         <Pressable
           style={({ pressed }) => [
             styles.confirm,
@@ -356,7 +356,6 @@ const styles = StyleSheet.create({
   footer: {
     paddingHorizontal: space.lg,
     paddingBottom: space.lg,
-    gap: space.lg,
   },
   bubbleRow: { flexDirection: "row", alignItems: "flex-end", gap: space.sm },
   boyPeek: { width: 150, height: 86 },
