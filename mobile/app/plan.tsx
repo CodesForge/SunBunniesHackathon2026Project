@@ -140,12 +140,6 @@ export default function PlanScreen() {
             </View>
           </View>
         </SafeAreaView>
-
-        <Image
-          source={require("../assets/plan/boy-peek.png")}
-          style={styles.boyPeek}
-          resizeMode="contain"
-        />
       </View>
 
       <ScrollView
@@ -314,13 +308,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: colors.surface,
     marginTop: 2,
-  },
-  boyPeek: {
-    position: "absolute",
-    right: -8,
-    bottom: 0,
-    width: 150,
-    height: 86,
   },
 
   body: { flex: 1 },
