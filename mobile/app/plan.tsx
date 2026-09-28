@@ -13,6 +13,7 @@ import { ChevronLeft, ChevronRight, Star } from "lucide-react-native";
 
 import JarCard from "../components/plan/JarCard";
 import Modal from "../components/ui/Modal";
+import RoundIconButton from "../components/ui/RoundIconButton";
 import SpeechBubble from "../components/ui/SpeechBubble";
 import { daysUntilIncome } from "../lib/time";
 import { usePet } from "../store/pet";
@@ -21,6 +22,10 @@ import goals from "../data/goals.json";
 import { colors, font, radius, space, HIT } from "../theme";
 
 const STEP = 100;
+const CIRCLE_LARGE = require("../assets/icons/circle-large.png");
+const COIN_NEED = require("../assets/icons/coin-need.png");
+const COIN_WANT = require("../assets/icons/coin-want.png");
+const COIN_DREAM = require("../assets/icons/coin-dream.png");
 const MEALS_PER_DAY = 2;
 const PERIOD_DAYS = ECONOMY.minNeed / (ECONOMY.mealCost * MEALS_PER_DAY);
 const MAX_COINS = 12;
@@ -123,14 +128,12 @@ export default function PlanScreen() {
       <View style={styles.header}>
         <SafeAreaView edges={["top"]}>
           <View style={styles.headerRow}>
-            <Pressable
-              style={styles.back}
+            <RoundIconButton
+              icon={ChevronLeft}
               onPress={() => router.back()}
               accessibilityRole="button"
               accessibilityLabel="Назад"
-            >
-              <ChevronLeft size={28} color={colors.navActive} strokeWidth={3.5} />
-            </Pressable>
+            />
 
             <View style={styles.headerText}>
               <Text style={styles.headerTitle}>План бюджета</Text>
@@ -140,12 +143,6 @@ export default function PlanScreen() {
             </View>
           </View>
         </SafeAreaView>
-
-        <Image
-          source={require("../assets/plan/boy-peek.png")}
-          style={styles.boyPeek}
-          resizeMode="contain"
-        />
       </View>
 
       <ScrollView
@@ -155,12 +152,15 @@ export default function PlanScreen() {
       >
         <View style={styles.budgetRow}>
           <View style={styles.starCircle}>
-            <Star
-              size={24}
-              color={colors.coinDreamBg}
-              fill={colors.coinDreamBg}
-              strokeWidth={2}
-            />
+            <Image source={CIRCLE_LARGE} style={styles.starCircleBg} resizeMode="contain" />
+            <View style={styles.starIconWrap}>
+              <Star
+                size={24}
+                color={colors.coinDreamBg}
+                fill={colors.coinDreamBg}
+                strokeWidth={2}
+              />
+            </View>
           </View>
 
           <View style={styles.budgetText}>
@@ -177,7 +177,7 @@ export default function PlanScreen() {
             accessibilityLabel="Доска желаний"
           >
             <Text style={styles.wishesText}>Доска{"\n"}Желаний</Text>
-            <ChevronRight size={22} color={colors.navActive} strokeWidth={3.5} />
+            <ChevronRight size={22} color={colors.iconBorder} strokeWidth={3.5} />
           </Pressable>
         </View>
 
@@ -190,6 +190,7 @@ export default function PlanScreen() {
             background={colors.jarNeedBg}
             value={draft.need}
             coinStep={STEP}
+            coinIcon={COIN_NEED}
             canAdd={left >= STEP}
             canRemove={draft.need >= STEP}
             onAdd={() => change("need", STEP)}
@@ -202,6 +203,7 @@ export default function PlanScreen() {
             background={colors.jarWantBg}
             value={draft.want}
             coinStep={STEP}
+            coinIcon={COIN_WANT}
             canAdd={left >= STEP}
             canRemove={draft.want >= STEP}
             onAdd={() => change("want", STEP)}
@@ -214,6 +216,7 @@ export default function PlanScreen() {
             background={colors.jarDreamBg}
             value={draft.dream}
             coinStep={dreamStep}
+            coinIcon={COIN_DREAM}
             canAdd={left >= STEP}
             canRemove={draft.dream >= STEP}
             onAdd={() => change("dream", STEP)}
@@ -221,18 +224,18 @@ export default function PlanScreen() {
             onInfo={() => setInfo("dream")}
           />
         </View>
-      </ScrollView>
 
-      <SafeAreaView edges={["bottom"]} style={styles.footer}>
         <View style={styles.bubbleRow}>
           <Image
-            source={require("../assets/plan/boy-wave.png")}
-            style={styles.boyWave}
+            source={require("../assets/plan/boy-peek.png")}
+            style={styles.boyPeek}
             resizeMode="contain"
           />
           <SpeechBubble text={hint} />
         </View>
+      </ScrollView>
 
+      <SafeAreaView edges={["bottom"]} style={styles.footer}>
         <Pressable
           style={({ pressed }) => [
             styles.confirm,
@@ -297,16 +300,6 @@ const styles = StyleSheet.create({
     paddingTop: space.sm,
     gap: space.md,
   },
-  back: {
-    width: HIT,
-    height: HIT,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surface,
-    borderWidth: BORDER,
-    borderColor: colors.surface,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   headerText: { flex: 1 },
   headerTitle: { ...font.h1, color: colors.surface },
   headerSubtitle: {
@@ -315,27 +308,26 @@ const styles = StyleSheet.create({
     color: colors.surface,
     marginTop: 2,
   },
-  boyPeek: {
-    position: "absolute",
-    right: -8,
-    bottom: 0,
-    width: 150,
-    height: 86,
-  },
 
   body: { flex: 1 },
   bodyContent: { padding: space.lg, gap: space.lg },
 
   budgetRow: { flexDirection: "row", alignItems: "center", gap: space.md },
   starCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: radius.pill,
-    borderWidth: BORDER,
-    borderColor: colors.iconBorder,
-    backgroundColor: colors.surface,
+    width: 64,
+    height: 64,
     alignItems: "center",
     justifyContent: "center",
+  },
+  starCircleBg: {
+    position: "absolute",
+    width: 64,
+    height: 64,
+    zIndex: 0,
+  },
+  starIconWrap: {
+    zIndex: 1,
+    elevation: 1,
   },
   budgetText: { flex: 1 },
   budgetLabel: { ...font.small, fontWeight: "700", color: colors.muted },
@@ -354,21 +346,25 @@ const styles = StyleSheet.create({
   wishesText: {
     fontSize: 14,
     fontWeight: "800",
-    color: colors.navActive,
+    color: colors.iconBorder,
     textAlign: "center",
   },
 
   divider: { height: 3, backgroundColor: colors.line, borderRadius: 2 },
 
-  jars: { flexDirection: "row", gap: space.sm, alignItems: "stretch" },
+  jars: {
+    flexDirection: "row",
+    gap: space.sm,
+    alignItems: "stretch",
+    justifyContent: "center",
+  },
 
   footer: {
     paddingHorizontal: space.lg,
-    paddingBottom: space.sm,
-    gap: space.lg,
+    paddingBottom: space.lg,
   },
   bubbleRow: { flexDirection: "row", alignItems: "flex-end", gap: space.sm },
-  boyWave: { width: 118, height: 98 },
+  boyPeek: { width: 150, height: 86 },
 
   confirm: {
     minHeight: HIT + 6,

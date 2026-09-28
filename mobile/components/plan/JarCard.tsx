@@ -1,5 +1,5 @@
 import { Info, Minus, Plus } from "lucide-react-native";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View, type ImageSourcePropType } from "react-native";
 
 import { colors, radius, space, HIT } from "../../theme";
 
@@ -9,6 +9,7 @@ type JarCardProps = {
   background: string;
   value: number;
   coinStep: number;
+  coinIcon: ImageSourcePropType;
   canAdd: boolean;
   canRemove: boolean;
   onAdd: () => void;
@@ -19,9 +20,26 @@ type JarCardProps = {
 const JAR_HEIGHT = 96;
 const LID_HEIGHT = 14;
 const NECK_HEIGHT = 8;
-const COIN_SIZE = 14;
+const COIN_SIZE = 28;
 const MAX_COINS = 12;
 const BORDER = 4;
+const COIN_LEFT_MIN = 5;
+const COIN_LEFT_MAX = 60;
+const COIN_BOTTOM_MIN = 6;
+const COIN_BOTTOM_MAX = 52;
+const COIN_GRID_COLS = 4;
+const COIN_GRID_ROWS = 3;
+
+const COL_STEP = (COIN_LEFT_MAX - COIN_LEFT_MIN) /(COIN_GRID_COLS - 1);
+const ROW_STEP = (COIN_BOTTOM_MAX - COIN_BOTTOM_MIN) / (COIN_GRID_ROWS - 1);
+const COIN_SLOTS = Array.from({ length: MAX_COINS }, (_, i) => {
+  const col = i % COIN_GRID_COLS;
+  const row = Math.floor(i / COIN_GRID_COLS);
+  return {
+    leftPercent: COIN_LEFT_MIN + col * COL_STEP,
+    bottom: COIN_BOTTOM_MIN + row * ROW_STEP,
+  };
+});
 
 export default function JarCard({
   title,
@@ -29,6 +47,7 @@ export default function JarCard({
   background,
   value,
   coinStep,
+  coinIcon,
   canAdd,
   canRemove,
   onAdd,
@@ -57,11 +76,17 @@ export default function JarCard({
         <View style={[styles.lid, { backgroundColor: color }]} />
         <View style={[styles.neck, { borderColor: color }]} />
         <View style={[styles.jar, { borderColor: color }]}>
-          <View style={styles.coins}>
-            {Array.from({ length: coins }, (_, i) => (
-              <View key={i} style={styles.coin} />
-            ))}
-          </View>
+          {Array.from({ length: coins }, (_, i) => (
+            <Image
+              key={i}
+              source={coinIcon}
+              resizeMode="contain"
+              style={[
+                styles.coin,
+                { left: `${COIN_SLOTS[i].leftPercent}%`, bottom: COIN_SLOTS[i].bottom },
+              ]}
+            />
+          ))}
         </View>
       </View>
 
@@ -105,6 +130,7 @@ export default function JarCard({
 const styles = StyleSheet.create({
   card: {
     flex: 1,
+    maxWidth: 160,
     borderWidth: BORDER,
     borderRadius: radius.lg,
     paddingVertical: space.md,
@@ -140,21 +166,10 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     justifyContent: "flex-end",
   },
-  coins: {
-    flexDirection: "row",
-    flexWrap: "wrap-reverse",
-    justifyContent: "center",
-    alignItems: "flex-end",
-    gap: 3,
-    padding: 5,
-  },
   coin: {
+    position: "absolute",
     width: COIN_SIZE,
     height: COIN_SIZE,
-    borderRadius: COIN_SIZE / 2,
-    backgroundColor: colors.coinDreamBg,
-    borderWidth: 2,
-    borderColor: colors.coinDream,
   },
 
   value: { fontSize: 24, fontWeight: "800" },
