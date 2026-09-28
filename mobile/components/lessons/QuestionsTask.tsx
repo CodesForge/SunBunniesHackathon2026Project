@@ -30,7 +30,6 @@ export default function QuestionsTask({ data, onDone, onStep }: Props) {
   const [index, setIndex] = useState(0);
   const [answeredIndex, setAnsweredIndex] = useState<number | null>(null);
   const mistakes = useRef(0);
-  // Идентификаторы вопросов с неверным ответом — для раздела родителя.
   const wrongIds = useRef<string[]>([]);
   const history = usePet((s) => s.history);
   const grantJars = usePet((s) => s.grantJars);
