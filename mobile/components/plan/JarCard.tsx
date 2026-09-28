@@ -23,14 +23,14 @@ const NECK_HEIGHT = 8;
 const COIN_SIZE = 28;
 const MAX_COINS = 12;
 const BORDER = 4;
-const COIN_LEFT_MIN = 22;
-const COIN_LEFT_MAX = 88;
+const COIN_LEFT_MIN = 5;
+const COIN_LEFT_MAX = 60;
 const COIN_BOTTOM_MIN = 6;
-const COIN_BOTTOM_MAX = 62;
+const COIN_BOTTOM_MAX = 52;
 const COIN_GRID_COLS = 4;
 const COIN_GRID_ROWS = 3;
 
-const COL_STEP = (COIN_LEFT_MAX - COIN_LEFT_MIN) / (COIN_GRID_COLS - 1);
+const COL_STEP = (COIN_LEFT_MAX - COIN_LEFT_MIN) /(COIN_GRID_COLS - 1);
 const ROW_STEP = (COIN_BOTTOM_MAX - COIN_BOTTOM_MIN) / (COIN_GRID_ROWS - 1);
 const COIN_SLOTS = Array.from({ length: MAX_COINS }, (_, i) => {
   const col = i % COIN_GRID_COLS;
