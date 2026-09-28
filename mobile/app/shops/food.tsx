@@ -20,7 +20,7 @@ import Animated, {
 import TopHud from "../../components/ui/TopHud";
 import { FOOD_ITEMS, type FoodItem } from "../../data/food";
 import { usePet } from "../../store/pet";
-import { font, space } from "../../theme";
+import { colors, font, radius, space } from "../../theme";
 
 const BACKGROUND = require("../../assets/food/shop-background.png");
 const CART = require("../../assets/food/cart.png");
@@ -311,6 +311,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 4,
     marginTop: 2,
+    backgroundColor: colors.surface,
+    borderRadius: radius.pill,
+    paddingHorizontal: space.sm,
+    paddingVertical: 2,
   },
   coinIcon: { width: 18, height: 18 },
   priceText: { ...font.small, fontWeight: "800", color: "#3A2E22" },
