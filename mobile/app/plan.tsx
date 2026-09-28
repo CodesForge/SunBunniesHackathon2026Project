@@ -13,6 +13,7 @@ import { ChevronLeft, ChevronRight, Star } from "lucide-react-native";
 
 import JarCard from "../components/plan/JarCard";
 import Modal from "../components/ui/Modal";
+import RoundIconButton from "../components/ui/RoundIconButton";
 import SpeechBubble from "../components/ui/SpeechBubble";
 import { daysUntilIncome } from "../lib/time";
 import { usePet } from "../store/pet";
@@ -21,6 +22,7 @@ import goals from "../data/goals.json";
 import { colors, font, radius, space, HIT } from "../theme";
 
 const STEP = 100;
+const CIRCLE_LARGE = require("../assets/icons/circle-large.png");
 const MEALS_PER_DAY = 2;
 const PERIOD_DAYS = ECONOMY.minNeed / (ECONOMY.mealCost * MEALS_PER_DAY);
 const MAX_COINS = 12;
@@ -123,14 +125,12 @@ export default function PlanScreen() {
       <View style={styles.header}>
         <SafeAreaView edges={["top"]}>
           <View style={styles.headerRow}>
-            <Pressable
-              style={styles.back}
+            <RoundIconButton
+              icon={ChevronLeft}
               onPress={() => router.back()}
               accessibilityRole="button"
               accessibilityLabel="Назад"
-            >
-              <ChevronLeft size={28} color={colors.navActive} strokeWidth={3.5} />
-            </Pressable>
+            />
 
             <View style={styles.headerText}>
               <Text style={styles.headerTitle}>План бюджета</Text>
@@ -149,8 +149,9 @@ export default function PlanScreen() {
       >
         <View style={styles.budgetRow}>
           <View style={styles.starCircle}>
+            <Image source={CIRCLE_LARGE} style={styles.starCircleBg} resizeMode="contain" />
             <Star
-              size={24}
+              size={36}
               color={colors.coinDreamBg}
               fill={colors.coinDreamBg}
               strokeWidth={2}
@@ -291,16 +292,6 @@ const styles = StyleSheet.create({
     paddingTop: space.sm,
     gap: space.md,
   },
-  back: {
-    width: HIT,
-    height: HIT,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surface,
-    borderWidth: BORDER,
-    borderColor: colors.surface,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   headerText: { flex: 1 },
   headerTitle: { ...font.h1, color: colors.surface },
   headerSubtitle: {
@@ -315,14 +306,15 @@ const styles = StyleSheet.create({
 
   budgetRow: { flexDirection: "row", alignItems: "center", gap: space.md },
   starCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: radius.pill,
-    borderWidth: BORDER,
-    borderColor: colors.iconBorder,
-    backgroundColor: colors.surface,
+    width: 88,
+    height: 88,
     alignItems: "center",
     justifyContent: "center",
+  },
+  starCircleBg: {
+    position: "absolute",
+    width: 88,
+    height: 88,
   },
   budgetText: { flex: 1 },
   budgetLabel: { ...font.small, fontWeight: "700", color: colors.muted },
@@ -356,7 +348,7 @@ const styles = StyleSheet.create({
 
   footer: {
     paddingHorizontal: space.lg,
-    paddingBottom: space.sm,
+    paddingBottom: space.lg,
     gap: space.lg,
   },
   bubbleRow: { flexDirection: "row", alignItems: "flex-end", gap: space.sm },
