@@ -28,7 +28,6 @@ type State = {
   lastFedAt: number;
   lastSleptAt: number;
   periodIndex: number;
-  /** Сколько периодов прожито в соответствии с планом. */
   keptPeriods: number;
 
   energyBase: number;
@@ -73,10 +72,6 @@ type State = {
 
 const EMPTY: Jars = { need: 0, want: 0, dream: 0 };
 
-/**
- * Ни одна банка не уходит в минус. Списание упирается в ноль и дальше
- * ничего не ухудшается — та же модель безопасной ошибки, что и у голода.
- */
 const clampJars = (j: Jars): Jars => ({
   need: Math.max(0, j.need),
   want: Math.max(0, j.want),
