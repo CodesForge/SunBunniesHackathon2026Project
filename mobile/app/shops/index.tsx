@@ -13,9 +13,6 @@ import TopHud from "../../components/ui/TopHud";
 import { colors } from "../../theme";
 
 const BACKGROUND = require("../../assets/shops/background.png");
-const FOOD_BUTTON = require("../../assets/shops/dining-button.png");
-const WARDROBE_BUTTON = require("../../assets/shops/wardrobe-button.png");
-const BUSHES = require("../../assets/shops/bushes.png");
 const FOOD_ICON = require("../../assets/shops/food-icon.png");
 const WARDROBE_ICON = require("../../assets/shops/wardrobe-icon.png");
 
@@ -41,9 +38,6 @@ export default function ShopsScreen() {
     <View style={styles.root}>
       <View pointerEvents="none">
         <Image source={BACKGROUND} style={[styles.layer, size]} resizeMode="cover" />
-        <Image source={FOOD_BUTTON} style={[styles.layer, size]} resizeMode="cover" />
-        <Image source={WARDROBE_BUTTON} style={[styles.layer, size]} resizeMode="cover" />
-        <Image source={BUSHES} style={[styles.layer, size]} resizeMode="cover" />
       </View>
 
       <ShopLink
