@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   wishesText: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "800",
     color: colors.iconBorder,
     textAlign: "center",

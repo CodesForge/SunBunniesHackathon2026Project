@@ -28,5 +28,5 @@ const styles = StyleSheet.create({
   wrap: { flexDirection: "row", alignItems: "center", gap: 8 },
   wrapStacked: { flexDirection: "column", gap: 2 },
   badge: { width: BADGE_SIZE, height: BADGE_SIZE },
-  value: { fontSize: 14, fontWeight: "800", color: colors.ink },
+  value: { fontSize: 16, fontWeight: "800", color: colors.ink },
 });

@@ -11,8 +11,6 @@ export type WardrobeOutfitItem = Item & {
   preview?: ImageSourcePropType;
 };
 
-// Подгузники — вещи на "малышовом" (1-м) уровне питомца, разных цветов.
-// Все подгузники стоят одинаково и покупаются из копилки "хочу".
 export const WARDROBE_ITEMS: WardrobeItem[] = [
   {
     id: "diaper",

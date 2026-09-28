@@ -10,7 +10,6 @@ import QuestionsTask from "../../components/lessons/QuestionsTask";
 import SortTask from "../../components/lessons/SortTask";
 import { getLesson } from "../../data/lessons";
 import {
-  LESSON_BG,
   LESSON_BODY_TEXT,
   LESSON_DONE_TITLE,
   LESSON_ORANGE,

@@ -24,7 +24,6 @@ type PetMiniProps = {
   mouth?: MouthKey;
   eyesOpen?: boolean;
   animated?: boolean;
-  // Надетая на тело вещь из гардероба (подгузник и т.п.), если есть.
   bodyWear?: ImageSourcePropType;
   outfit?: OutfitLayers;
   headWear?: ImageSourcePropType;

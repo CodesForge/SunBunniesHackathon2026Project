@@ -207,8 +207,6 @@ export const usePet = create<State & Actions>()(
           dirty: true,
         })),
 
-      // Без foodId — старое поведение (плоский расход из "надо").
-      // С foodId — списывает конкретный купленный продукт со стола.
       feed: (foodId) => {
         const s = get();
         const qty = s.foodOwned[foodId] ?? 0;
@@ -264,9 +262,6 @@ export const usePet = create<State & Actions>()(
         return true;
       },
 
-      // Покупка продукта в магазине еды: списывает цену из копилки товара
-      // и добавляет +1 к количеству на столе (foodOwned), в отличие от
-      // buy() — тут можно купить один и тот же продукт много раз.
       buyFood: (item) => {
         const s = get();
         if (s.jars[item.jar] < item.price) return false;

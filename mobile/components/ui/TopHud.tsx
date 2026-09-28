@@ -46,7 +46,7 @@ const MONEY_PILL_WIDTH_TABLET = 340;
 
 const TABLET_COIN_BADGE_SIZE = 38;
 const TABLET_COIN_FONT_SIZE = 18;
-const SMALL_PHONE_COIN_FONT_SIZE = 12;
+const SMALL_PHONE_COIN_FONT_SIZE = 16;
 
 const SCALES_FRAME_HEIGHT = 46;
 const SCALES_FRAME_HEIGHT_TABLET = 64;
@@ -66,7 +66,7 @@ const LOW_MARK_FONT_TABLET = 20;
 
 const ALERT_SIZE = 20;
 const ALERT_SIZE_TABLET = 26;
-const ALERT_FONT = 13;
+const ALERT_FONT = 16;
 const ALERT_FONT_TABLET = 16;
 
 const COIN_NEED = require("../../assets/icons/coin-need.png");

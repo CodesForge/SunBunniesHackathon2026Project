@@ -16,8 +16,8 @@ import Svg, { Ellipse } from "react-native-svg";
 
 export const ONB = {
   bg: "#C2DDFB",
-  oval: "#818BFE",
-  arrow: "#838DFC",
+  oval: "#A36AFF",
+  arrow: "#A36AFF",
 
   ovalWidth: 672 / 340,
   ovalAspect: 672 / 608,
