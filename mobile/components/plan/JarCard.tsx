@@ -27,39 +27,26 @@ const COIN_LEFT_MIN = 16;
 const COIN_LEFT_MAX = 82;
 const COIN_BOTTOM_MIN = 6;
 const COIN_BOTTOM_MAX = 62;
-const JAR_WIDTH_ESTIMATE = 120;
-const CANDIDATES_PER_SLOT = 25;
+const COIN_GRID_COLS = 4;
+const COIN_GRID_ROWS = 3;
 
 function seededRandom(seed: number) {
   const x = Math.sin(seed * 9973) * 43758.5453;
   return x - Math.floor(x);
 }
 
-function pickCoinSlots(count: number) {
-  const slots: { leftPercent: number; bottom: number }[] = [];
-  for (let i = 0; i < count; i++) {
-    let best = { leftPercent: COIN_LEFT_MIN, bottom: COIN_BOTTOM_MIN };
-    let bestMinDist = -1;
-    for (let c = 0; c < CANDIDATES_PER_SLOT; c++) {
-      const seed = i * CANDIDATES_PER_SLOT + c;
-      const leftPercent = COIN_LEFT_MIN + seededRandom(seed * 2 + 1) * (COIN_LEFT_MAX - COIN_LEFT_MIN);
-      const bottom = COIN_BOTTOM_MIN + seededRandom(seed * 2 + 2) * (COIN_BOTTOM_MAX - COIN_BOTTOM_MIN);
-      let minDist = Infinity;
-      for (const slot of slots) {
-        const dx = ((leftPercent - slot.leftPercent) / 100) * JAR_WIDTH_ESTIMATE;
-        const dy = bottom - slot.bottom;
-        minDist = Math.min(minDist, Math.hypot(dx, dy));
-      }
-      if (minDist > bestMinDist) {
-        bestMinDist = minDist;
-        best = { leftPercent, bottom };
-      }
-    }
-    slots.push(best);
-  }
-  return slots;
-}
-const COIN_SLOTS = pickCoinSlots(MAX_COINS);
+const CELL_WIDTH = (COIN_LEFT_MAX - COIN_LEFT_MIN) / COIN_GRID_COLS;
+const CELL_HEIGHT = (COIN_BOTTOM_MAX - COIN_BOTTOM_MIN) / COIN_GRID_ROWS;
+const COIN_SLOTS = Array.from({ length: MAX_COINS }, (_, i) => {
+  const col = i % COIN_GRID_COLS;
+  const row = Math.floor(i / COIN_GRID_COLS);
+  const leftJitter = (seededRandom(i * 2 + 1) - 0.5) * CELL_WIDTH * 0.7;
+  const bottomJitter = (seededRandom(i * 2 + 2) - 0.5) * CELL_HEIGHT * 0.7;
+  return {
+    leftPercent: COIN_LEFT_MIN + (col + 0.5) * CELL_WIDTH + leftJitter,
+    bottom: COIN_BOTTOM_MIN + (row + 0.5) * CELL_HEIGHT + bottomJitter,
+  };
+});
 
 export default function JarCard({
   title,
