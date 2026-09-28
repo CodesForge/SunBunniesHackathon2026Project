@@ -23,27 +23,43 @@ const NECK_HEIGHT = 8;
 const COIN_SIZE = 28;
 const MAX_COINS = 12;
 const BORDER = 4;
-const COIN_LEFT_MIN = 14;
-const COIN_LEFT_MAX = 72;
+const COIN_LEFT_MIN = 10;
+const COIN_LEFT_MAX = 78;
 const COIN_BOTTOM_MIN = 6;
-const COIN_BOTTOM_MAX = 34;
-const GOLDEN_RATIO_CONJUGATE = 0.6180339887;
+const COIN_BOTTOM_MAX = 62;
+const JAR_WIDTH_ESTIMATE = 120;
+const CANDIDATES_PER_SLOT = 25;
 
 function seededRandom(seed: number) {
   const x = Math.sin(seed * 9973) * 43758.5453;
   return x - Math.floor(x);
 }
-const COIN_SLOTS = Array.from({ length: MAX_COINS }, (_, i) => {
-  const leftFrac = (i * GOLDEN_RATIO_CONJUGATE) % 1;
-  const leftJitter = (seededRandom(i * 2 + 1) - 0.5) * 6;
-  return {
-    leftPercent: Math.min(
-      COIN_LEFT_MAX,
-      Math.max(COIN_LEFT_MIN, COIN_LEFT_MIN + leftFrac * (COIN_LEFT_MAX - COIN_LEFT_MIN) + leftJitter),
-    ),
-    bottom: COIN_BOTTOM_MIN + seededRandom(i * 2 + 2) * (COIN_BOTTOM_MAX - COIN_BOTTOM_MIN),
-  };
-});
+
+function pickCoinSlots(count: number) {
+  const slots: { leftPercent: number; bottom: number }[] = [];
+  for (let i = 0; i < count; i++) {
+    let best = { leftPercent: COIN_LEFT_MIN, bottom: COIN_BOTTOM_MIN };
+    let bestMinDist = -1;
+    for (let c = 0; c < CANDIDATES_PER_SLOT; c++) {
+      const seed = i * CANDIDATES_PER_SLOT + c;
+      const leftPercent = COIN_LEFT_MIN + seededRandom(seed * 2 + 1) * (COIN_LEFT_MAX - COIN_LEFT_MIN);
+      const bottom = COIN_BOTTOM_MIN + seededRandom(seed * 2 + 2) * (COIN_BOTTOM_MAX - COIN_BOTTOM_MIN);
+      let minDist = Infinity;
+      for (const slot of slots) {
+        const dx = ((leftPercent - slot.leftPercent) / 100) * JAR_WIDTH_ESTIMATE;
+        const dy = bottom - slot.bottom;
+        minDist = Math.min(minDist, Math.hypot(dx, dy));
+      }
+      if (minDist > bestMinDist) {
+        bestMinDist = minDist;
+        best = { leftPercent, bottom };
+      }
+    }
+    slots.push(best);
+  }
+  return slots;
+}
+const COIN_SLOTS = pickCoinSlots(MAX_COINS);
 
 export default function JarCard({
   title,
