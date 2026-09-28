@@ -66,6 +66,10 @@ export default function GoalScreen() {
   if (!goal) {
     return (
       <View style={styles.pickRoot}>
+        <SafeAreaView style={styles.backSlot} edges={["top"]} pointerEvents="box-none">
+          <BackHeader backHref="/plan" />
+        </SafeAreaView>
+
         <SafeAreaView style={styles.pickSafe} edges={["top", "bottom"]}>
           <View style={styles.titleBlock}>
             <Text style={styles.pickTitle}>Выбери мечту!</Text>
