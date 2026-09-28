@@ -71,6 +71,16 @@ type State = {
 
 const EMPTY: Jars = { need: 0, want: 0, dream: 0 };
 
+/**
+ * Ни одна банка не уходит в минус. Списание упирается в ноль и дальше
+ * ничего не ухудшается — та же модель безопасной ошибки, что и у голода.
+ */
+const clampJars = (j: Jars): Jars => ({
+  need: Math.max(0, j.need),
+  want: Math.max(0, j.want),
+  dream: Math.max(0, j.dream),
+});
+
 const initial: State = {
   species: null,
   name: "",
@@ -173,8 +183,8 @@ export const usePet = create<State & Actions>()(
 
       setPlan: (p) =>
         set((s) => ({
-          jars: { ...p },
-          plan: { ...p },
+          jars: clampJars(p),
+          plan: clampJars(p),
           unallocated: 0,
           behavior:
             p.need < ECONOMY.minNeed
@@ -188,7 +198,7 @@ export const usePet = create<State & Actions>()(
 
       rebalance: (next) =>
         set((s) => ({
-          jars: { ...next },
+          jars: clampJars(next),
           behavior:
             next.dream < s.jars.dream
               ? {
@@ -393,11 +403,11 @@ export const usePet = create<State & Actions>()(
 
       grantJars: (amount) =>
         set((s) => ({
-          jars: {
+          jars: clampJars({
             need: s.jars.need + (amount.need ?? 0),
             want: s.jars.want + (amount.want ?? 0),
             dream: s.jars.dream + (amount.dream ?? 0),
-          },
+          }),
           dirty: true,
         })),
 
