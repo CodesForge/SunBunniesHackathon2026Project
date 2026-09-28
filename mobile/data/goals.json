@@ -1,26 +1,20 @@
 [
   {
-    "id": "goal-ball",
-    "title": "Мяч",
-    "price": 800,
-    "art": "ball"
-  },
-  {
     "id": "goal-skate",
     "title": "Ролики",
-    "price": 1600,
+    "price": 2000,
     "art": "skate"
   },
   {
     "id": "goal-scooter",
     "title": "Самокат",
-    "price": 2400,
+    "price": 2000,
     "art": "scooter"
   },
   {
     "id": "goal-guitar",
     "title": "Гитара",
-    "price": 3400,
+    "price": 2000,
     "art": "guitar"
   }
 ]

@@ -21,7 +21,6 @@ const COIN_DREAM = require("../assets/icons/coin-dream.png");
 const BOARD_BACKGROUND = require("../assets/goals/board-background.png");
 
 const GOAL_IMAGES: Record<string, ImageSourcePropType> = {
-  ball: require("../assets/goals/ball.png"),
   guitar: require("../assets/goals/guitar.png"),
   skate: require("../assets/goals/skate.png"),
   scooter: require("../assets/goals/scooter.png"),
@@ -67,7 +66,11 @@ export default function GoalScreen() {
   if (!goal) {
     return (
       <View style={styles.pickRoot}>
-        <SafeAreaView style={styles.pickSafe} edges={["top", "bottom"]}>
+        <SafeAreaView style={styles.backSlot} edges={["top"]} pointerEvents="box-none">
+          <BackHeader backHref="/plan" />
+        </SafeAreaView>
+
+        <SafeAreaView style={styles.pickSafe} edges={["top", "bottom"]} pointerEvents="box-none">
           <View style={styles.titleBlock}>
             <Text style={styles.pickTitle}>Выбери мечту!</Text>
             <Text style={styles.pickWarning}>
@@ -203,8 +206,8 @@ const styles = StyleSheet.create({
     gap: space.xl,
   },
   titleBlock: { alignItems: "center", gap: space.xs, paddingHorizontal: space.xl },
-  pickTitle: { ...font.h1, color: colors.surface, textAlign: "center" },
-  pickWarning: { ...font.small, color: colors.warn, textAlign: "center" },
+  pickTitle: { ...font.h1, color: colors.navActive, textAlign: "center" },
+  pickWarning: { ...font.small, color: colors.muted, textAlign: "center" },
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
