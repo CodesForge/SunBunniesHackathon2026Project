@@ -27,8 +27,6 @@ const ARROW_LEFT = require("../../assets/icons/arrow-left.png");
 const ARROW_RIGHT = require("../../assets/icons/arrow-right.png");
 const COIN_WANT = require("../../assets/icons/coin-want.png");
 
-// Питомец на гардеробном экране центрируется по горизонтали,
-// снизу — отступ в долях высоты экрана.
 const PET_WIDTH_PERCENT = 70;
 const PET_BOTTOM_FRACTION = 0.22;
 
@@ -120,9 +118,6 @@ export default function WardrobeShopScreen() {
 
   const move = (delta: number) => {
     const dir = delta > 0 ? 1 : -1;
-    // Мгновенно "уводим" текущую картинку+цену в сторону и прячем, затем
-    // плавно возвращаем на место уже с новым товаром — получается красивый
-    // въезд следующей вещи с той стороны, откуда листаем.
     carouselOffset.value = dir * CAROUSEL_SLIDE_DISTANCE;
     carouselOpacity.value = 0;
     setIndex((i) => (i + delta + items.length) % items.length);

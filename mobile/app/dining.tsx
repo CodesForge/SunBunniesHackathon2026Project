@@ -55,7 +55,6 @@ export default function DiningScreen() {
   const petLeft = (width - petCoreW) / 2;
   const plateSize = width * PLATE_WIDTH_PERCENT;
 
-  // На стол попадают только реально купленные продукты (foodOwned > 0).
   const foodItems: FoodPlateItem[] = FOOD_ITEMS.filter(
     (item) => (foodOwned[item.id] ?? 0) > 0,
   ).map((item) => ({

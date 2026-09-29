@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Check, X as XIcon } from "lucide-react-native";
 
-import type { LessonQuestion, QuestionsStepData } from "../../data/lessons";
+import type { QuestionsStepData } from "../../data/lessons";
 import { LESSON_GREEN, LESSON_RED, LESSON_RED_BG, LESSON_TITLE } from "./lessonColors";
 import { usePet } from "../../store/pet";
 import { colors, font, radius, HIT } from "../../theme";
@@ -14,7 +14,6 @@ type Props = {
 };
 
 function resolveDynamicOptionIndex(
-  question: LessonQuestion,
   history: { spent: { need: number; want: number; dream: number } }[],
 ): number {
   const last = history[history.length - 1];
@@ -38,7 +37,7 @@ export default function QuestionsTask({ data, onDone, onStep }: Props) {
   const total = data.questions.length;
 
   const dynamicCorrectIndex = useMemo(() => {
-    if (question.dynamic === "topCategory") return resolveDynamicOptionIndex(question, history);
+    if (question.dynamic === "topCategory") return resolveDynamicOptionIndex(history);
     return null;
   }, [question, history]);
 

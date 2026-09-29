@@ -23,11 +23,6 @@ export type PetAssetSet = {
   armRightOrigin: string;
   tailOrigin: string;
   armsUnderBody?: boolean;
-  // Область под надетую на тело вещь из гардероба (подгузник и т.п.) —
-  // рисуется поверх пузика, но под ручками. Доли от ширины/высоты общего
-  // холста питомца (того же "w"/"h", что и у остальных слоёв), картинка
-  // вписывается через resizeMode="contain", так что реальные пропорции
-  // самой вещи не важны — main её не растянет.
   bodyWearLeft: number;
   bodyWearTop: number;
   bodyWearWidth: number;

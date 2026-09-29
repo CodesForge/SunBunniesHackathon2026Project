@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   },
   hint: {
     marginTop: 8,
-    fontSize: 13,
+    fontSize: 16,
     fontWeight: "600",
     color: colors.surface,
     opacity: 0.9,

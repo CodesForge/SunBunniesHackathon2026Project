@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Animated, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useMotion } from "../../lib/useMotion";
 import { colors, font } from "../../theme";

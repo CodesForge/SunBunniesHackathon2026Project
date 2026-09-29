@@ -5,8 +5,6 @@ import { ECONOMY } from "./economy";
 
 export type FoodItem = Item & { image: ImageSourcePropType };
 
-// Все продукты пока стоят одинаково (ECONOMY.mealCost) и покупаются
-// из копилки "надо" — цены по отдельности обсудим позже.
 export const FOOD_ITEMS: FoodItem[] = [
   {
     id: "soup",

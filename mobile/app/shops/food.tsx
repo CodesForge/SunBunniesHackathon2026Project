@@ -26,38 +26,23 @@ const BACKGROUND = require("../../assets/food/shop-background.png");
 const CART = require("../../assets/food/cart.png");
 const COIN_NEED = require("../../assets/icons/coin-need.png");
 
-// Доли высоты картинки фона, на которых начинаются деревянные полки —
-// вымерено по самому фону, чтобы еда легла ровно на полку.
 const SHELF_TOP_FRACTIONS = [0.2578, 0.432, 0.6063];
 const FLOOR_TOP_FRACTION = 0.7383;
 
-// Насколько низ картинки еды заходит "под" полку (в пикселях). Чем
-// БОЛЬШЕ число — тем НИЖЕ и плотнее еда сидит на полке (может слегка
-// перекрыть саму доску). Чем МЕНЬШЕ (или отрицательное) — тем выше и
-// "воздушнее" еда висит над полкой. Крути и смотри, что нравится.
 const SHELF_SINK_PX = 10;
 
 const ITEM_SIZE_PERCENT = 0.16;
 const CART_WIDTH_PERCENT = 0.7;
-const CART_ASPECT = 1681 / 2111; // высота / ширина картинки тележки
+const CART_ASPECT = 1681 / 2111;
 const FLIGHT_DURATION = 480;
 
-// Купленная еда складывается кучкой ВНУТРИ корзины тележки (за
-// сеточкой, а не поверх неё — это создаёт эффект "лежит в корзине"), в
-// произвольных местах и с небольшим поворотом, а не ровной сеткой. Область
-// вымерена по самой картинке тележки (где у неё открытая "корзинка").
-// Чтобы куча не разрослась до бесконечности, показываем максимум
-// MAX_PILE_ITEMS штук — все покупки сверх этого числа всё равно летят
-// анимацией, просто больше не добавляются в саму кучу.
 const MAX_PILE_ITEMS = 15;
-const PILE_ICON_RATIO = 1; // размер иконки в кучке относительно размера еды на полке
+const PILE_ICON_RATIO = 1;
 const BASKET_LEFT_RATIO = 0.2;
 const BASKET_TOP_RATIO = 0.08;
 const BASKET_WIDTH_RATIO = 0.6;
 const BASKET_HEIGHT_RATIO = 0.58;
 
-// Стабильный "случайный" разброс позиций/поворотов — считается один раз,
-// а не при каждом рендере, чтобы куча не дёргалась туда-сюда.
 function seededRandom(seed: number) {
   const x = Math.sin(seed * 9973) * 43758.5453;
   return x - Math.floor(x);
@@ -104,8 +89,6 @@ export default function FoodShopScreen() {
   const basketWidth = cartWidth * BASKET_WIDTH_RATIO;
   const basketHeight = cartHeight * BASKET_HEIGHT_RATIO;
 
-  // Плоский список отдельных купленных штук (не по одной иконке на вид
-  // еды, а именно по штуке на каждую покупку) — обрезанный по MAX_PILE_ITEMS.
   const pile: { key: string; image: FoodItem["image"] }[] = [];
   for (const item of FOOD_ITEMS) {
     const qty = sessionQty[item.id] ?? 0;
@@ -203,8 +186,6 @@ export default function FoodShopScreen() {
         ]}
         pointerEvents="none"
       >
-        {/* Еда лежит ЗА картинкой тележки (внутри её "сеточки"), поэтому
-            рисуем кучу раньше самой картинки тележки — та ляжет поверх. */}
         <View
           style={{
             position: "absolute",
