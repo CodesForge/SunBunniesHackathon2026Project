@@ -184,12 +184,14 @@ export default function TopHud({
           )}
 
           {showChat && (
-            <RoundIconButton
-              icon={MessageCircle}
-              accessibilityRole="button"
-              accessibilityLabel="Сообщения"
-              {...roundButtonProps}
-            />
+            <Link href={"/chat" as any} asChild>
+              <RoundIconButton
+                icon={MessageCircle}
+                accessibilityRole="button"
+                accessibilityLabel="Сообщения"
+                {...roundButtonProps}
+              />
+            </Link>
           )}
         </View>
 
