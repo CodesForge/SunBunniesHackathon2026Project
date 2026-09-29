@@ -17,6 +17,7 @@ import RoundIconButton from "../components/ui/RoundIconButton";
 import SpeechBubble from "../components/ui/SpeechBubble";
 import { daysUntilIncome } from "../lib/time";
 import { usePet } from "../store/pet";
+import { createBalance, createCategory } from "../lib/api";
 import { ECONOMY } from "../data/economy";
 import goals from "../data/goals.json";
 import { colors, font, radius, space, HIT } from "../theme";
@@ -104,8 +105,16 @@ export default function PlanScreen() {
           : `На еду отложено ${draft.need}. Этого хватит на ${days} ${dayWord(days)} из ${PERIOD_DAYS}.`;
 
   const confirm = () => {
-    if (planning) setPlan({ ...draft });
-    else rebalance({ ...draft });
+    if (planning) {
+      setPlan({ ...draft });
+      const userId = usePet.getState().userId;
+      if (userId) {
+        createBalance(userId, draft.need, draft.want, draft.dream);
+        createCategory(userId, draft.need, draft.want, draft.dream);
+      }
+    } else {
+      rebalance({ ...draft });
+    }
     setConfirming(false);
     router.back();
   };

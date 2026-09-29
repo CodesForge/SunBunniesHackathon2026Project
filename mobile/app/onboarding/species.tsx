@@ -19,6 +19,7 @@ import { PetMini } from "../../components/pet/PetMini";
 import { PET_ASSETS } from "../../components/pet/petAssets";
 import { colors, font, space } from "../../theme";
 import { usePet } from "../../store/pet";
+import { createPet } from "../../lib/api";
 
 const MIN = 3;
 const MAX = 25;
@@ -71,6 +72,8 @@ export default function ChooseSpeciesScreen() {
   const finish = () => {
     if (!canGo || !pet.species) return;
     hatch(pet.species, trimmedName, "");
+    const userId = usePet.getState().userId;
+    if (userId) createPet(userId, trimmedName);
     router.replace("/home" as any);
   };
 
