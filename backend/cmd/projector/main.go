@@ -61,8 +61,9 @@ func run(cfg *config.Config, logger *slog.Logger) error {
 	balanceRepo := repositories.NewBalanceRepository(pool)
 	petRepo := repositories.NewPetRepository(pool)
 	lessonRepo := repositories.NewLessonRepository(pool)
+	categoryRepo := repositories.NewCategoryRepository(pool)
 
-	projector := service.NewProjectorService(lessonRepo, petRepo, userRepo, balanceRepo, logger)
+	projector := service.NewProjectorService(categoryRepo, lessonRepo, petRepo, userRepo, balanceRepo, logger)
 
 	if err := consumer.Start(ctx, projector.Handle); err != nil {
 		return fmt.Errorf("consumer loop: %w", err)
