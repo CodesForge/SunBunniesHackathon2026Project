@@ -154,7 +154,7 @@ export default function GlossaryScreen() {
 
         <Pressable
           style={[styles.banner, { backgroundColor: colors.coinWant }]}
-          onPress={() => {}}
+          onPress={() => router.push("/daily-lesson" as any)}
           accessibilityRole="button"
           accessibilityLabel="Урок дня"
         >
