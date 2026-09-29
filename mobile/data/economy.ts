@@ -20,6 +20,8 @@ export const ECONOMY = {
   lessonPenalties: [0, 10, 15, 20],
   lessonRewardFloor: 20,
   mistakePenalty: 5,
+  demoCoinGrant: 1000,
+  demoPeriods: 5,
 } as const;
 
 export type Jar = "need" | "want" | "dream";

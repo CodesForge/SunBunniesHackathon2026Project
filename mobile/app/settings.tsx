@@ -55,6 +55,19 @@ export default function SettingsScreen() {
             </View>
             <ChevronRight size={22} color={colors.coinWant} strokeWidth={2.5} />
           </Pressable>
+
+          <Pressable
+            style={styles.card}
+            onPress={() => router.push("/demo" as any)}
+            accessibilityRole="button"
+            accessibilityLabel="Демо-режим"
+          >
+            <View style={styles.rowText}>
+              <Text style={styles.rowTitle}>Демо-режим</Text>
+              <Text style={styles.rowSubtitle}>Открыть все уроки и перематывать периоды для показа</Text>
+            </View>
+            <ChevronRight size={22} color={colors.coinWant} strokeWidth={2.5} />
+          </Pressable>
         </View>
       </SafeAreaView>
     </View>

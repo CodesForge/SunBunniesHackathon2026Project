@@ -147,7 +147,12 @@ export const useLessons = create<State & Actions>()(
   ),
 );
 
-export function isLessonUnlocked(number: number, completedLessons: string[]) {
+export function isLessonUnlocked(
+  number: number,
+  completedLessons: string[],
+  demoMode = false,
+) {
+  if (demoMode) return true;
   if (number <= 1) return true;
   return completedLessons.includes(`l${number - 1}`);
 }

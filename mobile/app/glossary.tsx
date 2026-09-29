@@ -102,6 +102,7 @@ export default function GlossaryScreen() {
   const energyBase = usePet((s) => s.energyBase);
   const energyAt = usePet((s) => s.energyAt);
   const asleep = usePet((s) => s.asleep);
+  const demoMode = usePet((s) => s.demoMode);
 
   useEffect(() => {
     if (!asleep) return;
@@ -116,7 +117,7 @@ export default function GlossaryScreen() {
   const lessonState = (number: number): "locked" | "current" | "done" => {
     const id = `l${number}`;
     if (completedLessons.includes(id)) return "done";
-    if (isLessonUnlocked(number, completedLessons)) return "current";
+    if (isLessonUnlocked(number, completedLessons, demoMode)) return "current";
     return "locked";
   };
 

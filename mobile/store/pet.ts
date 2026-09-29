@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { getPetStage } from "../components/pet/petAssets";
 import { ECONOMY, type Jar, type Theme } from "../data/economy";
 import { HOUR, energyNow, todayKey } from "../lib/time";
 
@@ -150,6 +151,8 @@ type Actions = {
   addXp: (amount: number) => void;
   setSetting: (k: "sound" | "motion", v: boolean) => void;
   toggleDemo: () => void;
+  growPet: () => void;
+  shrinkPet: () => void;
   reset: () => void;
 };
 
@@ -412,6 +415,26 @@ export const usePet = create<State & Actions>()(
       setGoal: (goalId) => set({ goalId, goalCelebrated: false, dirty: true }),
       markGoalCelebrated: () => set({ goalCelebrated: true, dirty: true }),
       toggleDemo: () => set((s) => ({ demoMode: !s.demoMode })),
+      growPet: () =>
+        set((s) => {
+          const stage = getPetStage(s.xp, s.keptPeriods);
+          if (stage === "mini") {
+            return {
+              xp: Math.max(s.xp, ECONOMY.teenLevel),
+              keptPeriods: Math.max(s.keptPeriods, ECONOMY.teenPeriods),
+              dirty: true,
+            };
+          }
+          if (stage === "teen") {
+            return {
+              xp: Math.max(s.xp, ECONOMY.adultLevel),
+              keptPeriods: Math.max(s.keptPeriods, ECONOMY.adultPeriods),
+              dirty: true,
+            };
+          }
+          return {};
+        }),
+      shrinkPet: () => set({ xp: 0, keptPeriods: 0, dirty: true }),
       reset: () => set({ ...initial, dayKey: todayKey(), energyAt: Date.now() }),
     }),
     {
