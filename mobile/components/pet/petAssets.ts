@@ -201,9 +201,9 @@ export const PET_ASSETS: Record<PetSpecies, Partial<Record<PetAgeStage, PetAsset
   },
 };
 
-export function getPetStage(xp: number): PetAgeStage {
-  if (xp >= ECONOMY.adultLevel) return "adult";
-  if (xp >= ECONOMY.teenLevel) return "teen";
+export function getPetStage(xp: number, keptPeriods = 0): PetAgeStage {
+  if (xp >= ECONOMY.adultLevel && keptPeriods >= ECONOMY.adultPeriods) return "adult";
+  if (xp >= ECONOMY.teenLevel && keptPeriods >= ECONOMY.teenPeriods) return "teen";
   return "mini";
 }
 

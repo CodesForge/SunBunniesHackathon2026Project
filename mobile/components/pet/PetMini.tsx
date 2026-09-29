@@ -81,7 +81,8 @@ export function PetMini({
   headWear,
 }: PetMiniProps) {
   const xp = usePet((s) => s.xp);
-  const stage = getPetStage(xp);
+  const keptPeriods = usePet((s) => s.keptPeriods);
+  const stage = getPetStage(xp, keptPeriods);
   const speciesAssets = PET_ASSETS[species];
   const assets = (speciesAssets[stage] ??
     speciesAssets.adult ??

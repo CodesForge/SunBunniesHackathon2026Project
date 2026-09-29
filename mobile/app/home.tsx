@@ -30,7 +30,8 @@ export default function HomeScreen() {
   );
   const mouth: MouthKey = worst >= 60 ? "happy" : worst >= 25 ? "neutral" : "sad";
 
-  const stage = getPetStage(xp);
+  const keptPeriods = usePet((s) => s.keptPeriods);
+  const stage = getPetStage(xp, keptPeriods);
   const { bodyWear, outfit, headWear } = resolveWornVisuals(worn, stage);
 
   return (

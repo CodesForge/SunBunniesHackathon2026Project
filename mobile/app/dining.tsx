@@ -38,7 +38,8 @@ export default function DiningScreen() {
   const full = fullness(lastFedAt);
   const mouth = full >= 60 ? "happy" : full >= 25 ? "neutral" : "sad";
 
-  const stage = getPetStage(xp);
+  const keptPeriods = usePet((s) => s.keptPeriods);
+  const stage = getPetStage(xp, keptPeriods);
   const { bodyWear, outfit, headWear } = resolveWornVisuals(worn, stage);
 
   const onSelect = (item: FoodPlateItem) => {
