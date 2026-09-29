@@ -15,13 +15,10 @@ spec:
         - name: migrate
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["/app/goose"]
+          command: [ "/bin/sh", "-c" ]
           args:
-            - -dir
-            - /app/migrations
-            - postgres
-            - "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)?sslmode=$(POSTGRES_SSL_MODE)"
-            - up
+            - |
+              /app/goose -dir /app/migrations postgres "postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB?sslmode=$POSTGRES_SSL_MODE" up
           envFrom:
             - secretRef:
                 name: {{ include "k8s.fullname" . }}-secret
