@@ -71,7 +71,8 @@ export default function WardrobeShopScreen() {
   const wear = usePet((s) => s.wear);
   const unwear = usePet((s) => s.unwear);
 
-  const stage = getPetStage(xp);
+  const keptPeriods = usePet((s) => s.keptPeriods);
+  const stage = getPetStage(xp, keptPeriods);
   const isBaby = stage === "mini";
   const isGrownUp = stage !== "mini";
 
