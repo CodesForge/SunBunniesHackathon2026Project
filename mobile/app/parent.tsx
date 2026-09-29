@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ChevronDown, ChevronRight } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import AdultGate from "../components/ui/AdultGate";
 import BackHeader from "../components/ui/BackHeader";
 import { getPetStage, type PetAgeStage } from "../components/pet/petAssets";
 import { LESSONS, getLesson } from "../data/lessons";
@@ -50,13 +51,6 @@ function plural(n: number, forms: [string, string, string]) {
   return forms[2];
 }
 
-function generateProblem() {
-  const a = Math.floor(Math.random() * 41) + 20;
-  const b = Math.floor(Math.random() * 9) + 12;
-  const c = Math.floor(Math.random() * 15) + 5;
-  return { text: `${a} × ${b} + ${c}`, answer: a * b + c };
-}
-
 export default function ParentScreen() {
   const parentBonus = usePet((s) => s.parentBonus);
   const xp = usePet((s) => s.xp);
@@ -67,21 +61,6 @@ export default function ParentScreen() {
 
   const [justGiven, setJustGiven] = useState(false);
   const [openLessonId, setOpenLessonId] = useState<string | null>(null);
-
-  const [unlocked, setUnlocked] = useState(false);
-  const [problem, setProblem] = useState(generateProblem);
-  const [answer, setAnswer] = useState("");
-  const [showWrong, setShowWrong] = useState(false);
-
-  const checkAnswer = () => {
-    if (Number(answer) === problem.answer) {
-      setUnlocked(true);
-      return;
-    }
-    setShowWrong(true);
-    setProblem(generateProblem());
-    setAnswer("");
-  };
 
   const handleBonus = () => {
     parentBonus();
@@ -115,268 +94,240 @@ export default function ParentScreen() {
 
   const lastPeriod = history.length > 0 ? history[history.length - 1] : null;
 
-  if (!unlocked) {
-    return (
+  return (
+    <AdultGate backHref="/settings" title="Родителям">
       <View style={styles.root}>
         <SafeAreaView style={styles.content} edges={["top", "bottom"]}>
           <BackHeader backHref="/settings" />
 
-          <View style={styles.gateBody}>
+          <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
             <Text style={styles.title}>Родителям</Text>
-            <View style={styles.gateCard}>
-              <Text style={styles.gateHint}>Реши пример, чтобы продолжить</Text>
-              <Text style={styles.gateProblem}>{problem.text} = ?</Text>
-              <TextInput
-                value={answer}
-                onChangeText={setAnswer}
-                style={styles.gateInput}
-                keyboardType="number-pad"
-                returnKeyType="done"
-                onSubmitEditing={checkAnswer}
-              />
-              {showWrong && <Text style={styles.gateError}>Не совсем так, попробуй ещё раз</Text>}
-              <Pressable style={styles.gateButton} onPress={checkAnswer} accessibilityRole="button">
-                <Text style={styles.gateButtonText}>Проверить</Text>
+
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Бонус за хорошую работу</Text>
+              <Text style={styles.cardHint}>
+                Начислит ребёнку {ECONOMY.parentBonus} монет. Он сам разложит их по банкам,
+                когда будет составлять план бюджета.
+              </Text>
+              <Pressable
+                style={styles.bonusButton}
+                onPress={handleBonus}
+                accessibilityRole="button"
+                accessibilityLabel="Выдать бонус"
+              >
+                <Text style={styles.bonusButtonText}>
+                  {justGiven ? "Начислено!" : "Выдать бонус"}
+                </Text>
               </Pressable>
             </View>
-          </View>
-        </SafeAreaView>
-      </View>
-    );
-  }
 
-  return (
-    <View style={styles.root}>
-      <SafeAreaView style={styles.content} edges={["top", "bottom"]}>
-        <BackHeader backHref="/settings" />
+            <Text style={styles.sectionTitle}>Пройденные уроки</Text>
 
-        <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
-          <Text style={styles.title}>Родителям</Text>
-
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Бонус за хорошую работу</Text>
-            <Text style={styles.cardHint}>
-              Начислит ребёнку {ECONOMY.parentBonus} монет. Он сам разложит их по банкам,
-              когда будет составлять план бюджета.
-            </Text>
-            <Pressable
-              style={styles.bonusButton}
-              onPress={handleBonus}
-              accessibilityRole="button"
-              accessibilityLabel="Выдать бонус"
-            >
-              <Text style={styles.bonusButtonText}>
-                {justGiven ? "Начислено!" : "Выдать бонус"}
-              </Text>
-            </Pressable>
-          </View>
-
-          <Text style={styles.sectionTitle}>Пройденные уроки</Text>
-
-          {passed.length === 0 ? (
-            <View style={styles.statCard}>
-              <Text style={styles.statEmpty}>Ребёнок ещё не прошёл ни одного урока.</Text>
-            </View>
-          ) : (
-            <>
-              <Text style={styles.sectionHint}>
-                {passed.length} из {LESSONS.length}
-                {totalMistakes > 0
-                  ? ` · ${totalMistakes} ${plural(totalMistakes, ["ошибка", "ошибки", "ошибок"])}`
-                  : " · без ошибок"}
-              </Text>
-
-              {passed.map((lesson) => {
-                const record = results[lesson.id];
-                const isOpen = openLessonId === lesson.id;
-                const mistakes = record?.mistakes ?? 0;
-
-                return (
-                  <View key={lesson.id} style={styles.statCard}>
-                    <Pressable
-                      style={styles.lessonHeader}
-                      onPress={() => setOpenLessonId(isOpen ? null : lesson.id)}
-                      accessibilityRole="button"
-                      accessibilityLabel={`Урок ${lesson.number}. ${lesson.title}`}
-                    >
-                      <View style={styles.lessonHeaderText}>
-                        <Text style={styles.statLabel}>
-                          Урок {lesson.number}. {lesson.title}
-                        </Text>
-                        <Text
-                          style={[
-                            styles.lessonBadge,
-                            { color: mistakes === 0 ? colors.good : colors.warn },
-                          ]}
-                        >
-                          {mistakes === 0
-                            ? "без ошибок"
-                            : `${mistakes} ${plural(mistakes, ["ошибка", "ошибки", "ошибок"])}`}
-                        </Text>
-                      </View>
-                      {isOpen ? (
-                        <ChevronDown size={22} color={colors.coinWant} strokeWidth={2.5} />
-                      ) : (
-                        <ChevronRight size={22} color={colors.coinWant} strokeWidth={2.5} />
-                      )}
-                    </Pressable>
-
-                    {isOpen && (
-                      <View style={styles.lessonDetail}>
-                        <Text style={styles.detailTheme}>{lesson.themeLabel}</Text>
-
-                        {!record ? (
-                          <Text style={styles.statEmpty}>
-                            Разбор не сохранён — урок пройден до появления статистики.
-                          </Text>
-                        ) : (
-                          <>
-                            {record.steps.map((step, i) => (
-                              <Text key={i} style={styles.detailRow}>
-                                {STEP_LABEL[step.kind] ?? step.kind} —{" "}
-                                {step.mistakes === 0
-                                  ? "без ошибок"
-                                  : `${step.mistakes} ${plural(step.mistakes, [
-                                      "ошибка",
-                                      "ошибки",
-                                      "ошибок",
-                                    ])}`}
-                              </Text>
-                            ))}
-
-                            {record.wrongQuestionIds.length > 0 && (
-                              <>
-                                <Text style={styles.detailSubtitle}>Ответил неверно:</Text>
-                                {record.wrongQuestionIds.map((qid, i) => {
-                                  const info = QUESTION_INFO.get(qid);
-                                  if (!info) {
-                                    return (
-                                      <Text key={`${qid}-${i}`} style={styles.detailQuestion}>
-                                        • {qid}
-                                      </Text>
-                                    );
-                                  }
-                                  return (
-                                    <View key={`${qid}-${i}`} style={styles.wrongBlock}>
-                                      <Text style={styles.detailQuestion}>• {info.prompt}</Text>
-                                      {info.correct && (
-                                        <Text style={styles.detailAnswer}>
-                                          Верный ответ: {info.correct}
-                                        </Text>
-                                      )}
-                                      <Text style={styles.detailExplain}>{info.explanation}</Text>
-                                    </View>
-                                  );
-                                })}
-                              </>
-                            )}
-                          </>
-                        )}
-                      </View>
-                    )}
-                  </View>
-                );
-              })}
-            </>
-          )}
-
-          <Text style={styles.sectionTitle}>Возраст питомца</Text>
-
-          <View style={styles.statCard}>
-            <View style={styles.statHeader}>
-              <Text style={styles.statLabel}>
-                {petName ? `${petName} — ${STAGE_LABEL[stage].toLowerCase()}` : STAGE_LABEL[stage]}
-              </Text>
-              <Text style={styles.statBadge}>
-                {passed.length} {plural(passed.length, ["урок", "урока", "уроков"])}
-              </Text>
-            </View>
-
-            <View style={styles.barTrack}>
-              <View
-                style={[styles.barFill, { width: `${stagePercent}%`, backgroundColor: colors.good }]}
-              />
-            </View>
-
-            {nextLevel === null ? (
-              <Text style={styles.statDetail}>Питомец вырос полностью.</Text>
+            {passed.length === 0 ? (
+              <View style={styles.statCard}>
+                <Text style={styles.statEmpty}>Ребёнок ещё не прошёл ни одного урока.</Text>
+              </View>
             ) : (
               <>
-                <Text style={styles.statDetail}>
-                  До стадии «{stage === "mini" ? STAGE_LABEL.teen : STAGE_LABEL.adult}» осталось:
+                <Text style={styles.sectionHint}>
+                  {passed.length} из {LESSONS.length}
+                  {totalMistakes > 0
+                    ? ` · ${totalMistakes} ${plural(totalMistakes, ["ошибка", "ошибки", "ошибок"])}`
+                    : " · без ошибок"}
                 </Text>
-                <Text style={styles.growthRow}>
-                  {toNext === 0
-                    ? "· уроки пройдены"
-                    : `· ${toNext} ${plural(toNext, ["урок", "урока", "уроков"])}`}
-                </Text>
-                <Text style={styles.growthRow}>
-                  {periodsLeft === 0
-                    ? "· недели по плану прожиты"
-                    : `· ${periodsLeft} ${plural(periodsLeft, [
-                        "неделя, прожитая по плану",
-                        "недели, прожитые по плану",
-                        "недель, прожитых по плану",
-                      ])}`}
-                </Text>
-                <Text style={styles.growthHint}>
-                  Питомец растёт от пройденных уроков, но одних уроков мало: недели, прожитые по
-                  плану, обязательны. Каждая такая неделя вдобавок засчитывается за урок.
-                </Text>
-                <Text style={styles.growthHint}>
-                  Неделя засчитывается, если на «Надо» запланировано не меньше {ECONOMY.minNeed}{" "}
-                  монет, к концу недели в «Мечте» осталось не меньше запланированного и сверх плана
-                  что-то отложилось. Прожито недель по плану: {keptPeriods}.
-                </Text>
+
+                {passed.map((lesson) => {
+                  const record = results[lesson.id];
+                  const isOpen = openLessonId === lesson.id;
+                  const mistakes = record?.mistakes ?? 0;
+
+                  return (
+                    <View key={lesson.id} style={styles.statCard}>
+                      <Pressable
+                        style={styles.lessonHeader}
+                        onPress={() => setOpenLessonId(isOpen ? null : lesson.id)}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Урок ${lesson.number}. ${lesson.title}`}
+                      >
+                        <View style={styles.lessonHeaderText}>
+                          <Text style={styles.statLabel}>
+                            Урок {lesson.number}. {lesson.title}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.lessonBadge,
+                              { color: mistakes === 0 ? colors.good : colors.warn },
+                            ]}
+                          >
+                            {mistakes === 0
+                              ? "без ошибок"
+                              : `${mistakes} ${plural(mistakes, ["ошибка", "ошибки", "ошибок"])}`}
+                          </Text>
+                        </View>
+                        {isOpen ? (
+                          <ChevronDown size={22} color={colors.coinWant} strokeWidth={2.5} />
+                        ) : (
+                          <ChevronRight size={22} color={colors.coinWant} strokeWidth={2.5} />
+                        )}
+                      </Pressable>
+
+                      {isOpen && (
+                        <View style={styles.lessonDetail}>
+                          <Text style={styles.detailTheme}>{lesson.themeLabel}</Text>
+
+                          {!record ? (
+                            <Text style={styles.statEmpty}>
+                              Разбор не сохранён — урок пройден до появления статистики.
+                            </Text>
+                          ) : (
+                            <>
+                              {record.steps.map((step, i) => (
+                                <Text key={i} style={styles.detailRow}>
+                                  {STEP_LABEL[step.kind] ?? step.kind} —{" "}
+                                  {step.mistakes === 0
+                                    ? "без ошибок"
+                                    : `${step.mistakes} ${plural(step.mistakes, [
+                                        "ошибка",
+                                        "ошибки",
+                                        "ошибок",
+                                      ])}`}
+                                </Text>
+                              ))}
+
+                              {record.wrongQuestionIds.length > 0 && (
+                                <>
+                                  <Text style={styles.detailSubtitle}>Ответил неверно:</Text>
+                                  {record.wrongQuestionIds.map((qid, i) => {
+                                    const info = QUESTION_INFO.get(qid);
+                                    if (!info) {
+                                      return (
+                                        <Text key={`${qid}-${i}`} style={styles.detailQuestion}>
+                                          • {qid}
+                                        </Text>
+                                      );
+                                    }
+                                    return (
+                                      <View key={`${qid}-${i}`} style={styles.wrongBlock}>
+                                        <Text style={styles.detailQuestion}>• {info.prompt}</Text>
+                                        {info.correct && (
+                                          <Text style={styles.detailAnswer}>
+                                            Верный ответ: {info.correct}
+                                          </Text>
+                                        )}
+                                        <Text style={styles.detailExplain}>{info.explanation}</Text>
+                                      </View>
+                                    );
+                                  })}
+                                </>
+                              )}
+                            </>
+                          )}
+                        </View>
+                      )}
+                    </View>
+                  );
+                })}
               </>
             )}
-          </View>
 
-          <Text style={styles.sectionTitle}>Итоги последнего периода</Text>
+            <Text style={styles.sectionTitle}>Возраст питомца</Text>
 
-          {!lastPeriod ? (
-            <View style={styles.statCard}>
-              <Text style={styles.statEmpty}>
-                Первый период ещё не завершён. Итоги появятся, когда придёт новый доход.
-              </Text>
-            </View>
-          ) : (
             <View style={styles.statCard}>
               <View style={styles.statHeader}>
-                <Text style={styles.statLabel}>Период {lastPeriod.n}</Text>
-                <Text
-                  style={[
-                    styles.statBadge,
-                    { color: lastPeriod.kept ? colors.good : colors.warn },
-                  ]}
-                >
-                  {lastPeriod.kept ? "план выполнен" : "план разошёлся с фактом"}
+                <Text style={styles.statLabel}>
+                  {petName ? `${petName} — ${STAGE_LABEL[stage].toLowerCase()}` : STAGE_LABEL[stage]}
+                </Text>
+                <Text style={styles.statBadge}>
+                  {passed.length} {plural(passed.length, ["урок", "урока", "уроков"])}
                 </Text>
               </View>
 
-              <View style={styles.planRow}>
-                <Text style={styles.planLabel}>Надо</Text>
-                <Text style={styles.planValue}>
-                  план {lastPeriod.plan.need} · потрачено {Math.max(0, lastPeriod.spent.need)}
-                </Text>
+              <View style={styles.barTrack}>
+                <View
+                  style={[styles.barFill, { width: `${stagePercent}%`, backgroundColor: colors.good }]}
+                />
               </View>
-              <View style={styles.planRow}>
-                <Text style={styles.planLabel}>Хочу</Text>
-                <Text style={styles.planValue}>
-                  план {lastPeriod.plan.want} · потрачено {Math.max(0, lastPeriod.spent.want)}
-                </Text>
-              </View>
-              <View style={styles.planRow}>
-                <Text style={styles.planLabel}>Мечта</Text>
-                <Text style={styles.planValue}>
-                  план {lastPeriod.plan.dream} · отложено {lastPeriod.saved}
-                </Text>
-              </View>
+
+              {nextLevel === null ? (
+                <Text style={styles.statDetail}>Питомец вырос полностью.</Text>
+              ) : (
+                <>
+                  <Text style={styles.statDetail}>
+                    До стадии «{stage === "mini" ? STAGE_LABEL.teen : STAGE_LABEL.adult}» осталось:
+                  </Text>
+                  <Text style={styles.growthRow}>
+                    {toNext === 0
+                      ? "· уроки пройдены"
+                      : `· ${toNext} ${plural(toNext, ["урок", "урока", "уроков"])}`}
+                  </Text>
+                  <Text style={styles.growthRow}>
+                    {periodsLeft === 0
+                      ? "· недели по плану прожиты"
+                      : `· ${periodsLeft} ${plural(periodsLeft, [
+                          "неделя, прожитая по плану",
+                          "недели, прожитые по плану",
+                          "недель, прожитых по плану",
+                        ])}`}
+                  </Text>
+                  <Text style={styles.growthHint}>
+                    Питомец растёт от пройденных уроков, но одних уроков мало: недели, прожитые по
+                    плану, обязательны. Каждая такая неделя вдобавок засчитывается за урок.
+                  </Text>
+                  <Text style={styles.growthHint}>
+                    Неделя засчитывается, если на «Надо» запланировано не меньше {ECONOMY.minNeed}{" "}
+                    монет, к концу недели в «Мечте» осталось не меньше запланированного и сверх плана
+                    что-то отложилось. Прожито недель по плану: {keptPeriods}.
+                  </Text>
+                </>
+              )}
             </View>
-          )}
-        </ScrollView>
-      </SafeAreaView>
-    </View>
+
+            <Text style={styles.sectionTitle}>Итоги последнего периода</Text>
+
+            {!lastPeriod ? (
+              <View style={styles.statCard}>
+                <Text style={styles.statEmpty}>
+                  Первый период ещё не завершён. Итоги появятся, когда придёт новый доход.
+                </Text>
+              </View>
+            ) : (
+              <View style={styles.statCard}>
+                <View style={styles.statHeader}>
+                  <Text style={styles.statLabel}>Период {lastPeriod.n}</Text>
+                  <Text
+                    style={[
+                      styles.statBadge,
+                      { color: lastPeriod.kept ? colors.good : colors.warn },
+                    ]}
+                  >
+                    {lastPeriod.kept ? "план выполнен" : "план разошёлся с фактом"}
+                  </Text>
+                </View>
+
+                <View style={styles.planRow}>
+                  <Text style={styles.planLabel}>Надо</Text>
+                  <Text style={styles.planValue}>
+                    план {lastPeriod.plan.need} · потрачено {Math.max(0, lastPeriod.spent.need)}
+                  </Text>
+                </View>
+                <View style={styles.planRow}>
+                  <Text style={styles.planLabel}>Хочу</Text>
+                  <Text style={styles.planValue}>
+                    план {lastPeriod.plan.want} · потрачено {Math.max(0, lastPeriod.spent.want)}
+                  </Text>
+                </View>
+                <View style={styles.planRow}>
+                  <Text style={styles.planLabel}>Мечта</Text>
+                  <Text style={styles.planValue}>
+                    план {lastPeriod.plan.dream} · отложено {lastPeriod.saved}
+                  </Text>
+                </View>
+              </View>
+            )}
+          </ScrollView>
+        </SafeAreaView>
+      </View>
+    </AdultGate>
   );
 }
 
@@ -392,49 +343,6 @@ const styles = StyleSheet.create({
     paddingBottom: space.xxl,
   },
   title: { ...font.h1, fontWeight: "700", color: colors.coinWant, marginBottom: space.lg },
-
-  gateBody: {
-    flex: 1,
-    width: "100%",
-    maxWidth: 480,
-    alignSelf: "center",
-    paddingHorizontal: space.xl,
-    paddingTop: space.lg,
-    justifyContent: "center",
-  },
-  gateCard: {
-    backgroundColor: colors.surface,
-    borderWidth: 2,
-    borderColor: colors.sceneOval,
-    borderRadius: radius.lg,
-    padding: space.xl,
-    alignItems: "center",
-  },
-  gateHint: { ...font.body, color: colors.coinWant, fontWeight: "700", marginBottom: space.md, textAlign: "center" },
-  gateProblem: { ...font.h1, fontWeight: "700", color: colors.coinWant, marginBottom: space.lg },
-  gateInput: {
-    width: "100%",
-    height: 54,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surface,
-    borderWidth: 2,
-    borderColor: colors.sceneOval,
-    paddingHorizontal: space.lg,
-    fontSize: 20,
-    fontWeight: "700",
-    color: colors.coinWant,
-    textAlign: "center",
-    marginBottom: space.md,
-  },
-  gateError: { ...font.small, color: colors.bad, fontWeight: "700", marginBottom: space.sm, textAlign: "center" },
-  gateButton: {
-    width: "100%",
-    backgroundColor: colors.sceneOval,
-    borderRadius: radius.pill,
-    paddingVertical: space.md,
-    alignItems: "center",
-  },
-  gateButtonText: { ...font.body, color: colors.surface, fontWeight: "700" },
 
   card: {
     backgroundColor: colors.sceneOvalLight,
