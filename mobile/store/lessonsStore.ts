@@ -4,6 +4,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 import { ECONOMY, rewardForMistakes } from "../data/economy";
 import { LESSON_SECTIONS, getLesson, sectionForLesson, waveForLesson } from "../data/lessons";
+import { getPetStage } from "../components/pet/petAssets";
 import { usePet } from "./pet";
 
 export type LessonResult = {
@@ -13,12 +14,25 @@ export type LessonResult = {
   reward: number;
 };
 
+export type LessonRecord = {
+  mistakes: number;
+  wrongQuestionIds: string[];
+  steps: { kind: string; mistakes: number }[];
+  at: number;
+};
+
+export type LessonDetail = {
+  wrongQuestionIds?: string[];
+  steps?: { kind: string; mistakes: number }[];
+};
+
 type State = {
   completedLessons: string[];
   chestsOpened: number[];
   pendingChest: number | null;
   pendingPetGrowth: boolean;
   lastResult: LessonResult | null;
+  results: Record<string, LessonRecord>;
 };
 
 const initial: State = {
@@ -27,10 +41,15 @@ const initial: State = {
   pendingChest: null,
   pendingPetGrowth: false,
   lastResult: null,
+  results: {},
 };
 
 type Actions = {
-  completeLesson: (id: string, mistakes?: number) => LessonResult | null;
+  completeLesson: (
+    id: string,
+    mistakes?: number,
+    detail?: LessonDetail,
+  ) => LessonResult | null;
   openChest: (waveIndex: number) => void;
   dismissPetGrowth: () => void;
   reset: () => void;
@@ -41,10 +60,18 @@ export const useLessons = create<State & Actions>()(
     (set, get) => ({
       ...initial,
 
-      completeLesson: (id, mistakes = 0) => {
+      completeLesson: (id, mistakes = 0, detail) => {
         const s = get();
         const lesson = getLesson(id);
         if (!lesson) return null;
+
+        const record: LessonRecord = {
+          mistakes,
+          wrongQuestionIds: detail?.wrongQuestionIds ?? [],
+          steps: detail?.steps ?? [],
+          at: Date.now(),
+        };
+        const results = { ...s.results, [id]: record };
 
         const reward = rewardForMistakes(lesson.reward, mistakes);
         const result: LessonResult = {
@@ -55,16 +82,20 @@ export const useLessons = create<State & Actions>()(
         };
 
         const pet = usePet.getState();
+        const stageBefore = getPetStage(pet.xp, pet.keptPeriods);
         pet.noteLessonDone();
 
         if (s.completedLessons.includes(id)) {
           const repeat = { ...result, reward: 0 };
-          set({ lastResult: repeat });
+          set({ lastResult: repeat, results });
           return repeat;
         }
 
         pet.grantJars({ want: reward });
         pet.addXp(1);
+
+        const after = usePet.getState();
+        const grew = getPetStage(after.xp, after.keptPeriods) !== stageBefore;
 
         const completedLessons = [...s.completedLessons, id];
         const section = sectionForLesson(lesson.number);
@@ -85,8 +116,9 @@ export const useLessons = create<State & Actions>()(
             waveDone && !s.chestsOpened.includes(waveIndex)
               ? waveIndex
               : s.pendingChest,
-          pendingPetGrowth: true,
+          pendingPetGrowth: grew || s.pendingPetGrowth,
           lastResult: result,
+          results,
         });
 
         return result;
