@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,7 +16,7 @@ import {
   LESSON_ORANGE,
   LESSON_TITLE,
 } from "../../components/lessons/lessonColors";
-import { useLessons } from "../../store/lessonsStore";
+import { useLessons, type LessonResult } from "../../store/lessonsStore";
 import { colors, font, radius, space, HIT } from "../../theme";
 
 type Phase = "intro" | number | "done";
@@ -28,6 +28,11 @@ export default function LessonScreen() {
 
   const lesson = getLesson(String(id));
   const [phase, setPhase] = useState<Phase>("intro");
+  const [result, setResult] = useState<LessonResult | null>(null);
+
+  const mistakesTotal = useRef(0);
+  const wrongQuestionIds = useRef<string[]>([]);
+  const stepResults = useRef<{ kind: string; mistakes: number }[]>([]);
 
   if (!lesson) {
     return (
@@ -43,12 +48,23 @@ export default function LessonScreen() {
   }
 
   const finishLesson = () => {
-    completeLesson(lesson.id);
+    const awarded = completeLesson(lesson.id, mistakesTotal.current, {
+      wrongQuestionIds: wrongQuestionIds.current,
+      steps: stepResults.current,
+    });
+    setResult(awarded);
     setPhase("done");
   };
 
-  const goNextStep = () => {
+  const goNextStep = (mistakes = 0, wrongIds?: string[]) => {
     const current = typeof phase === "number" ? phase : -1;
+
+    if (current >= 0) {
+      stepResults.current.push({ kind: lesson.steps[current].kind, mistakes });
+      mistakesTotal.current += mistakes;
+      if (wrongIds?.length) wrongQuestionIds.current.push(...wrongIds);
+    }
+
     if (current + 1 < lesson.steps.length) {
       setPhase(current + 1);
     } else {
@@ -94,7 +110,12 @@ export default function LessonScreen() {
           {phase === "done" && (
             <View style={styles.doneCard}>
               <Text style={styles.doneTitle}>Урок пройден!</Text>
-              <Text style={styles.doneReward}>+{lesson.reward} монет</Text>
+              <Text style={styles.doneReward}>+{result?.reward ?? lesson.reward} монет</Text>
+              {result?.reward === 0 && (
+                <Text style={styles.doneNote}>
+                  Этот урок уже проходили — монеты за него начисляются один раз.
+                </Text>
+              )}
               <Pressable
                 style={[styles.primaryButton, styles.doneButton]}
                 onPress={() => router.back()}
@@ -150,4 +171,5 @@ const styles = StyleSheet.create({
   },
   doneTitle: { fontSize: 20, fontWeight: 700, color: LESSON_DONE_TITLE },
   doneReward: { fontSize: 30, fontWeight: 700, color: LESSON_ORANGE },
+  doneNote: { ...font.small, color: LESSON_BODY_TEXT, textAlign: "center" },
 });
