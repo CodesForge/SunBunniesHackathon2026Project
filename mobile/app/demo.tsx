@@ -3,6 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import AdultGate from "../components/ui/AdultGate";
+import { getPetStage, type PetAgeStage } from "../components/pet/petAssets";
 import BackHeader from "../components/ui/BackHeader";
 import Modal from "../components/ui/Modal";
 import PurpleSwitch from "../components/ui/PurpleSwitch";
@@ -11,10 +12,18 @@ import { useLessons } from "../store/lessonsStore";
 import { usePet } from "../store/pet";
 import { colors, font, radius, space, HIT } from "../theme";
 
+const STAGE_LABEL: Record<PetAgeStage, string> = {
+  mini: "Малыш",
+  teen: "Подросток",
+  adult: "Взрослый",
+};
+
 export default function DemoScreen() {
   const demoMode = usePet((s) => s.demoMode);
   const toggleDemo = usePet((s) => s.toggleDemo);
   const periodIndex = usePet((s) => s.periodIndex);
+  const xp = usePet((s) => s.xp);
+  const keptPeriods = usePet((s) => s.keptPeriods);
   const nextPeriod = usePet((s) => s.nextPeriod);
   const grantJars = usePet((s) => s.grantJars);
   const growPet = usePet((s) => s.growPet);
@@ -22,6 +31,7 @@ export default function DemoScreen() {
   const resetLessons = useLessons((s) => s.reset);
 
   const [confirmingReset, setConfirmingReset] = useState(false);
+  const stage = getPetStage(xp, keptPeriods);
 
   const handleReset = () => {
     resetPet();
@@ -54,6 +64,7 @@ export default function DemoScreen() {
               <Text style={styles.periodLine}>
                 Период {periodIndex} из {ECONOMY.demoPeriods}
               </Text>
+              <Text style={styles.periodLine}>Питомец: {STAGE_LABEL[stage]}</Text>
             </View>
 
             {demoMode && (
