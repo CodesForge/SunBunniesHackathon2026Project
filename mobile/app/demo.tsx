@@ -17,6 +17,7 @@ export default function DemoScreen() {
   const periodIndex = usePet((s) => s.periodIndex);
   const nextPeriod = usePet((s) => s.nextPeriod);
   const grantJars = usePet((s) => s.grantJars);
+  const growPet = usePet((s) => s.growPet);
   const resetPet = usePet((s) => s.reset);
   const resetLessons = useLessons((s) => s.reset);
 
@@ -75,6 +76,15 @@ export default function DemoScreen() {
                   <Text style={styles.actionButtonText}>
                     Начислить {ECONOMY.demoCoinGrant} монет
                   </Text>
+                </Pressable>
+
+                <Pressable
+                  style={styles.actionButton}
+                  onPress={growPet}
+                  accessibilityRole="button"
+                  accessibilityLabel="Вырастить питомца"
+                >
+                  <Text style={styles.actionButtonText}>Вырастить питомца</Text>
                 </Pressable>
 
                 <Pressable
