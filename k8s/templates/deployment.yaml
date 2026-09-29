@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "k8s.fullname" . }}-backend
+  labels:
+    {{ include "k8s.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{ include "k8s.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: backend
+  template:
+    metadata:
+      name: {{ include "k8s.fullname" . }}-backend
+      labels:
+        {{ include "k8s.labels" . | nindent 8 }}
+        app.kubernetes.io/component: backend
+    spec:
+      containers:
+        - name: {{ include "k8s.fullname" . }}-backend
+          ports:
+            - containerPort: {{ .Values.backend.port.containerPort }}
+              name: {{ .Values.backend.port.name }}
+              protocol: {{ .Values.backend.port.protocol }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          livenessProbe:
+            httpGet:
+              port: {{ .Values.livenessProbe.httpGet.port }}
+              path: {{ .Values.livenessProbe.httpGet.path }}
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+          readinessProbe:
+            httpGet:
+              port: {{ .Values.readinessProbe.httpGet.port }}
+              path: {{ .Values.readinessProbe.httpGet.path }}
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+          resources:
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+          envFrom:
+            - secretRef:
+                name: {{ include "k8s.fullname" . }}-secret
+            - configMapRef:
+                name: {{ include "k8s.fullname" . }}-config
+          command: []
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "k8s.fullname" . }}-projector
+  labels:
+    {{ include "k8s.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{ include "k8s.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: projector
+  template:
+    metadata:
+      name: {{ include "k8s.fullname" . }}-projector
+      labels:
+        {{ include "k8s.labels" . | nindent 8 }}
+        app.kubernetes.io/component: projector
+    spec:
+      containers:
+        - name: {{ include "k8s.fullname" . }}-projector
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+          envFrom:
+            - secretRef:
+                name: {{ include "k8s.fullname" . }}-secret
+            - configMapRef:
+                name: {{ include "k8s.fullname" . }}-config
+          command: ["/app/projector"]
