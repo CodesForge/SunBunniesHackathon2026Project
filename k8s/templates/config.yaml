@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "k8s.fullname" . }}-config
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "-10"
+data:
+  # APP ENV
+  APP_ENV: {{ .Values.config.app.env | quote }}
+  HTTP_PORT: {{ .Values.config.app.port | quote }}
+
+  # POSTGRES ENV
+  POSTGRES_HOST: {{ .Values.config.database.host | quote }}
+  POSTGRES_PORT: {{ .Values.config.database.port | quote }}
+  POSTGRES_SSL_MODE: {{ .Values.config.database.ssl | quote }}
+
+  # KAFKA ENV
+  KAFKA_BROKERS: {{ .Values.config.kafka.brokers | quote }}
+  KAFKA_TOPIC: {{ .Values.config.kafka.topic | quote }}
+  KAFKA_CONSUMER_START_OFFSET: {{ .Values.config.kafka.offset | quote }}
+
+  # GRPC ENV
+  GRPC_TARGET_ADDR: {{ .Values.config.grpc.addr | quote }}
+  GRPC_TIMEOUT: {{ .Values.config.grpc.timeout | quote }}
