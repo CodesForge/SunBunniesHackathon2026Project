@@ -27,6 +27,7 @@ export default function DemoScreen() {
   const nextPeriod = usePet((s) => s.nextPeriod);
   const grantJars = usePet((s) => s.grantJars);
   const growPet = usePet((s) => s.growPet);
+  const shrinkPet = usePet((s) => s.shrinkPet);
   const resetPet = usePet((s) => s.reset);
   const resetLessons = useLessons((s) => s.reset);
 
@@ -96,6 +97,15 @@ export default function DemoScreen() {
                   accessibilityLabel="Вырастить питомца"
                 >
                   <Text style={styles.actionButtonText}>Вырастить питомца</Text>
+                </Pressable>
+
+                <Pressable
+                  style={styles.actionButton}
+                  onPress={shrinkPet}
+                  accessibilityRole="button"
+                  accessibilityLabel="Вернуть питомца в малыша"
+                >
+                  <Text style={styles.actionButtonText}>Вернуть питомца в малыша</Text>
                 </Pressable>
 
                 <Pressable

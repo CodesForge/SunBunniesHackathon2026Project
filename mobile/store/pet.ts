@@ -152,6 +152,7 @@ type Actions = {
   setSetting: (k: "sound" | "motion", v: boolean) => void;
   toggleDemo: () => void;
   growPet: () => void;
+  shrinkPet: () => void;
   reset: () => void;
 };
 
@@ -433,6 +434,7 @@ export const usePet = create<State & Actions>()(
           }
           return {};
         }),
+      shrinkPet: () => set({ xp: 0, keptPeriods: 0, dirty: true }),
       reset: () => set({ ...initial, dayKey: todayKey(), energyAt: Date.now() }),
     }),
     {
