@@ -66,6 +66,7 @@ type State = {
   settings: { sound: boolean; motion: boolean };
   demoMode: boolean;
   username: string | null;
+  userId: string | null;
   dirty: boolean;
   lastSyncAt: number;
 };
@@ -116,6 +117,7 @@ const initial: State = {
   settings: { sound: true, motion: true },
   demoMode: false,
   username: null,
+  userId: null,
   dirty: false,
   lastSyncAt: 0,
 };

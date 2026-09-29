@@ -11,6 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 
 import { usePet } from "../../store/pet";
+import { createUser } from "../../lib/api";
 import { BigOval, Clouds, Leaves, ONB, SkyBackground } from "../../components/onboarding/scene";
 import { RoundButton } from "../../components/onboarding/buttons";
 import { colors } from "../../theme";
@@ -28,9 +29,11 @@ export default function ChooseNameScreen() {
   const validChars = USERNAME_PATTERN.test(trimmed);
   const valid = validLength && validChars;
 
-  const next = () => {
+  const next = async () => {
     if (!valid) return;
     usePet.setState({ username: trimmed, dirty: true });
+    const userId = await createUser(trimmed);
+    if (userId) usePet.setState({ userId });
     router.push("/onboarding/species" as any);
   };
 

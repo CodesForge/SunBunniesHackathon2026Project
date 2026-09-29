@@ -6,6 +6,7 @@ import { ECONOMY, rewardForMistakes } from "../data/economy";
 import { LESSON_SECTIONS, getLesson, sectionForLesson, waveForLesson } from "../data/lessons";
 import { getPetStage } from "../components/pet/petAssets";
 import { usePet } from "./pet";
+import { createLessonRecord } from "../lib/api";
 
 export type LessonResult = {
   lessonId: string;
@@ -120,6 +121,9 @@ export const useLessons = create<State & Actions>()(
           lastResult: result,
           results,
         });
+
+        const userId = usePet.getState().userId;
+        if (userId) createLessonRecord(userId, completedLessons.length);
 
         return result;
       },
