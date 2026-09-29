@@ -14,6 +14,11 @@ import (
 	"github.com/segmentio/kafka-go"
 )
 
+type CategoryRepository interface {
+	CreateCategory(ctx context.Context, params db.CreateCategoryParams) (db.Category, error)
+	GetCategoryByUserID(ctx context.Context, userID uuid.UUID) (db.Category, error)
+}
+
 type LessonRepository interface {
 	CreateLesson(ctx context.Context, params db.CreateLessonParams) (db.Lesson, error)
 	GetLessonByUserID(ctx context.Context, userID uuid.UUID) (db.Lesson, error)
@@ -35,20 +40,22 @@ type UserRepository interface {
 }
 
 type ProjectorService struct {
-	lessonRepo  LessonRepository
-	petRepo     PetRepository
-	balanceRepo BalanceRepository
-	userRepo    UserRepository
-	logger      *slog.Logger
+	categoryRepo CategoryRepository
+	lessonRepo   LessonRepository
+	petRepo      PetRepository
+	balanceRepo  BalanceRepository
+	userRepo     UserRepository
+	logger       *slog.Logger
 }
 
-func NewProjectorService(lessonRepo LessonRepository, petRepo PetRepository, userRepo UserRepository, balanceRepo BalanceRepository, logger *slog.Logger) *ProjectorService {
+func NewProjectorService(categoryRepo CategoryRepository, lessonRepo LessonRepository, petRepo PetRepository, userRepo UserRepository, balanceRepo BalanceRepository, logger *slog.Logger) *ProjectorService {
 	return &ProjectorService{
-		lessonRepo:  lessonRepo,
-		petRepo:     petRepo,
-		userRepo:    userRepo,
-		balanceRepo: balanceRepo,
-		logger:      logger,
+		categoryRepo: categoryRepo,
+		lessonRepo:   lessonRepo,
+		petRepo:      petRepo,
+		userRepo:     userRepo,
+		balanceRepo:  balanceRepo,
+		logger:       logger,
 	}
 }
 
@@ -68,14 +75,16 @@ func (s *ProjectorService) Handle(ctx context.Context, msg kafka.Message) error 
 	)
 
 	switch envelope.EventType {
-	case "user.created":
+	case events.UserCreatedEventName:
 		return s.handleUserCreated(ctx, envelope)
-	case "balance.created":
+	case events.BalanceCreatedEventName:
 		return s.handleBalanceCreated(ctx, envelope)
-	case "pet.created":
+	case events.PetCreatedEventName:
 		return s.handlePetCreated(ctx, envelope)
-	case "lesson.created":
+	case events.LessonCreatedEventName:
 		return s.handleLessonCreated(ctx, envelope)
+	case events.CategoryCreatedEventName:
+		return s.handleCategoryCreated(ctx, envelope)
 	default:
 		s.logger.Debug("unhandled event type", slog.String("type", envelope.EventType))
 		return nil
@@ -169,5 +178,39 @@ func (s *ProjectorService) handleLessonCreated(ctx context.Context, env events.E
 	}
 
 	s.logger.Info("lesson projection created successfully", slog.String("lesson_id", payload.LessonID.String()))
+	return nil
+}
+
+func (s *ProjectorService) handleCategoryCreated(ctx context.Context, env events.EventEnvelope) error {
+	var payload events.CategoryCreatedPayloadDTO
+	if err := json.Unmarshal(env.Payload, &payload); err != nil {
+		s.logger.ErrorContext(ctx, "invalid CategoryCreated payload", slog.String("error", err.Error()))
+		return nil
+	}
+
+	_, err := s.categoryRepo.CreateCategory(ctx, db.CreateCategoryParams{
+		ID:                payload.CategoryID,
+		UserID:            payload.UserID,
+		TotalSpent:        payload.TotalSpent,
+		MandatoryExpenses: payload.MandatoryExpenses,
+		OptionalExpenses:  payload.OptionalExpenses,
+		DreamSavings:      payload.DreamSavings,
+	})
+	if err != nil {
+		if errors.Is(err, domain_errors.ErrCategoryAlreadyExists) {
+			s.logger.Info("category already projected",
+				slog.String("category_id", payload.CategoryID.String()))
+			return nil
+		}
+		if errors.Is(err, domain_errors.ErrUserNotFound) {
+			s.logger.Warn("category references missing user, skipping",
+				slog.String("user_id", payload.UserID.String()))
+			return nil
+		}
+		return fmt.Errorf("insert category projection to db: %w", err)
+	}
+
+	s.logger.Info("category projection created successfully",
+		slog.String("category_id", payload.CategoryID.String()))
 	return nil
 }

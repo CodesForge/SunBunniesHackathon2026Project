@@ -16,6 +16,7 @@ import (
 	quiz_v1 "github.com/CodesForge/SunBunniesHackathon2026Project/pkg/quiz/v1"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -28,11 +29,12 @@ import (
 )
 
 const (
-	RouteUser    = "/user"
-	RouteBalance = "/balance"
-	RoutePet     = "/pet"
-	RouteLesson  = "/lesson"
-	RouteQuiz    = "/quiz"
+	RouteUser     = "/user"
+	RouteBalance  = "/balance"
+	RoutePet      = "/pet"
+	RouteLesson   = "/lesson"
+	RouteQuiz     = "/quiz"
+	RouteCategory = "/category"
 )
 
 func main() {
@@ -90,20 +92,32 @@ func run(cfg *config.Config, logger *slog.Logger) error {
 	balanceRepo := repositories.NewBalanceRepository(pool)
 	petRepo := repositories.NewPetRepository(pool)
 	lessonRepo := repositories.NewLessonRepository(pool)
+	categoryRepo := repositories.NewCategoryRepository(pool)
 
 	userSvc := service.NewUserService(userRepo, eventRepo, producer, logger)
 	balanceSvc := service.NewBalanceService(eventRepo, balanceRepo, producer, logger)
 	petSvc := service.NewPetService(eventRepo, petRepo, producer, logger)
 	lessonSvc := service.NewLessonService(eventRepo, lessonRepo, producer, logger)
 	quizSvc := grpc_handler.NewQuizService(quizGrpcClient, logger, cfg.Timeout)
+	categorySvc := service.NewCategoryService(eventRepo, categoryRepo, producer, logger)
 
 	userHandler := handlers.NewUserHandler(userSvc)
 	balanceHandler := handlers.NewBalanceHandler(balanceSvc)
 	petHandler := handlers.NewPetHandler(petSvc)
 	lessonHandler := handlers.NewLessonHandler(lessonSvc)
 	quizHandler := handlers.NewQuizHandler(quizSvc)
+	categoryHandler := handlers.NewCategoryHandler(categorySvc)
 
 	r := chi.NewRouter()
+
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Content-Type", "X-User-ID"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
+
 	r.Use(middleware.RequestID, middleware.RealIP, middleware.Logger, middleware.Recoverer)
 	r.Use(middleware.Timeout(30 * time.Second))
 
@@ -127,6 +141,10 @@ func run(cfg *config.Config, logger *slog.Logger) error {
 	})
 	r.Route(RouteQuiz, func(r chi.Router) {
 		r.Post("/generate", quizHandler.GenerateQuestion)
+	})
+	r.Route(RouteCategory, func(r chi.Router) {
+		r.Use(middleware2.UserIDMiddleware)
+		r.Post("/create", categoryHandler.CreateCategory)
 	})
 
 	srv := &http.Server{

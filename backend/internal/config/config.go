@@ -15,7 +15,7 @@ type Config struct {
 	KafkaProducerConfig
 	KafkaConsumerConfig
 	PostgresConfig
-	gRPCConfig
+	GRPCConfig
 }
 
 type AppConfig struct {
@@ -52,7 +52,7 @@ type KafkaConsumerConfig struct {
 	StartOffset    string        `env:"KAFKA_CONSUMER_START_OFFSET" envDefault:"first"` // "first" (earliest) или "last" (latest)
 }
 
-type gRPCConfig struct {
+type GRPCConfig struct {
 	TargetAddr string        `env:"GRPC_TARGET_ADDR" envDefault:"localhost:50051"`
 	Timeout    time.Duration `env:"GRPC_TIMEOUT" envDefault:"5s"`
 }

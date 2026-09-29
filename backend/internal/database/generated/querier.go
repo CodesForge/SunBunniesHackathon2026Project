@@ -12,11 +12,13 @@ import (
 
 type Querier interface {
 	CreateBalance(ctx context.Context, arg CreateBalanceParams) (Balance, error)
+	CreateCategory(ctx context.Context, arg CreateCategoryParams) (Category, error)
 	CreateEvent(ctx context.Context, arg CreateEventParams) error
 	CreateLesson(ctx context.Context, arg CreateLessonParams) (Lesson, error)
 	CreatePet(ctx context.Context, arg CreatePetParams) (Pet, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	GetBalanceByUserID(ctx context.Context, userID uuid.UUID) (Balance, error)
+	GetCategoryByUserID(ctx context.Context, userID uuid.UUID) (Category, error)
 	GetLessonByUserID(ctx context.Context, userID uuid.UUID) (Lesson, error)
 	GetPetByUserID(ctx context.Context, userID uuid.UUID) (Pet, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
