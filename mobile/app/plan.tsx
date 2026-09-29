@@ -17,7 +17,7 @@ import RoundIconButton from "../components/ui/RoundIconButton";
 import SpeechBubble from "../components/ui/SpeechBubble";
 import { daysUntilIncome } from "../lib/time";
 import { usePet } from "../store/pet";
-import { createBalance } from "../lib/api";
+import { createBalance, createCategory } from "../lib/api";
 import { ECONOMY } from "../data/economy";
 import goals from "../data/goals.json";
 import { colors, font, radius, space, HIT } from "../theme";
@@ -108,7 +108,10 @@ export default function PlanScreen() {
     if (planning) {
       setPlan({ ...draft });
       const userId = usePet.getState().userId;
-      if (userId) createBalance(userId, draft.need, draft.want, draft.dream);
+      if (userId) {
+        createBalance(userId, draft.need, draft.want, draft.dream);
+        createCategory(userId, draft.need, draft.want, draft.dream);
+      }
     } else {
       rebalance({ ...draft });
     }

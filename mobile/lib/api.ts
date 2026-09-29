@@ -10,6 +10,11 @@ type CreateBalanceResponse = {
   balance: Record<string, unknown>;
 };
 
+type CreateCategoryResponse = {
+  success: boolean;
+  category: Record<string, unknown>;
+};
+
 type CreatePetResponse = {
   success: boolean;
   pet: Record<string, unknown>;
@@ -60,6 +65,24 @@ export async function createBalance(
     {
       mandatory_expenses: mandatoryExpenses,
       discretionary_expenses: discretionaryExpenses,
+      dream_savings: dreamSavings,
+    },
+    userId,
+  );
+  return data?.success ?? false;
+}
+
+export async function createCategory(
+  userId: string,
+  mandatoryExpenses: number,
+  optionalExpenses: number,
+  dreamSavings: number,
+): Promise<boolean> {
+  const data = await postJson<CreateCategoryResponse>(
+    "/category/create",
+    {
+      mandatory_expenses: mandatoryExpenses,
+      optional_expenses: optionalExpenses,
       dream_savings: dreamSavings,
     },
     userId,
